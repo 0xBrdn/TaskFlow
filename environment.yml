@@ -1,12 +1,21 @@
 name: TaskFlow
 channels:
   - defaults
-  - conda-forge  # Nécessaire pour bcrypt
+  - conda-forge  # Utilisé pour certains paquets comme authlib
 dependencies:
-  - python=3.12
-  - mysql-connector-python  # Pour se connecter à MySQL
+  - python=3.12  # Version de Python
+  - flask  # Framework web pour créer l'application
+  - authlib  # Bibliothèque pour gérer l'authentification OAuth2 avec Google
   - bcrypt  # Pour hacher les mots de passe
-  - pip  # Si tu veux utiliser pip pour d'autres bibliothèques
-  - pytest  # Pour les tests unitaires
-  - sphinx  # Pour la documentation
+  - mysql-connector-python  # Pour se connecter à la base de données MySQL
+  - sphinx  # Génération de la documentation
+  - pytest  # Pour écrire et exécuter les tests unitaires
+  - pip  # Pour installer les dépendances pip si nécessaire
+  - setuptools  # Pour les scripts Python
+  - wheel  # Utilisé pour le packaging Python
+  - openssl  # Pour la sécurité, nécessaire pour Authlib et Flask
 
+  # Si d'autres packages spécifiques doivent être installés via pip
+  - pip:
+    - google-auth  # Pour la gestion de l'authentification Google, si nécessaire
+    - requests  # Pour les appels HTTP (parfois requis pour OAuth2)
