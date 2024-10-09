@@ -1,7 +1,7 @@
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../backend')))
 
 from auth import create_user, login_user, change_password
 
