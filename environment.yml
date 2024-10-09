@@ -5,7 +5,6 @@ channels:
 dependencies:
   - python=3.12  # Version de Python
   - flask  # Framework web pour créer l'application
-  - authlib  # Bibliothèque pour gérer l'authentification OAuth2 avec Google
   - bcrypt  # Pour hacher les mots de passe
   - mysql-connector-python  # Pour se connecter à la base de données MySQL
   - sphinx  # Génération de la documentation
@@ -18,4 +17,6 @@ dependencies:
   # Si d'autres packages spécifiques doivent être installés via pip
   - pip:
     - google-auth  # Pour la gestion de l'authentification Google, si nécessaire
+    - google-auth-oauthlib
+    - google-auth-httplib2
     - requests  # Pour les appels HTTP (parfois requis pour OAuth2)
