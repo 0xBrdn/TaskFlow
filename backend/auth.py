@@ -3,6 +3,12 @@ from mysql.connector import Error
 import bcrypt
 
 def connect_to_db():
+    """
+    Se connecte à la base de données MySQL.
+
+    Returns:
+        connection: L'objet de connexion à la base de données si la connexion est réussie, sinon None.
+    """
     try:
         connection = mysql.connector.connect(
             host='localhost',   
@@ -18,11 +24,28 @@ def connect_to_db():
         return None
 
 def close_db_connection(connection):
+    """
+    Ferme la connexion à la base de données MySQL.
+
+    Args:
+        connection: L'objet de connexion à fermer.
+    """
     if connection.is_connected():
         connection.close()
         print("Connexion à MySQL fermée.")
 
 def create_user(username, password, email):
+    """
+    Crée un nouvel utilisateur dans la base de données.
+
+    Args:
+        username (str): Le nom d'utilisateur de l'utilisateur à créer.
+        password (str): Le mot de passe de l'utilisateur à créer.
+        email (str): L'adresse e-mail de l'utilisateur à créer.
+
+    Raises:
+        Error: En cas d'erreur lors de l'insertion dans la base de données.
+    """
     try:
         connection = connect_to_db()
         if connection is None:
@@ -44,6 +67,19 @@ def create_user(username, password, email):
             close_db_connection(connection)
 
 def login_user(username, password):
+    """
+    Authentifie un utilisateur en vérifiant ses identifiants.
+
+    Args:
+        username (str): Le nom d'utilisateur de l'utilisateur à authentifier.
+        password (str): Le mot de passe de l'utilisateur à authentifier.
+
+    Returns:
+        bool: True si la connexion réussit, False sinon.
+
+    Raises:
+        Error: En cas d'erreur lors de la vérification des identifiants.
+    """
     try:
         connection = connect_to_db()
         if connection is None:
@@ -79,6 +115,20 @@ def login_user(username, password):
             close_db_connection(connection)
 
 def change_password(username, old_password, new_password):
+    """
+    Change le mot de passe d'un utilisateur.
+
+    Args:
+        username (str): Le nom d'utilisateur dont le mot de passe doit être changé.
+        old_password (str): L'ancien mot de passe de l'utilisateur.
+        new_password (str): Le nouveau mot de passe à définir.
+
+    Returns:
+        bool: True si le mot de passe est changé avec succès, False sinon.
+
+    Raises:
+        Error: En cas d'erreur lors du changement de mot de passe.
+    """
     try:
         connection = connect_to_db()
         if connection is None:
@@ -122,4 +172,10 @@ def change_password(username, old_password, new_password):
             close_db_connection(connection)
 
 def logout_user():
+    """
+    Déconnecte l'utilisateur.
+
+    Note:
+        Cette fonction peut être utilisée pour gérer les sessions côté serveur.
+    """
     print("Déconnexion réussie.")
