@@ -51,7 +51,6 @@ def login_user(username, password):
 
         cursor = connection.cursor()
 
-        # Rechercher le mot de passe pour l'utilisateur
         query = "SELECT password FROM user WHERE username = %s"
         cursor.execute(query, (username,))
         result = cursor.fetchone()
@@ -59,14 +58,13 @@ def login_user(username, password):
         if result:
             stored_password = result[0]
 
-            # Vérifier si le mot de passe est correct
             if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
                 print("Connexion réussie.")
-                cursor.fetchall()  # S'assurer que tous les résultats sont consommés
+                cursor.fetchall() 
                 return True
             else:
                 print("Mot de passe incorrect.")
-                cursor.fetchall()  # S'assurer que tous les résultats sont consommés
+                cursor.fetchall()
                 return False
         else:
             print("Nom d'utilisateur non trouvé.")
@@ -76,7 +74,7 @@ def login_user(username, password):
         return False
     finally:
         if cursor:
-            cursor.close()  # Fermer le curseur ouvert
+            cursor.close() 
         if connection:
             close_db_connection(connection)
 
@@ -88,7 +86,6 @@ def change_password(username, old_password, new_password):
 
         cursor = connection.cursor()
 
-        # Rechercher le mot de passe actuel de l'utilisateur
         query = "SELECT password FROM user WHERE username = %s"
         cursor.execute(query, (username,))
         result = cursor.fetchone()
@@ -96,19 +93,14 @@ def change_password(username, old_password, new_password):
         if result:
             stored_password = result[0]
 
-            # Vérifier l'ancien mot de passe
             if bcrypt.checkpw(old_password.encode('utf-8'), stored_password.encode('utf-8')):
-                # Fermer le curseur précédent avant d'en ouvrir un autre
-                cursor.fetchall()  # S'assurer que tous les résultats sont consommés
+                cursor.fetchall()
                 cursor.close()
 
-                # Hacher le nouveau mot de passe
                 hashed_new_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
 
-                # Ouvrir un nouveau curseur pour la mise à jour du mot de passe
                 cursor = connection.cursor()
 
-                # Mettre à jour le mot de passe
                 update_query = "UPDATE user SET password = %s WHERE username = %s"
                 cursor.execute(update_query, (hashed_new_password, username))
                 connection.commit()
@@ -125,13 +117,9 @@ def change_password(username, old_password, new_password):
         return False
     finally:
         if cursor:
-            cursor.close()  # Fermer le curseur ouvert
+            cursor.close()
         if connection:
             close_db_connection(connection)
-
-
-
-
 
 def logout_user():
     print("Déconnexion réussie.")
