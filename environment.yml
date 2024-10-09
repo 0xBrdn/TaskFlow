@@ -1,9 +1,12 @@
 name: TaskFlow
 channels:
   - defaults
+  - conda-forge  # Nécessaire pour bcrypt
 dependencies:
   - python=3.12
-  - pytest
-  - sphinx
-  - pyqt
-  - pip
+  - mysql-connector-python  # Pour se connecter à MySQL
+  - bcrypt  # Pour hacher les mots de passe
+  - pip  # Si tu veux utiliser pip pour d'autres bibliothèques
+  - pytest  # Pour les tests unitaires
+  - sphinx  # Pour la documentation
+
