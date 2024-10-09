@@ -22,6 +22,6 @@ QtObject {
 
 
     property StudioApplication application: StudioApplication {
-        fontPath: Qt.resolvedUrl("../AuthContent/" + relativeFontDirectory)
+        fontPath: Qt.resolvedUrl("../UntitledProjectContent/" + relativeFontDirectory)
     }
 }

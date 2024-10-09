@@ -1,6 +1,6 @@
 MetaInfo {
     Type {
-        name: "Auth.EventListSimulator"
+        name: "UntitledProject.EventListSimulator"
         icon: ":/qtquickplugin/images/item-icon16.png"
 
         Hints {

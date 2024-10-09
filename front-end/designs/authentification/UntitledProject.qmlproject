@@ -1,16 +1,16 @@
 import QmlProject
 
 Project {
-    mainFile: "AuthContent/App.qml"
-    mainUiFile: "AuthContent/Screen01.ui.qml"
+    mainFile: "UntitledProjectContent/App.qml"
+    mainUiFile: "UntitledProjectContent/Screen01.ui.qml"
 
     /* Include .qml, .js, and image files from current directory and subdirectories */
     QmlFiles {
-        directory: "Auth"
+        directory: "UntitledProject"
     }
 
     QmlFiles {
-        directory: "AuthContent"
+        directory: "UntitledProjectContent"
     }
 
     QmlFiles {
@@ -18,15 +18,15 @@ Project {
     }
 
     JavaScriptFiles {
-        directory: "Auth"
+        directory: "UntitledProject"
     }
 
     JavaScriptFiles {
-        directory: "Auth"
+        directory: "UntitledProject"
     }
 
     ImageFiles {
-        directory: "AuthContent"
+        directory: "UntitledProjectContent"
     }
 
     ImageFiles {
@@ -97,11 +97,11 @@ Project {
     importPaths: [ "." ]
 
     /* Required for deployment */
-    targetDirectory: "/opt/Auth"
+    targetDirectory: "/opt/UntitledProject"
 
     qdsVersion: "4.6"
 
-    quickVersion: "6.5"
+    quickVersion: "6.7"
 
     /* If any modules the project imports require widgets (e.g. QtCharts), widgetApp must be true */
     widgetApp: true
@@ -109,10 +109,10 @@ Project {
     /* args: Specifies command line arguments for qsb tool to generate shaders.
        files: Specifies target files for qsb tool. If path is included, it must be relative to this file.
               Wildcard '*' can be used in the file name part of the path.
-              e.g. files: [ "AuthContent/shaders/*.vert", "*.frag" ]  */
+              e.g. files: [ "UntitledProjectContent/shaders/*.vert", "*.frag" ]  */
     ShaderTool {
         args: "-s --glsl \"100 es,120,150\" --hlsl 50 --msl 12"
-        files: [ "AuthContent/shaders/*" ]
+        files: [ "UntitledProjectContent/shaders/*" ]
     }
 
     multilanguageSupport: true
