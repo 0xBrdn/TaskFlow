@@ -18,10 +18,10 @@ else:
     print("Échec de la connexion avec le nouveau mot de passe.")
 
 # Exemple de jeton reçu de Google (à remplacer par le jeton réel)
-google_token = "TOKEN_ID_FROM_GOOGLE"
+# google_token = "TOKEN_ID_FROM_GOOGLE"
 
-if login_with_google(google_token):
-    print("Utilisateur authentifié avec succès via Google.")
-else:
-    print("Échec de l'authentification Google.")
+# if login_with_google(google_token):
+#     print("Utilisateur authentifié avec succès via Google.")
+# else:
+#     print("Échec de l'authentification Google.")
 

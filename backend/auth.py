@@ -1,6 +1,10 @@
 import mysql.connector
 from mysql.connector import Error
 import bcrypt
+import requests
+import json
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 
 def connect_to_db():
     """
@@ -33,6 +37,51 @@ def close_db_connection(connection):
     if connection.is_connected():
         connection.close()
         print("Connexion à MySQL fermée.")
+
+def login_with_google(id_token_str):
+    """
+    Authentifie un utilisateur avec un compte Google en validant le jeton.
+    Args:
+        id_token_str (str): Le jeton ID reçu de l'authentification Google.
+    Returns:
+        bool: True si l'authentification réussit, False sinon.
+    """
+    try:
+        # Remplace par ton ID client
+        CLIENT_ID = '428963010703-44ievtu901l6r9g8dhs2jjmf11mphidg.apps.googleusercontent.com'  # Remplace par ton ID client Google
+
+        # Vérifier le jeton ID avec Google
+        idinfo = id_token.verify_oauth2_token(id_token_str, google_requests.Request(), CLIENT_ID)
+
+        # Récupérer l'adresse e-mail de l'utilisateur à partir du jeton
+        email = idinfo['email']
+
+        # Vérifier si l'utilisateur existe déjà dans la base de données
+        connection = connect_to_db()
+        cursor = connection.cursor()
+
+        query = "SELECT * FROM user WHERE email = %s"
+        cursor.execute(query, (email,))
+        result = cursor.fetchone()
+
+        if result:
+            print("Connexion Google réussie.")
+            return True
+        else:
+            print("Utilisateur non trouvé, veuillez vous inscrire.")
+            return False
+
+    except ValueError as e:
+        print(f"Erreur lors de la vérification du jeton : {e}")
+        return False
+    except Error as e:
+        print(f"Erreur lors de la connexion à la base de données : {e}")
+        return False
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            close_db_connection(connection)
 
 def create_user(username, password, email):
     """
