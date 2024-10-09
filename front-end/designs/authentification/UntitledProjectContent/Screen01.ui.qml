@@ -12,22 +12,22 @@ import UntitledProject
 import QtQuick.Studio.DesignEffects
 
 Rectangle {
-    id: rectangle
+    id: main
     width: Constants.width
     height: Constants.height
 
     Image {
-        id: image
+        id: background
         x: -20
         y: -112
         width: 1953
         height: 1290
-        source: "../../../../../../../../../swann project/logiciel/colorkit(3).png"
+        source: "../../../../../../Downloads/colorkit3.png"
         fillMode: Image.PreserveAspectFit
     }
 
     Rectangle {
-        id: rectangle1
+        id: mireAuthentification
         x: 658
         y: 143
         width: 604
@@ -36,25 +36,25 @@ Rectangle {
         radius: 13
         border.color: "#fc9840"
         border.width: 0
-    }
-
-    Text {
-        id: _text
-        x: 830
-        y: 191
-        width: 263
-        height: 41
-        color: "#ffffff"
-        text: "Creér un compte"
-        font.pixelSize: 31
-        horizontalAlignment: Text.AlignHCenter
-        font.styleName: "Gras"
-        font.family: "Tahoma"
 
         Text {
-            id: _text2
-            x: -115
-            y: 110
+            id: mainTitre
+            x: 172
+            y: 48
+            width: 263
+            height: 41
+            color: "#ffffff"
+            text: "S'identifier"
+            font.pixelSize: 31
+            horizontalAlignment: Text.AlignHCenter
+            font.styleName: "Gras"
+            font.family: "Tahoma"
+        }
+
+        Text {
+            id: textMail
+            x: 57
+            y: 158
             width: 77
             height: 29
             color: "#ffffff"
@@ -65,7 +65,7 @@ Rectangle {
             font.family: "Tahoma"
 
             Rectangle {
-                id: rectangle5
+                id: containerMail
                 x: 0
                 y: 28
                 width: 490
@@ -74,7 +74,7 @@ Rectangle {
                 radius: 5
 
                 TextInput {
-                    id: textInput
+                    id: inputMail
                     x: 15
                     y: 12
                     width: 460
@@ -83,6 +83,7 @@ Rectangle {
                     font.pixelSize: 17
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignVCenter
+                    selectionColor: "#b3c7c7c7"
                     font.bold: true
                     echoMode: TextInput.Normal
                     layer.enabled: true
@@ -90,73 +91,13 @@ Rectangle {
                     readOnly: false
                     property int newName: 0
                 }
-
-                TextInput {
-                    id: textInput1
-                    x: 15
-                    y: 12
-                    width: 460
-                    height: 50
-                    color: "#ffffff"
-                    font.pixelSize: 17
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
-                    readOnly: false
-                    property int newName: 0
-                    maximumLength: 255
-                    layer.enabled: true
-                    font.bold: true
-                    echoMode: TextInput.Normal
-                }
             }
         }
 
         Text {
-            id: _text3
-            x: -115
-            y: 227
-            width: 156
-            height: 31
-            color: "#ffffff"
-            text: "Nom d'affichage "
-            font.pixelSize: 21
-            horizontalAlignment: Text.AlignHCenter
-            font.styleName: "Gras"
-            font.family: "Tahoma"
-
-            Rectangle {
-                id: rectangle6
-                x: -1
-                y: 29
-                width: 490
-                height: 70
-                color: "#5c5c5c"
-                radius: 5
-            }
-
-            TextInput {
-                id: textInput2
-                x: 8
-                y: 39
-                width: 460
-                height: 50
-                color: "#ffffff"
-                font.pixelSize: 17
-                horizontalAlignment: Text.AlignLeft
-                verticalAlignment: Text.AlignVCenter
-                readOnly: false
-                property int newName: 0
-                maximumLength: 255
-                layer.enabled: true
-                font.bold: true
-                echoMode: TextInput.Normal
-            }
-        }
-
-        Text {
-            id: _text4
-            x: -118
-            y: 347
+            id: textPassword
+            x: 57
+            y: 281
             width: 125
             height: 31
             color: "#ffffff"
@@ -167,7 +108,7 @@ Rectangle {
             font.family: "Tahoma"
 
             Rectangle {
-                id: rectangle7
+                id: containerPassword
                 x: 0
                 y: 29
                 width: 490
@@ -177,7 +118,7 @@ Rectangle {
             }
 
             TextInput {
-                id: textInput3
+                id: inputPassword
                 x: 15
                 y: 39
                 width: 460
@@ -186,48 +127,7 @@ Rectangle {
                 font.pixelSize: 17
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
-                readOnly: false
-                property int newName: 0
-                maximumLength: 255
-                layer.enabled: true
-                font.bold: true
-                echoMode: TextInput.Password
-            }
-        }
-
-        Text {
-            id: _text5
-            x: -118
-            y: 465
-            width: 154
-            height: 31
-            color: "#ffffff"
-            text: "Mot de passe x2"
-            font.pixelSize: 21
-            horizontalAlignment: Text.AlignHCenter
-            font.styleName: "Gras"
-            font.family: "Tahoma"
-
-            Rectangle {
-                id: rectangle9
-                x: 0
-                y: 29
-                width: 490
-                height: 70
-                color: "#5c5c5c"
-                radius: 5
-            }
-
-            TextInput {
-                id: textInput4
-                x: 15
-                y: 39
-                width: 460
-                height: 50
-                color: "#ffffff"
-                font.pixelSize: 17
-                horizontalAlignment: Text.AlignLeft
-                verticalAlignment: Text.AlignVCenter
+                selectionColor: "#b3c7c7c7"
                 readOnly: false
                 property int newName: 0
                 maximumLength: 255
@@ -239,20 +139,21 @@ Rectangle {
 
         Rectangle {
             id: rectangle8
-            x: 22
-            y: 623
+            x: 194
+            y: 671
             width: 211
             height: 74
-            color: "#5c5c5c"
+            color: "#353637"
             radius: 5
 
             Button {
                 id: button
-                x: 24
-                y: 11
-                width: 164
-                height: 51
+                x: 11
+                y: 3
+                width: 190
+                height: 68
                 text: qsTr("Valider")
+                flat: false
                 z: 0
                 scale: 1.106
                 highlighted: false
@@ -275,18 +176,4 @@ Rectangle {
             DesignDropShadow {}
         ]
     }
-
-    states: [
-        State {
-            name: "clicked"
-        }
-    ]
 }
-
-/*##^##
-Designer {
-    D{i:0}D{i:1;locked:true}D{i:2;locked:true}D{i:4}D{i:7}D{i:8}D{i:10}D{i:11}D{i:13}
-D{i:14}D{i:16}D{i:17}
-}
-##^##*/
-
