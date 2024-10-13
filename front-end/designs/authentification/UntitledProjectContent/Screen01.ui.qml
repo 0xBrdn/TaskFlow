@@ -22,7 +22,7 @@ Rectangle {
         y: -112
         width: 1953
         height: 1290
-        source: "../../../../../../Downloads/colorkit3.png"
+        source: "../../colorkit3.png"
         fillMode: Image.PreserveAspectFit
     }
 
@@ -54,50 +54,38 @@ Rectangle {
         Text {
             id: textMail
             x: 57
-            y: 158
-            width: 77
-            height: 29
+            y: 156
+            width: 62
+            height: 31
             color: "#ffffff"
-            text: "E-mail"
+            text: "E-Mail"
             font.pixelSize: 21
-            horizontalAlignment: Text.AlignHCenter
+            horizontalAlignment: Text.AlignLeft
             font.styleName: "Gras"
             font.family: "Tahoma"
+        }
 
-            Rectangle {
-                id: containerMail
-                x: 0
-                y: 28
-                width: 490
-                height: 70
+        TextField {
+            id: inputMail
+            x: 57
+            y: 193
+            width: 490
+            height: 68
+            color: "#ffffff"
+            selectedTextColor: "#5c5c5c"
+            font.pointSize: 17
+            selectionColor: "#b3c7c7c7"
+            placeholderText: qsTr("")
+            background: Rectangle {
                 color: "#5c5c5c"
                 radius: 5
-
-                TextInput {
-                    id: inputMail
-                    x: 15
-                    y: 12
-                    width: 460
-                    height: 50
-                    color: "#ffffff"
-                    font.pixelSize: 17
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
-                    selectionColor: "#b3c7c7c7"
-                    font.bold: true
-                    echoMode: TextInput.Normal
-                    layer.enabled: true
-                    maximumLength: 255
-                    readOnly: false
-                    property int newName: 0
-                }
             }
         }
 
         Text {
             id: textPassword
             x: 57
-            y: 281
+            y: 280
             width: 125
             height: 31
             color: "#ffffff"
@@ -106,67 +94,49 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             font.styleName: "Gras"
             font.family: "Tahoma"
+        }
 
-            Rectangle {
-                id: containerPassword
-                x: 0
-                y: 29
-                width: 490
-                height: 70
+        TextField {
+            id: inputPassword
+            x: 57
+            y: 317
+            width: 490
+            height: 68
+            color: "#ffffff"
+            echoMode: TextInput.Password
+            selectionColor: "#b3c7c7c7"
+            selectedTextColor: "#5c5c5c"
+            placeholderText: qsTr("")
+            font.pointSize: 17
+            background: Rectangle {
                 color: "#5c5c5c"
                 radius: 5
             }
-
-            TextInput {
-                id: inputPassword
-                x: 15
-                y: 39
-                width: 460
-                height: 50
-                color: "#ffffff"
-                font.pixelSize: 17
-                horizontalAlignment: Text.AlignLeft
-                verticalAlignment: Text.AlignVCenter
-                selectionColor: "#b3c7c7c7"
-                readOnly: false
-                property int newName: 0
-                maximumLength: 255
-                layer.enabled: true
-                font.bold: true
-                echoMode: TextInput.Password
-            }
         }
 
-        Rectangle {
-            id: rectangle8
-            x: 194
-            y: 671
-            width: 211
-            height: 74
-            color: "#353637"
-            radius: 5
+        Button {
+            id: boutonValider
+            x: 199
+            y: 641
+            width: 210
+            height: 75
+            text: qsTr("Valider")
+            font.pointSize: 17
+            hoverEnabled: true
 
-            Button {
-                id: button
-                x: 11
-                y: 3
-                width: 190
-                height: 68
-                text: qsTr("Valider")
-                flat: false
-                z: 0
-                scale: 1.106
-                highlighted: false
-                spacing: 5
-                font.pointSize: 10
-                font.bold: true
-                font.family: "Tahoma"
-                autoRepeat: true
-                autoExclusive: true
-                checkable: true
-                checked: true
-                display: AbstractButton.TextOnly
-                font.weight: Font.Normal
+            contentItem: Text {
+                color: "#ffffff"
+                text: "Valider"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.pointSize: 17
+                styleColor: "#ffffff"
+            }
+
+            background: Rectangle {
+                color: boutonValider.down ? "#5c5c5c" : boutonValider.hovered ? "#343434" : "#5c5c5c"
+                radius: 5
+                border.width: 0
             }
         }
     }
