@@ -1,3 +1,5 @@
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../backend')))
 from auth import login_with_google  # Remplace par le nom de ton fichier auth.py
 from flask import Flask, request, jsonify, redirect, url_for
 import requests
