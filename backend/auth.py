@@ -46,18 +46,25 @@ def login_with_google(id_token_str):
     Returns:
         bool: True si l'authentification réussit, False sinon.
     """
+    cursor = None
+    connection = None
+
     try:
-        # Remplace par ton ID client
-        CLIENT_ID = '428963010703-44ievtu901l6r9g8dhs2jjmf11mphidg.apps.googleusercontent.com'  # Remplace par ton ID client Google
+        # Remplace par ton vrai ID client Google
+        CLIENT_ID = '428963010703-44ievtu901l6r9g8dhs2jjmf11mphidg.apps.googleusercontent.com'
 
         # Vérifier le jeton ID avec Google
         idinfo = id_token.verify_oauth2_token(id_token_str, google_requests.Request(), CLIENT_ID)
 
-        # Récupérer l'adresse e-mail de l'utilisateur à partir du jeton
-        email = idinfo['email']
+        # Récupérer l'adresse e-mail et le nom de l'utilisateur à partir du jeton
+        email = idinfo.get('email')
+        google_name = idinfo.get('name')
 
         # Vérifier si l'utilisateur existe déjà dans la base de données
         connection = connect_to_db()
+        if connection is None:
+            return False
+
         cursor = connection.cursor()
 
         query = "SELECT * FROM user WHERE email = %s"
@@ -65,11 +72,13 @@ def login_with_google(id_token_str):
         result = cursor.fetchone()
 
         if result:
-            print("Connexion Google réussie.")
+            print("Utilisateur Google existant trouvé, connexion réussie.")
             return True
         else:
-            print("Utilisateur non trouvé, veuillez vous inscrire.")
-            return False
+            # Si l'utilisateur n'existe pas, le créer comme un utilisateur Google
+            create_user_google(google_name, email)
+            print("Utilisateur Google créé avec succès.")
+            return True
 
     except ValueError as e:
         print(f"Erreur lors de la vérification du jeton : {e}")
@@ -82,6 +91,39 @@ def login_with_google(id_token_str):
             cursor.close()
         if connection:
             close_db_connection(connection)
+
+def create_user_google(username, email):
+    """
+    Crée un utilisateur Google dans la base de données.
+
+    Args:
+        username (str): Le nom d'utilisateur de Google.
+        email (str): L'adresse e-mail de l'utilisateur Google.
+
+    Returns:
+        None
+    """
+    try:
+        connection = connect_to_db()
+        if connection is None:
+            return
+
+        cursor = connection.cursor()
+
+        # Créer un utilisateur avec is_google_user=1
+        query = """INSERT INTO user (username, password, email, is_google_user) 
+                   VALUES (%s, %s, %s, %s)"""
+        # Pas besoin de mot de passe car l'authentification se fait via Google
+        cursor.execute(query, (username, None, email, 1))
+        connection.commit()
+        print("Utilisateur Google créé avec succès.")
+    except Error as e:
+        print(f"Erreur lors de la création de l'utilisateur Google : {e}")
+    finally:
+        if connection:
+            close_db_connection(connection)
+
+
 
 def create_user(username, password, email):
     """
