@@ -110,11 +110,10 @@ def create_user_google(username, email):
 
         cursor = connection.cursor()
 
-        # Créer un utilisateur avec is_google_user=1
+        # Créer un utilisateur avec un mot de passe vide
         query = """INSERT INTO user (username, password, email, is_google_user) 
                    VALUES (%s, %s, %s, %s)"""
-        # Pas besoin de mot de passe car l'authentification se fait via Google
-        cursor.execute(query, (username, None, email, 1))
+        cursor.execute(query, (username, '', email, 1))  # Une chaîne vide pour le mot de passe
         connection.commit()
         print("Utilisateur Google créé avec succès.")
     except Error as e:
@@ -122,7 +121,6 @@ def create_user_google(username, email):
     finally:
         if connection:
             close_db_connection(connection)
-
 
 
 def create_user(username, password, email):
