@@ -1,9 +1,13 @@
 import datetime
+import logging
+from typing import Optional
 
 from mysql.connector.cursor import MySQLCursor
 
 from db_helper import cm_cursor, ResultType, cm_conn
 from db_requests import _Requests
+
+_log = logging.getLogger(__name__)
 
 
 class DB_API:
@@ -15,7 +19,7 @@ class DB_API:
         Permet de récuperer tous les utilisateurs de la DB.
 
         Cette fonction renvoie une liste de tuples comprenant les
-        users sous la forme (userID, username, email).
+        users sous la forme (userID, username, email, is_google_user).
         Cette fonction peut ne pas fonctionner, dans ce cas elle
         renvoie un objet de type Exception.
 
@@ -156,7 +160,9 @@ class DB_API:
         return result
 
     @cm_cursor()
-    def get_users_in_project_by_project_id(self, project_id: int, *, cursor: MySQLCursor) -> ResultType:
+    def get_users_in_project_by_project_id(
+        self, project_id: int, *, cursor: MySQLCursor
+    ) -> ResultType:
         """
         Permet de récuperer toutes users dans un projet en fonction du projectID.
 
@@ -204,7 +210,9 @@ class DB_API:
         return result
 
     @cm_cursor()
-    def get_users_in_tasks_group_by_group_id(self, group_id: int, *, cursor: MySQLCursor) -> ResultType:
+    def get_users_in_tasks_group_by_group_id(
+        self, group_id: int, *, cursor: MySQLCursor
+    ) -> ResultType:
         """
         Permet de récuperer tous les utilisateurs dans un groupe
         de tâches en fonction de son groupID.
@@ -252,7 +260,15 @@ class DB_API:
 
     @cm_conn()
     @cm_cursor()
-    def add_user(self, username: str, password: str, email: str, *, cursor: MySQLCursor):
+    def add_user(
+        self,
+        username: str,
+        password: Optional[str],
+        email: str,
+        is_google_user: bool,
+        *,
+        cursor: MySQLCursor,
+    ):
         """
         Permet d'ajouter un nouvel utilisateur à la DB.
 
@@ -262,6 +278,7 @@ class DB_API:
         :param username: Nom d'utilisateur
         :param password: Mot de passe (hashé)
         :param email: Adresse email de l'utilisateur
+        :param is_google_user: Si l'utilisateur se connecte avec google
         :param cursor: Curseur d'une connexion vers une DB
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
@@ -271,7 +288,7 @@ class DB_API:
         >>> assert success is True
         """
 
-        return cursor.execute(_Requests.add_user.format(username, password, email))
+        return cursor.execute(_Requests.add_user.format(username, password, email, is_google_user))
 
     @cm_conn()
     @cm_cursor()
@@ -318,7 +335,7 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def add_user_to_group(
-            self, project_id: int, user_id: int, permission: int, joined: bool, *, cursor: MySQLCursor
+        self, project_id: int, user_id: int, permission: int, joined: bool, *, cursor: MySQLCursor
     ):
         """
         Permet d'ajouter un utilisateur à un groupe de projet.
@@ -346,16 +363,16 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def add_task_info(
-            self,
-            status: int,
-            priority: int,
-            title: str,
-            description: str,
-            dead_line: datetime.datetime,
-            covered: bool,
-            assign: int,
-            *,
-            cursor: MySQLCursor,
+        self,
+        status: int,
+        priority: int,
+        title: str,
+        description: str,
+        dead_line: datetime.datetime,
+        covered: bool,
+        assign: int,
+        *,
+        cursor: MySQLCursor,
     ):
         """
         Permet d'ajouter des informations sur une tâche.
@@ -475,4 +492,4 @@ class DB_API:
 
 
 if __name__ == "__main__":
-    pass
+    api = DB_API()
