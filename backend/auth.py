@@ -138,7 +138,7 @@ def create_user_google(username, email):
 
         query = """INSERT INTO user (username, password, email, is_google_user) 
                    VALUES (%s, %s, %s, %s)"""
-        cursor.execute(query, (username, '', email, 1))  # Une chaîne vide pour le mot de passe
+        cursor.execute(query, (username, '', email, 1))  
         connection.commit()
         print("Utilisateur Google créé avec succès.")
         send_confirmation_email(email, username)
