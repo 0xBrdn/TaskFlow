@@ -16,4 +16,5 @@ dependencies:
   - google-auth  # Pour la gestion de l'authentification Google, si nécessaire
   - google-auth-oauthlib
   - google-auth-httplib2
+  - google-api-python-client
   - requests  # Pour les appels HTTP (parfois requis pour OAuth2)

@@ -5,6 +5,16 @@ import requests
 import json
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+import os.path
+import base64
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from googleapiclient.discovery import build
+from email.mime.text import MIMEText
+
+# Configuration de l'API Gmail
+SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 def connect_to_db():
     """
@@ -116,6 +126,7 @@ def create_user_google(username, email):
         cursor.execute(query, (username, '', email, 1))  # Une chaîne vide pour le mot de passe
         connection.commit()
         print("Utilisateur Google créé avec succès.")
+        send_confirmation_email(email, username)
     except Error as e:
         print(f"Erreur lors de la création de l'utilisateur Google : {e}")
     finally:
@@ -149,6 +160,7 @@ def create_user(username, password, email):
         cursor.execute(query, (username, hashed_password, email))
         connection.commit()
         print("Utilisateur créé avec succès.")
+        send_confirmation_email(email, username)
     except Error as e:
         print(f"Erreur lors de la création de l'utilisateur : {e}")
     finally:
@@ -268,3 +280,46 @@ def logout_user():
         Cette fonction peut être utilisée pour gérer les sessions côté serveur.
     """
     print("Déconnexion réussie.")
+
+def send_confirmation_email(to_email, username):
+    """
+    Envoie un e-mail de confirmation à l'utilisateur après la création de son compte.
+
+    Args:
+        to_email (str): L'adresse e-mail de l'utilisateur.
+        username (str): Le nom d'utilisateur de l'utilisateur.
+
+    Returns:
+        None
+    """
+    # Authentification à l'API Gmail
+    creds = None
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    # Si les informations d'identification n'existent pas ou sont invalides, en obtenir de nouvelles
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'api/credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Enregistrer les informations d'identification pour la prochaine exécution
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
+
+    # Créer le message
+    message = MIMEText(f"Bonjour {username},\n\nVotre compte a été créé avec succès.\nMerci de vous être inscrit !")
+    message['to'] = to_email
+    message['subject'] = "Confirmation de création de compte"
+
+    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+
+    # Envoi de l'e-mail
+    service = build('gmail', 'v1', credentials=creds)
+    try:
+        message = {'raw': raw_message}
+        service.users().messages().send(userId='me', body=message).execute()
+        print("E-mail de confirmation envoyé avec succès.")
+    except Exception as e:
+        print(f"Une erreur est survenue lors de l'envoi de l'e-mail : {e}")
