@@ -1,0 +1,44 @@
+/* Style pour frameMire */
+#frameMire {
+    background-color: rgba(92, 92, 92, 190);
+    border-radius: 15;
+}
+
+/* Style pour frameTitre */
+#frameTitre {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/* Style pour frameLogin */
+#frameLogin {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/* Style pour titreMail et titrePassword */
+#titreMail, #titrePassword {
+    color: rgb(255, 255, 255);
+}
+
+/* Style pour inputMail et inputPassword */
+#inputMail, #inputPassword {
+    background-color: rgb(92, 92, 92);
+    color: rgb(255, 255, 255);
+    selection-color: rgb(92, 92, 92);
+    selection-background-color: rgb(255, 255, 255);
+    border-radius: 5;
+}
+
+/* Style pour boutonValider */
+QPushButton {
+    color: rgb(255, 255, 255);
+    background-color: rgb(92, 92, 92);
+    border-radius: 5;
+}
+
+QPushButton:hover {
+    background-color: rgb(52, 52, 52);
+}
+
+QPushButton:pressed {
+    background-color: rgb(92, 92, 92);
+}
