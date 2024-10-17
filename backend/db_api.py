@@ -2,7 +2,7 @@ import datetime
 
 from mysql.connector.cursor import MySQLCursor
 
-from db_helper import cm_cursor, _T, cm_conn
+from db_helper import cm_cursor, ResultType, cm_conn
 from db_requests import _Requests
 
 
@@ -10,7 +10,7 @@ class DB_API:
     """Classe permettant d'executer les commandes vers la DB SQL"""
 
     @cm_cursor()
-    def get_all_users(self, *, cursor: MySQLCursor) -> _T:
+    def get_all_users(self, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer tous les utilisateurs de la DB.
 
@@ -34,7 +34,7 @@ class DB_API:
         return result
 
     @cm_cursor()
-    def get_user_hashpass(self, user_id: int, *, cursor: MySQLCursor) -> _T:
+    def get_user_hashpass(self, user_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer le mdp hash d'un user dans la DB.
 
@@ -58,7 +58,7 @@ class DB_API:
         return result
 
     @cm_cursor()
-    def get_projects_by_user_id(self, user_id: int, *, cursor: MySQLCursor) -> _T:
+    def get_projects_by_user_id(self, user_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer tous les projets d'un utilisateur en fonction de son userID.
 
@@ -82,7 +82,7 @@ class DB_API:
         return result
 
     @cm_cursor()
-    def get_tasks_by_project_id(self, project_id: int, *, cursor: MySQLCursor) -> _T:
+    def get_tasks_by_project_id(self, project_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer toutes les taches d'un projet en fonction de son projectID.
 
@@ -107,7 +107,7 @@ class DB_API:
         return result
 
     @cm_cursor()
-    def get_subtasks_by_task_id(self, task_id: int, *, cursor: MySQLCursor) -> _T:
+    def get_subtasks_by_task_id(self, task_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer toutes les sous taches d'un projet en fonction de son taskID.
 
@@ -132,7 +132,7 @@ class DB_API:
         return result
 
     @cm_cursor()
-    def get_user_logs_by_id(self, log_id: int, *, cursor: MySQLCursor) -> _T:
+    def get_user_logs_by_id(self, log_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer toutes les logs d'un user grace a son userID.
 
@@ -156,7 +156,7 @@ class DB_API:
         return result
 
     @cm_cursor()
-    def get_users_in_project_by_project_id(self, project_id: int, *, cursor: MySQLCursor) -> _T:
+    def get_users_in_project_by_project_id(self, project_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer toutes users dans un projet en fonction du projectID.
 
@@ -180,7 +180,7 @@ class DB_API:
         return result
 
     @cm_cursor()
-    def get_tasks_by_user_id(self, user_id: int, *, cursor: MySQLCursor) -> _T:
+    def get_tasks_by_user_id(self, user_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer toutes les taches d'un utilisateur en fonction de son userID.
 
@@ -204,7 +204,7 @@ class DB_API:
         return result
 
     @cm_cursor()
-    def get_users_in_tasks_group_by_group_id(self, group_id: int, *, cursor: MySQLCursor) -> _T:
+    def get_users_in_tasks_group_by_group_id(self, group_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer tous les utilisateurs dans un groupe
         de tâches en fonction de son groupID.
@@ -229,7 +229,7 @@ class DB_API:
         return result
 
     @cm_cursor()
-    def get_all_status(self, *, cursor: MySQLCursor) -> _T:
+    def get_all_status(self, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer les statuts de tous les users dans la DB.
 
