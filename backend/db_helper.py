@@ -2,7 +2,6 @@ from functools import partial
 from typing import Callable, Optional, List, TypeVar
 
 import mysql.connector
-from mysql.connector import errorcode
 from mysql.connector.abstracts import MySQLConnectionAbstract
 from mysql.connector.types import RowType
 
@@ -40,7 +39,7 @@ def cm_cursor() -> Callable:
 
 
 def create_conn(
-        host: str, user: str, password: str, database: str
+    host: str, user: str, password: str, database: str
 ) -> Optional[MySQLConnectionAbstract]:
     global conn
     try:
@@ -50,15 +49,11 @@ def create_conn(
 
     except mysql.connector.Error as err:
         if err.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
-            print(
-                "Erreur d'authentification : Vérifiez votre nom d'utilisateur et votre mot de passe."
-            )
+            pass
         elif err.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
-            print(
-                "Base de données non existante : Vérifiez le nom de la base de données."
-            )
+            pass
         else:
-            print(f"Erreur MySQL non gérée : {err}")
+            pass
         connexion = None
     conn = connexion
     return connexion

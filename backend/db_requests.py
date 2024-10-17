@@ -52,9 +52,15 @@ class _Requests:
 
     add_project = "INSERT INTO projects (name) VALUES ({});"
 
-    add_user_to_group = "INSERT INTO users_groups (projectID, userID, permission, joined) VALUES ({}, {}, {}, {});"
+    add_user_to_group = (
+        "INSERT INTO users_groups (projectID, userID, "
+        "permission, joined) VALUES ({}, {}, {}, {});"
+    )
 
-    add_task_info = "INSERT INTO tasks_infos (status, priority, title, description, dead_line, covered, assign) VALUES ({}, {}, {}, {}, {}, {}, {});"
+    add_task_info = (
+        "INSERT INTO tasks_infos (status, priority, title, description, "
+        "dead_line, covered, assign) VALUES ({}, {}, {}, {}, {}, {}, {});"
+    )
 
     add_task = "INSERT INTO tasks (projectID, task_infoID, userID) VALUES ({}, {}, {});"
 
@@ -64,11 +70,8 @@ class _Requests:
         "INSERT INTO users_tasks_groups (task_projectID, userID) VALUES ({}, {});"
     )
 
-    add_user_log = (
-        "INSERT INTO users_logs (userID, action, details) VALUES ({}, {}, {});"
-    )
+    add_user_log = "INSERT INTO users_logs (userID, action, details) VALUES ({}, {}, {});"
 
 
 if __name__ == "__main__":
     _Requests.get_user_hashpass.format("test")
-    print(_Requests.get_user_hashpass)
