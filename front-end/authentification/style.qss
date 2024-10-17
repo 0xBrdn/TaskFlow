@@ -1,3 +1,10 @@
+QWidget {
+    background-image: url("./images/colorkit3.png"); /* Chemin vers l'image */
+    background-repeat: no-repeat; /* Empêche la répétition de l'image */
+    background-position: center; /* Centre l'image dans le widget */
+    background-attachment: fixed; /* L'image reste fixe lors du défilement */
+}
+
 /* Style pour frameMire */
 #frameMire {
     background-color: rgba(92, 92, 92, 190);
@@ -14,8 +21,8 @@
     background-color: rgba(0, 0, 0, 0);
 }
 
-/* Style pour titreMail et titrePassword */
-#titreMail, #titrePassword {
+/* Style pour titres */
+QLabel {
     color: rgb(255, 255, 255);
 }
 
