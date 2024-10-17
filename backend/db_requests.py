@@ -1,5 +1,5 @@
 class _Requests:
-    get_all_users = "SELECT userID, username, email FROM users;"
+    get_all_users = "SELECT userID, username, email, is_google_user FROM users;"
 
     get_user_hashpass = "SELECT password FROM users WHERE userID = {};"
 
@@ -46,7 +46,9 @@ class _Requests:
 
     get_all_status = "SELECT userID, status FROM status;"
 
-    add_user = "INSERT INTO users (username, password, email) VALUES ({}, {}, {});"
+    add_user = (
+        "INSERT INTO users (username, password, email, is_google_user) VALUES ({}, {}, {}, {});"
+    )
 
     add_status = "INSERT INTO status (userID, status) VALUES ({}, {});"
 
