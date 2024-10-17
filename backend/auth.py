@@ -1,3 +1,25 @@
+"""
+Module de gestion des utilisateurs et de l'authentification Google pour une application TaskFlow.
+
+Ce module fournit des fonctions pour :
+- Se connecter à une base de données MySQL.
+- Créer, connecter, déconnecter, et gérer des utilisateurs (y compris via Google OAuth2).
+- Envoyer des e-mails de confirmation à travers l'API Gmail.
+
+Imports:
+    mysql.connector: Utilisé pour interagir avec la base de données MySQL.
+    bcrypt: Utilisé pour chiffrer et vérifier les mots de passe.
+    requests: Utilisé pour faire des requêtes HTTP (Google API).
+    google.oauth2.id_token: Utilisé pour vérifier les tokens OAuth2 Google.
+    google.auth.transport.requests: Utilisé pour transporter les requêtes Google.
+    googleapiclient.discovery.build: Utilisé pour interagir avec l'API Gmail de Google.
+    email.mime.text.MIMEText: Utilisé pour formater les e-mails envoyés via Gmail.
+
+Variables:
+    SCOPES (list): Liste des autorisations nécessaires pour interagir avec l'API Gmail.
+    CLIENT_ID (str): ID client Google OAuth2.
+"""
+
 import mysql.connector
 from mysql.connector import Error
 import bcrypt
@@ -13,7 +35,6 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from email.mime.text import MIMEText
 
-# Configuration de l'API Gmail
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 def connect_to_db():
@@ -60,17 +81,13 @@ def login_with_google(id_token_str):
     connection = None
 
     try:
-        # Remplace par ton vrai ID client Google
         CLIENT_ID = '428963010703-44ievtu901l6r9g8dhs2jjmf11mphidg.apps.googleusercontent.com'
 
-        # Vérifier le jeton ID avec Google
         idinfo = id_token.verify_oauth2_token(id_token_str, google_requests.Request(), CLIENT_ID)
 
-        # Récupérer l'adresse e-mail et le nom de l'utilisateur à partir du jeton
         email = idinfo.get('email')
         google_name = idinfo.get('name')
 
-        # Vérifier si l'utilisateur existe déjà dans la base de données
         connection = connect_to_db()
         if connection is None:
             return False
@@ -85,7 +102,6 @@ def login_with_google(id_token_str):
             print("Utilisateur Google existant trouvé, connexion réussie.")
             return True
         else:
-            # Si l'utilisateur n'existe pas, le créer comme un utilisateur Google
             create_user_google(google_name, email)
             print("Utilisateur Google créé avec succès.")
             return True
@@ -120,7 +136,6 @@ def create_user_google(username, email):
 
         cursor = connection.cursor()
 
-        # Créer un utilisateur avec un mot de passe vide
         query = """INSERT INTO user (username, password, email, is_google_user) 
                    VALUES (%s, %s, %s, %s)"""
         cursor.execute(query, (username, '', email, 1))  # Une chaîne vide pour le mot de passe
@@ -292,11 +307,9 @@ def send_confirmation_email(to_email, username):
     Returns:
         None
     """
-    # Authentification à l'API Gmail
     creds = None
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-    # Si les informations d'identification n'existent pas ou sont invalides, en obtenir de nouvelles
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -304,18 +317,15 @@ def send_confirmation_email(to_email, username):
             flow = InstalledAppFlow.from_client_secrets_file(
                 'api/credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
-        # Enregistrer les informations d'identification pour la prochaine exécution
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
 
-    # Créer le message
-    message = MIMEText(f"Bonjour {username},\n\nVotre compte a été créé avec succès.\nMerci de vous être inscrit !")
+    message = MIMEText(f"Bonjour {username},\n\nVotre compte a été créé avec succès.\nMerci de vous être inscrit sur TaskFlow !")
     message['to'] = to_email
     message['subject'] = "Confirmation de création de compte"
 
     raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
 
-    # Envoi de l'e-mail
     service = build('gmail', 'v1', credentials=creds)
     try:
         message = {'raw': raw_message}
