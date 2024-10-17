@@ -13,10 +13,8 @@ dependencies:
   - setuptools  # Pour les scripts Python
   - wheel  # Utilisé pour le packaging Python
   - openssl  # Pour la sécurité, nécessaire pour Authlib et Flask
-
-  # Si d'autres packages spécifiques doivent être installés via pip
-  - pip:
-    - google-auth  # Pour la gestion de l'authentification Google, si nécessaire
-    - google-auth-oauthlib
-    - google-auth-httplib2
-    - requests  # Pour les appels HTTP (parfois requis pour OAuth2)
+  - google-auth  # Pour la gestion de l'authentification Google, si nécessaire
+  - google-auth-oauthlib
+  - google-auth-httplib2
+  - google-api-python-client
+  - requests  # Pour les appels HTTP (parfois requis pour OAuth2)
