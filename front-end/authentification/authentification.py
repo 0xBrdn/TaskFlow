@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from authLogic import login_user  # Importer la logique d'authentification
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -128,6 +128,7 @@ class Ui_MainWindow(object):
         self.boutonValider.setFont(font)
         self.boutonValider.setObjectName("boutonValider")
         self.verticalLayout_4.addWidget(self.boutonValider)
+        self.boutonValider.clicked.connect(self.handle_login)
 
         self.verticalLayout.addWidget(self.frameBouton, 0, QtCore.Qt.AlignHCenter)
         self.gridLayout.addWidget(self.frameMire, 1, 0, 1, 1)
@@ -135,6 +136,18 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def handle_login(self):
+        username = self.inputMail.text()
+        password = self.inputPassword.text()
+        print(f'Utilisation de {username} avec {password}')
+
+        # Appeler la fonction login_user importée depuis auth_logic.py
+        if login_user(username, password):
+            print('succès')
+
+        else:
+            print('echec')
 
     def load_stylesheet(self, MainWindow):
         with open("style.qss", "r") as file:
