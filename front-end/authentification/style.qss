@@ -1,8 +1,8 @@
-QWidget {
-    background-image: url("./images/colorkit3.png"); /* Chemin vers l'image */
+/* Styles globaux pour tous les QWidget */
+QWidget#centralwidget {
+    background-image: url("./images/colorkit3.png");
     background-repeat: no-repeat; /* Empêche la répétition de l'image */
-    background-position: center; /* Centre l'image dans le widget */
-    background-attachment: fixed; /* L'image reste fixe lors du défilement */
+    background-size: cover; /* Redimensionne l'image pour couvrir tout le widget */
 }
 
 /* Style pour frameMire */
