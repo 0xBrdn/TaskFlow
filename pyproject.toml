@@ -1,8 +1,7 @@
 [tool.ruff]
 line-length = 99
-show-source = true
-
-select = [
+output-format = "full"
+lint.select = [
     "E", # pycodestyle
     "F", # Pyflakes
     "W", # Warning
@@ -32,7 +31,7 @@ extend-exclude = [
     "__pycache__",
 ]
 
-ignore = [
+lint.ignore = [
     "F403", # unable to detect undefined names from star imports
     "F405", # undefined locals from star imports
     "W605", # invalid escape sequence
@@ -50,4 +49,5 @@ ignore = [
     "PGH003", # Use specific rule codes when ignoring type issues
     "PLC1901", # compare-to-empty-string
     "B026",
+    "ISC001"
 ]
