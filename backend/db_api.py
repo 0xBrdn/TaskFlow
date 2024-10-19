@@ -13,8 +13,9 @@ _log = logging.getLogger(__name__)
 class DB_API:
     """Classe permettant d'executer les commandes vers la DB SQL"""
 
+    @staticmethod
     @cm_cursor()
-    def get_all_users(self, *, cursor: MySQLCursor) -> ResultType:
+    def get_all_users(*, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer tous les utilisateurs de la DB.
 
@@ -28,17 +29,18 @@ class DB_API:
         :return: resultat de la commande ou exception
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> users = db_api.get_all_users()
-        >>> print(users)
+        >>> users = DB_API.get_all_users()
+        >>> if not isinstance(users, Exception):
+        >>>     print(users)
 
         """
         cursor.execute(_Requests.get_all_users)
         result = cursor.fetchall()
         return result
 
+    @staticmethod
     @cm_cursor()
-    def get_user_hashpass(self, user_id: int, *, cursor: MySQLCursor) -> ResultType:
+    def get_user_hashpass(user_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer le mdp hash d'un user dans la DB.
 
@@ -53,16 +55,17 @@ class DB_API:
         :return: resultat de la commande ou exception
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> hash_pass = db_api.get_user_hashpass(1)
-        >>> print(hash_pass)
+        >>> hash_pass = DB_API.get_user_hashpass(1)
+        >>> if not isinstance(hash_pass, Exception):
+        >>>     print(hash_pass)
         """
         cursor.execute(_Requests.get_user_hashpass.format(user_id))
         result = cursor.fetchone()
         return result
 
+    @staticmethod
     @cm_cursor()
-    def get_projects_by_user_id(self, user_id: int, *, cursor: MySQLCursor) -> ResultType:
+    def get_projects_by_user_id(user_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer tous les projets d'un utilisateur en fonction de son userID.
 
@@ -77,16 +80,17 @@ class DB_API:
         :return: resultat de la commande ou exception
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> projects = db_api.get_projects_by_user_id(1)
-        >>> print(projects)
+        >>> projects = DB_API.get_projects_by_user_id(1)
+        >>> if not isinstance(projects, Exception):
+        >>>     print(projects)
         """
         cursor.execute(_Requests.get_projects_by_user_id.format(user_id))
         result = cursor.fetchall()
         return result
 
+    @staticmethod
     @cm_cursor()
-    def get_tasks_by_project_id(self, project_id: int, *, cursor: MySQLCursor) -> ResultType:
+    def get_tasks_by_project_id(project_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer toutes les taches d'un projet en fonction de son projectID.
 
@@ -102,16 +106,17 @@ class DB_API:
         :return: resultat de la commande ou exception
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> tasks = db_api.get_tasks_by_project_id(1)
-        >>> print(tasks)
+        >>> tasks = DB_API.get_tasks_by_project_id(1)
+        >>> if not isinstance(tasks, Exception):
+        >>>     print(tasks)
         """
         cursor.execute(_Requests.get_tasks_by_project_id.format(project_id))
         result = cursor.fetchall()
         return result
 
+    @staticmethod
     @cm_cursor()
-    def get_subtasks_by_task_id(self, task_id: int, *, cursor: MySQLCursor) -> ResultType:
+    def get_subtasks_by_task_id(task_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer toutes les sous taches d'un projet en fonction de son taskID.
 
@@ -127,16 +132,17 @@ class DB_API:
         :return: resultat de la commande ou exception
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> subtasks = db_api.get_subtasks_by_task_id(1)
-        >>> print(subtasks)
+        >>> subtasks = DB_API.get_subtasks_by_task_id(1)
+        >>> if not isinstance(subtasks, Exception):
+        >>>     print(subtasks)
         """
         cursor.execute(_Requests.get_subtasks_by_task_id.format(task_id))
         result = cursor.fetchall()
         return result
 
+    @staticmethod
     @cm_cursor()
-    def get_user_logs_by_id(self, log_id: int, *, cursor: MySQLCursor) -> ResultType:
+    def get_user_logs_by_id(log_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer toutes les logs d'un user grace a son userID.
 
@@ -151,18 +157,17 @@ class DB_API:
         :return: resultat de la commande ou exception
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> logs = db_api.get_user_logs_by_id(1)
-        >>> print(logs)
+        >>> logs = DB_API.get_user_logs_by_id(1)
+        >>> if not isinstance(logs, Exception):
+        >>>     print(logs)
         """
         cursor.execute(_Requests.get_user_logs_by_id.format(log_id))
         result = cursor.fetchall()
         return result
 
+    @staticmethod
     @cm_cursor()
-    def get_users_in_project_by_project_id(
-        self, project_id: int, *, cursor: MySQLCursor
-    ) -> ResultType:
+    def get_users_in_project_by_project_id(project_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer toutes users dans un projet en fonction du projectID.
 
@@ -177,16 +182,17 @@ class DB_API:
         :return: resultat de la commande ou exception
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> users_in_project = db_api.get_users_in_project_by_project_id(1)
-        >>> print(users_in_project)
+        >>> users_in_project = DB_API.get_users_in_project_by_project_id(1)
+        >>> if not isinstance(users_in_project, Exception):
+        >>>     print(users_in_project)
         """
         cursor.execute(_Requests.get_users_in_project_by_project_id.format(project_id))
         result = cursor.fetchall()
         return result
 
+    @staticmethod
     @cm_cursor()
-    def get_tasks_by_user_id(self, user_id: int, *, cursor: MySQLCursor) -> ResultType:
+    def get_tasks_by_user_id(user_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer toutes les taches d'un utilisateur en fonction de son userID.
 
@@ -201,18 +207,17 @@ class DB_API:
         :return: resultat de la commande ou exception
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> user_tasks = db_api.get_tasks_by_user_id(1)
-        >>> print(user_tasks)
+        >>> user_tasks = DB_API.get_tasks_by_user_id(1)
+        >>> if not isinstance(user_tasks, Exception):
+        >>>     print(user_tasks)
         """
         cursor.execute(_Requests.get_tasks_by_user_id.format(user_id))
         result = cursor.fetchall()
         return result
 
+    @staticmethod
     @cm_cursor()
-    def get_users_in_tasks_group_by_group_id(
-        self, group_id: int, *, cursor: MySQLCursor
-    ) -> ResultType:
+    def get_users_in_tasks_group_by_group_id(group_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer tous les utilisateurs dans un groupe
         de tâches en fonction de son groupID.
@@ -228,16 +233,17 @@ class DB_API:
         :return: resultat de la commande ou exception
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> users_in_group = db_api.get_users_in_tasks_group_by_group_id(1)
-        >>> print(users_in_group)
+        >>> users_in_group = DB_API.get_users_in_tasks_group_by_group_id(1)
+        >>> if not isinstance(users_in_group, Exception):
+        >>>     print(users_in_group)
         """
         cursor.execute(_Requests.get_users_in_tasks_group_by_group_id.format(group_id))
         result = cursor.fetchall()
         return result
 
+    @staticmethod
     @cm_cursor()
-    def get_all_status(self, *, cursor: MySQLCursor) -> ResultType:
+    def get_all_status(*, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer les statuts de tous les users dans la DB.
 
@@ -250,18 +256,18 @@ class DB_API:
         :return: resultat de la commande ou exception
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> status = db_api.get_all_status()
-        >>> print(status)
+        >>> status = DB_API.get_all_status()
+        >>> if not isinstance(status, Exception):
+        >>>     print(status)
         """
         cursor.execute(_Requests.get_all_status)
         result = cursor.fetchall()
         return result
 
+    @staticmethod
     @cm_conn()
     @cm_cursor()
     def add_user(
-        self,
         username: str,
         password: Optional[str],
         email: str,
@@ -283,16 +289,18 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> success = db_api.add_user("new_user", "hashed_password", "user@Exemple.com")
-        >>> assert success is True
+        >>> success = DB_API.add_user("new_user", "hashed_password", "user@Exemple.com")
+        >>> assert success is True # Soit celui çi, raise une exc si pas True
+        >>> if not isinstance(success, Exception): # Soit celui ça
+        >>>     print(success)
         """
 
         return cursor.execute(_Requests.add_user.format(username, password, email, is_google_user))
 
+    @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_status(self, user_id: int, status: int, *, cursor: MySQLCursor):
+    def add_status(user_id: int, status: int, *, cursor: MySQLCursor):
         """
         Permet d'ajouter un statut à un utilisateur.
 
@@ -305,16 +313,18 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> success = db_api.add_status(1, 0)
-        >>> assert success is True
+        >>> success = DB_API.add_status(1, 0)
+        >>> assert success is True # Soit celui çi, raise une exc si pas True
+        >>> if not isinstance(success, Exception): # Soit celui ça
+        >>>     print(success)
         """
 
         return cursor.execute(_Requests.add_status.format(user_id, status))
 
+    @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_project(self, name: str, *, cursor: MySQLCursor):
+    def add_project(name: str, *, cursor: MySQLCursor):
         """
         Permet d'ajouter un nouveau projet à la DB.
 
@@ -326,16 +336,18 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> success = db_api.add_project("project_test")
-        >>> assert success is True
+        >>> success = DB_API.add_project("project_test")
+        >>> assert success is True # Soit celui çi, raise une exc si pas True
+        >>> if not isinstance(success, Exception): # Soit celui ça
+        >>>     print(success)
         """
         return cursor.execute(_Requests.add_project.format(name))
 
+    @staticmethod
     @cm_conn()
     @cm_cursor()
     def add_user_to_group(
-        self, project_id: int, user_id: int, permission: int, joined: bool, *, cursor: MySQLCursor
+        project_id: int, user_id: int, permission: int, joined: bool, *, cursor: MySQLCursor
     ):
         """
         Permet d'ajouter un utilisateur à un groupe de projet.
@@ -352,18 +364,19 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> success = db_api.add_user_to_group(1, 1, 1, True)
-        >>> assert success is True
+        >>> success = DB_API.add_user_to_group(1, 1, 1, True)
+        >>> assert success is True # Soit celui çi, raise une exc si pas True
+        >>> if not isinstance(success, Exception): # Soit celui ça
+        >>>     print(success)
         """
         return cursor.execute(
             _Requests.add_user_to_group.format(project_id, user_id, permission, joined)
         )
 
+    @staticmethod
     @cm_conn()
     @cm_cursor()
     def add_task_info(
-        self,
         status: int,
         priority: int,
         title: str,
@@ -393,10 +406,11 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> success = db_api.add_task_info(1, 2, "titre tache",
+        >>> success = DB_API.add_task_info(1, 2, "titre tache",
         "ceci est une description de la tache", datetime.datetime.now(), False, 1)
-        >>> assert success is True
+        >>> assert success is True # Soit celui çi, raise une exc si pas True
+        >>> if not isinstance(success, Exception): # Soit celui ça
+        >>>     print(success)
         """
         return cursor.execute(
             _Requests.add_task_info.format(
@@ -404,9 +418,10 @@ class DB_API:
             )
         )
 
+    @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_task(self, project_id: int, task_info_id: int, user_id: int, *, cursor: MySQLCursor):
+    def add_task(project_id: int, task_info_id: int, user_id: int, *, cursor: MySQLCursor):
         """
         Permet d'ajouter une tâche à un projet.
 
@@ -420,15 +435,17 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> success = db_api.add_task(1, 1, 1)
-        >>> assert success is True
+        >>> success = DB_API.add_task(1, 1, 1)
+        >>> assert success is True # Soit celui çi, raise une exc si pas True
+        >>> if not isinstance(success, Exception): # Soit celui ça
+        >>>     print(success)
         """
         return cursor.execute(_Requests.add_task.format(project_id, task_info_id, user_id))
 
+    @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_subtask(self, task_id: int, task_info_id: int, *, cursor: MySQLCursor):
+    def add_subtask(task_id: int, task_info_id: int, *, cursor: MySQLCursor):
         """
         Permet d'ajouter une sous-tâche à une tâche.
 
@@ -441,15 +458,17 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> success = db_api.add_subtask(1, 1)
-        >>> assert success is True
+        >>> success = DB_API.add_subtask(1, 1)
+        >>> assert success is True # Soit celui çi, raise une exc si pas True
+        >>> if not isinstance(success, Exception): # Soit celui ça
+        >>>     print(success)
         """
         return cursor.execute(_Requests.add_subtask.format(task_id, task_info_id))
 
+    @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_user_to_task_group(self, task_project_id: int, user_id: int, *, cursor: MySQLCursor):
+    def add_user_to_task_group(task_project_id: int, user_id: int, *, cursor: MySQLCursor):
         """
         Permet d'ajouter un utilisateur à un groupe de tâches.
 
@@ -462,15 +481,17 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> success = db_api.add_user_to_task_group(1, 1)
-        >>> assert success is True
+        >>> success = DB_API.add_user_to_task_group(1, 1)
+        >>> assert success is True # Soit celui çi, raise une exc si pas True
+        >>> if not isinstance(success, Exception): # Soit celui ça
+        >>>     print(success)
         """
         return cursor.execute(_Requests.add_user_to_task_group.format(task_project_id, user_id))
 
+    @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_user_log(self, user_id: int, action: str, details: str, *, cursor: MySQLCursor):
+    def add_user_log(user_id: int, action: str, details: str, *, cursor: MySQLCursor):
         """
         Permet d'ajouter une log d'action pour un utilisateur.
 
@@ -484,12 +505,13 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> db_api = DB_API()
-        >>> success = db_api.add_user_log(1, "affect", "user to task")
-        >>> assert success is True
+        >>> success = DB_API.add_user_log(1, "affect", "user to task")
+        >>> assert success is True # Soit celui çi, raise une exc si pas True
+        >>> if not isinstance(success, Exception): # Soit celui ça
+        >>>     print(success)
         """
         return cursor.execute(_Requests.add_user_log.format(user_id, action, details))
 
 
 if __name__ == "__main__":
-    api = DB_API()
+    pass
