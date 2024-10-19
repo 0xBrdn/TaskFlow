@@ -104,11 +104,11 @@ def cm_conn() -> Callable:
 
     Utilisé seulement pour les ajouts dans la base de données,
     les modifications et les suppressions, en tant que "context manager".
-    :return: True si commit, False si rollback
+    :return: True si commit, Exception si rollback
     """
 
     def decorator(func: Callable) -> Callable:
-        def wrapper(*args, **kwargs) -> bool:
+        def wrapper(*args, **kwargs) -> Union[bool, Exception]:
             global conn
             if not isinstance(conn, MySQLConnectionAbstract):
                 _conn: Optional[Union[MySQLConnectionAbstract, PooledMySQLConnection]] = (
@@ -122,7 +122,7 @@ def cm_conn() -> Callable:
             if isinstance(res, Exception):
                 conn.rollback()
                 _log.debug("Rollback effectué")
-                return False
+                return res
             else:
                 conn.commit()
                 _log.debug("Commit effectué")
