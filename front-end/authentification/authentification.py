@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from authentificationLogic import login_user  # Importer la logique d'authentification
+import bcrypt
+from backend.db_api import DB_API
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -137,17 +138,30 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        self.inputMail.returnPressed.connect(self.bouton_animation)
+        self.inputPassword.returnPressed.connect(self.bouton_animation)
+
+
+    def bouton_animation(self):
+        self.boutonValider.setFocus()
+        self.handle_login()
+        QtCore.QTimer.singleShot(100, self.boutonValider.clearFocus)
+
     def handle_login(self):
-        username = self.inputMail.text()
+        email = self.inputMail.text()
         password = self.inputPassword.text()
-        print(f'Utilisation de {username} avec {password}')
 
-        # Appeler la fonction login_user importée depuis authentificationLogic.py
-        if login_user(username, password):
-            print('connexion ok')
+        hashpass = DB_API.get_email_hashpass(email)
+        if isinstance(hashpass, Exception) or not hashpass:
+            print("Identifiant incorrect ou compte non local", hashpass)
+            return False
 
+        elif hashpass[0] == password:
+            print("YAY")
+            return True
         else:
-            print('connexion nok')
+            print("Identifiant ou mot de passe incorrect")
+            return False
 
     def load_stylesheet(self, MainWindow):
         with open("style.qss", "r") as file:

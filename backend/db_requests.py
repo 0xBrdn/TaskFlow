@@ -1,4 +1,6 @@
 class _Requests:
+    get_email_hashpass = "SELECT password FROM users WHERE email = '{}';"
+
     get_all_users = "SELECT userID, username, email, is_google_user FROM users;"
 
     get_user_hashpass = "SELECT password FROM users WHERE userID = {};"

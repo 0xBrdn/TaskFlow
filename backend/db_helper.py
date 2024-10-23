@@ -8,7 +8,7 @@ from mysql.connector.abstracts import MySQLConnectionAbstract
 from mysql.connector.pooling import PooledMySQLConnection
 from mysql.connector.types import RowType
 
-from config import DB_HOST, DB_USER, DB_DATABASE, DB_PASSWORD
+from .config import DB_HOST, DB_USER, DB_DATABASE, DB_PASSWORD
 
 ResultType: TypeAlias = Union[List[RowType], Optional[RowType], str, Exception]
 
@@ -39,7 +39,6 @@ def cm_cursor() -> Callable:
                 kwargs.pop("cursor")
             else:
                 cursor = conn.cursor()
-
             try:
                 res = func(cursor=cursor, *args, **kwargs)
             except Exception as e:
