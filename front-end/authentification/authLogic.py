@@ -1,29 +1,28 @@
 import mysql.connector
 from mysql.connector import Error
 import bcrypt
-import requests
-import json
+
 
 def connect_to_db():
     """
     Se connecte à la base de données MySQL.
 
     Returns:
-        connection: L'objet de connexion à la base de données si la connexion est réussie, sinon None.
+        connection: L'objet de connexion à la base de données
+        si la connexion est réussie, sinon None.
     """
     try:
         connection = mysql.connector.connect(
-            host='mysql-taskflowsae.alwaysdata.net',
-            database='taskflowsae_db',
-            user='379290_user',
-            password='&Y37tMHYrC9J&G7SC7R4mRS?6KBBHD8c!HQ6!4n5'
+            host="mysql-taskflowsae.alwaysdata.net",
+            database="taskflowsae_db",
+            user="379290_user",
+            password="&Y37tMHYrC9J&G7SC7R4mRS?6KBBHD8c!HQ6!4n5",
         )
         if connection.is_connected():
-            print("Connexion à la base de données MySQL réussie")
             return connection
-    except Error as e:
-        print(f"Erreur lors de la connexion à MySQL : {e}")
+    except Error:
         return None
+
 
 def close_db_connection(connection):
     """
@@ -34,7 +33,8 @@ def close_db_connection(connection):
     """
     if connection.is_connected():
         connection.close()
-        print("Connexion à MySQL fermée.")
+
+
 def create_user(username, password, email):
     """
     Crée un nouvel utilisateur dans la base de données.
@@ -54,18 +54,18 @@ def create_user(username, password, email):
 
         cursor = connection.cursor()
 
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
-        query = """INSERT INTO user (username, password, email) 
+        query = """INSERT INTO user (username, password, email)
                    VALUES (%s, %s, %s)"""
         cursor.execute(query, (username, hashed_password, email))
         connection.commit()
-        print("Utilisateur créé avec succès.")
-    except Error as e:
-        print(f"Erreur lors de la création de l'utilisateur : {e}")
+    except Error:
+        pass
     finally:
         if connection:
             close_db_connection(connection)
+
 
 def login_user(username, password):
     """
@@ -95,25 +95,22 @@ def login_user(username, password):
         if result:
             stored_password = result[0]
 
-            if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
-                print("Connexion réussie.")
-                cursor.fetchall() 
+            if bcrypt.checkpw(password.encode("utf-8"), stored_password.encode("utf-8")):
+                cursor.fetchall()
                 return True
             else:
-                print("Mot de passe incorrect.")
                 cursor.fetchall()
                 return False
         else:
-            print("Nom d'utilisateur non trouvé.")
             return False
-    except Error as e:
-        print(f"Erreur lors de la connexion de l'utilisateur : {e}")
+    except Error:
         return False
     finally:
         if cursor:
-            cursor.close() 
+            cursor.close()
         if connection:
             close_db_connection(connection)
+
 
 def change_password(username, old_password, new_password):
     """
@@ -144,33 +141,30 @@ def change_password(username, old_password, new_password):
         if result:
             stored_password = result[0]
 
-            if bcrypt.checkpw(old_password.encode('utf-8'), stored_password.encode('utf-8')):
+            if bcrypt.checkpw(old_password.encode("utf-8"), stored_password.encode("utf-8")):
                 cursor.fetchall()
                 cursor.close()
 
-                hashed_new_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+                hashed_new_password = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt())
 
                 cursor = connection.cursor()
 
                 update_query = "UPDATE user SET password = %s WHERE username = %s"
                 cursor.execute(update_query, (hashed_new_password, username))
                 connection.commit()
-                print("Mot de passe changé avec succès.")
                 return True
             else:
-                print("L'ancien mot de passe est incorrect.")
                 return False
         else:
-            print("Nom d'utilisateur non trouvé.")
             return False
-    except Error as e:
-        print(f"Erreur lors du changement de mot de passe : {e}")
+    except Error:
         return False
     finally:
         if cursor:
             cursor.close()
         if connection:
             close_db_connection(connection)
+
 
 def logout_user():
     """
@@ -179,4 +173,3 @@ def logout_user():
     Note:
         Cette fonction peut être utilisée pour gérer les sessions côté serveur.
     """
-    print("Déconnexion réussie.")

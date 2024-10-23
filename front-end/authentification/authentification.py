@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-import bcrypt
 from backend.db_api import DB_API
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -141,7 +141,6 @@ class Ui_MainWindow(object):
         self.inputMail.returnPressed.connect(self.bouton_animation)
         self.inputPassword.returnPressed.connect(self.bouton_animation)
 
-
     def bouton_animation(self):
         self.boutonValider.setFocus()
         self.handle_login()
@@ -153,14 +152,11 @@ class Ui_MainWindow(object):
 
         hashpass = DB_API.get_email_hashpass(email)
         if isinstance(hashpass, Exception) or not hashpass:
-            print("Identifiant incorrect ou compte non local", hashpass)
             return False
 
         elif hashpass[0] == password:
-            print("YAY")
             return True
         else:
-            print("Identifiant ou mot de passe incorrect")
             return False
 
     def load_stylesheet(self, MainWindow):

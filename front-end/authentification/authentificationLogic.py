@@ -1,19 +1,16 @@
 # auth_logic.py
 import mysql.connector
-import bcrypt
 
 DB_USER = "379290_user"
 DB_PASSWORD = "&Y37tMHYrC9J&G7SC7R4mRS?6KBBHD8c!HQ6!4n5"
 DB_DATABASE = "taskflowsae_db"
 DB_HOST = "mysql-taskflowsae.alwaysdata.net"
 
+
 def login_user(username, password):
     try:
         conn = mysql.connector.connect(
-            host=DB_HOST,
-            database=DB_DATABASE,
-            user=DB_USER,
-            password=DB_PASSWORD
+            host=DB_HOST, database=DB_DATABASE, user=DB_USER, password=DB_PASSWORD
         )
         assert conn.is_connected()
         cursor = conn.cursor()
@@ -27,8 +24,7 @@ def login_user(username, password):
 
         return False
 
-    except Exception as e:
-        print(f"Error while connecting to MySQL: {e}")
+    except Exception:
         return False
 
     # finally:
@@ -36,4 +32,5 @@ def login_user(username, password):
     #         cursor.close()
     #         conn.close()
 
-login_user('toto','toto')
+
+login_user("toto", "toto")
