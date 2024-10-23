@@ -6,6 +6,11 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1035, 774)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("./images/logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
+        MainWindow.setWindowTitle("TaskFlow - Login")
+
 
         # Charger le fichier QSS
         self.load_stylesheet(MainWindow)

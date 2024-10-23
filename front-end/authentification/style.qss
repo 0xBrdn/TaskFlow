@@ -1,6 +1,6 @@
 /* Styles globaux pour tous les QWidget */
 QWidget#centralwidget {
-    border-image: url("./images/colorkit3.png");
+    border-image: url("./images/colorkit (5).png");
     border-repeat: no-repeat; /* Empêche la répétition de l'image */
     border-size: cover; /* Redimensionne l'image pour couvrir tout le widget */
 }
