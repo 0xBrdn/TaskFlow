@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1035</width>
-    <height>774</height>
+    <width>1109</width>
+    <height>763</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,9 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
-    <string notr="true"/>
+    <string notr="true">#centralwidget{
+border-image: url(:/images/images/colorkit3.png);
+}</string>
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="1" column="0">

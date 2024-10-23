@@ -6,10 +6,10 @@ from mysql.connector import Error
 def login_user(username, password):
     try:
         conn = mysql.connector.connect(
-            host='localhost',
-            database='database_name',
-            user='your_user',
-            password='your_password'
+            host='mysql-taskflowsae.alwaysdata.net',
+            database='Taskflow',
+            user='379290',
+            password='Admin1234!'
         )
 
         cursor = conn.cursor()

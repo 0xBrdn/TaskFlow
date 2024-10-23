@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from authLogic import login_user  # Importer la logique d'authentification
+from authentificationLogic import login_user  # Importer la logique d'authentification
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):

@@ -1,8 +1,8 @@
 /* Styles globaux pour tous les QWidget */
 QWidget#centralwidget {
-    background-image: url("./images/colorkit3.png");
-    background-repeat: no-repeat; /* Empêche la répétition de l'image */
-    background-size: cover; /* Redimensionne l'image pour couvrir tout le widget */
+    border-image: url("./images/colorkit3.png");
+    border-repeat: no-repeat; /* Empêche la répétition de l'image */
+    border-size: cover; /* Redimensionne l'image pour couvrir tout le widget */
 }
 
 /* Style pour frameMire */
