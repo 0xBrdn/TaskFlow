@@ -142,12 +142,12 @@ class Ui_MainWindow(object):
         password = self.inputPassword.text()
         print(f'Utilisation de {username} avec {password}')
 
-        # Appeler la fonction login_user importée depuis auth_logic.py
+        # Appeler la fonction login_user importée depuis authentificationLogic.py
         if login_user(username, password):
-            print('succès')
+            print('connexion ok')
 
         else:
-            print('echec')
+            print('connexion nok')
 
     def load_stylesheet(self, MainWindow):
         with open("style.qss", "r") as file:
