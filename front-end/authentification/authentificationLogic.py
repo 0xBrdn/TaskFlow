@@ -22,7 +22,7 @@ def login_user(username, password):
         cursor.execute("SELECT password FROM users WHERE email=%s;", (username,))
         record = cursor.fetchone()
 
-        if record[0] == password:
+        if record and record[0] == password:
             return True
 
         return False
