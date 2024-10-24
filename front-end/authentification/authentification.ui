@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1130</width>
-    <height>788</height>
+    <height>723</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,16 +19,16 @@
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
     <string notr="true">#centralwidget{
-border-image: url(:/images/images/colorkit3.png);
+border-image: url(:/images/images/colorkit (5).png);
 }</string>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0">
+    <item row="2" column="0">
      <widget class="QFrame" name="frameMire">
       <property name="minimumSize">
        <size>
         <width>350</width>
-        <height>30</height>
+        <height>500</height>
        </size>
       </property>
       <property name="maximumSize">
@@ -346,6 +346,42 @@ border-radius: 5
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item row="0" column="0" alignment="Qt::AlignHCenter">
+     <widget class="QFrame" name="frame">
+      <property name="minimumSize">
+       <size>
+        <width>300</width>
+        <height>140</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>300</width>
+        <height>160</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-image: url(:/images/images/TASKFLOW (3).png);</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout"/>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QFrame" name="frame_2">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
      </widget>
     </item>
    </layout>
