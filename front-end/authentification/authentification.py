@@ -7,10 +7,8 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1035, 774)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("./images/logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("./images/logo_alternatif.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
-        MainWindow.setWindowTitle("TaskFlow - Login")
-
 
         # Charger le fichier QSS
         self.load_stylesheet(MainWindow)
@@ -21,7 +19,7 @@ class Ui_MainWindow(object):
         self.gridLayout.setObjectName("gridLayout")
 
         self.frameMire = QtWidgets.QFrame(self.centralwidget)
-        self.frameMire.setMinimumSize(QtCore.QSize(350, 30))
+        self.frameMire.setMinimumSize(QtCore.QSize(350, 500))
         self.frameMire.setMaximumSize(QtCore.QSize(350, 500))
         self.frameMire.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameMire.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -137,22 +135,21 @@ class Ui_MainWindow(object):
         self.boutonValider.clicked.connect(self.handle_login)
 
         self.verticalLayout.addWidget(self.frameBouton, 0, QtCore.Qt.AlignHCenter)
-        # self.gridLayout.addWidget(self.frameMire, 2, 0, 1, 1)
-        # self.frame = QtWidgets.QFrame(self.centralwidget)
-        # self.frame.setMinimumSize(QtCore.QSize(300, 140))
-        # self.frame.setMaximumSize(QtCore.QSize(300, 160))
-        # self.frame.setStyleSheet("border-image: url(:/images/images/TASKFLOW (3).png);")
-        # self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        # self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        # self.frame.setObjectName("frame")
-        # self.horizontalLayout = QtWidgets.QHBoxLayout(self.frame)
-        # self.horizontalLayout.setObjectName("horizontalLayout")
-        # self.gridLayout.addWidget(self.frame, 0, 0, 1, 1, QtCore.Qt.AlignHCenter)
-        # self.frame_2 = QtWidgets.QFrame(self.centralwidget)
-        # self.frame_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        # self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
-        # self.frame_2.setObjectName("frame_2")
-        # self.gridLayout.addWidget(self.frame_2, 3, 0, 1, 1)
+        self.gridLayout.addWidget(self.frameMire, 2, 0, 1, 1)
+        self.frame = QtWidgets.QFrame(self.centralwidget)
+        self.frame.setMinimumSize(QtCore.QSize(300, 140))
+        self.frame.setMaximumSize(QtCore.QSize(300, 160))
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.frame)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.gridLayout.addWidget(self.frame, 0, 0, 1, 1, QtCore.Qt.AlignHCenter)
+        self.frame_2 = QtWidgets.QFrame(self.centralwidget)
+        self.frame_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_2.setObjectName("frame_2")
+        self.gridLayout.addWidget(self.frame_2, 3, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -186,7 +183,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("TaskFlow - Login", "TaskFlow - Login"))
         self.label.setText(_translate("MainWindow", "S'identifier"))
         self.titreMail.setText(_translate("MainWindow", "E-Mail"))
         self.titrePassword.setText(_translate("MainWindow", "Mot de passe"))

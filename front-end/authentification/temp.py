@@ -196,4 +196,3 @@ class Ui_MainWindow(object):
         self.titreMail.setText(_translate("MainWindow", "E-Mail"))
         self.titrePassword.setText(_translate("MainWindow", "Mot de passe"))
         self.boutonValider.setText(_translate("MainWindow", "Valider"))
-import res_rc

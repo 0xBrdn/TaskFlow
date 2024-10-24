@@ -4,12 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b11fcf0e-807e-4bab-8e39-8b1dbce24052" name="Changes" comment="">
+    <list default="true" id="5338d278-2e09-40d0-8047-f0efcab8280b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/SAE502-TaskFlow.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SAE502-TaskFlow.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front-end/authentification/authentification.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/authentification.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/authentification/authentification.ui" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/authentification.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/authentification/images/Thumbs.db" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/images/Thumbs.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/authentification/res.qrc" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/res.qrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front-end/authentification/style.qss" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/style.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front-end/authentification/temp.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/temp.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,53 +19,44 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 4
-}</component>
-  <component name="ProjectId" id="2npTgbJGUyIvNTYDhq4T8CM5OYM" />
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Ykari68"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/zzendor/SAE502-TaskFlow.git",
+    "accountId": "0ba7469b-52ba-4cf0-b509-4542e0a822ad"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 6
+}]]></component>
+  <component name="ProjectId" id="2nsKSAFhi38Cn0Y2e628EdeJqnL" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.authentification.executor&quot;: &quot;Run&quot;,
-    &quot;Python.authentificationLogic.executor&quot;: &quot;Run&quot;,
-    &quot;Python.temp.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/MachinesVirtuelles/Temp/miniconda/conda.exe&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.authentification.executor": "Run",
+    "Python.temp.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "develop"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Python.authentification">
     <configuration name="authentification" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="TaskFlow" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="C:\MachinesVirtuelles\Temp\miniconda\envs\TaskFlow" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/front-end/authentification" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/front-end/authentification/authentification.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="authentificationLogic" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="TaskFlow" />
+      <module name="SAE502-TaskFlow" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -75,7 +68,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/front-end/authentification/authentificationLogic.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/front-end/authentification/authentification.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -110,7 +103,6 @@
       <list>
         <item itemvalue="Python.authentification" />
         <item itemvalue="Python.temp" />
-        <item itemvalue="Python.authentificationLogic" />
       </list>
     </recent_temporary>
   </component>
@@ -124,35 +116,12 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="b11fcf0e-807e-4bab-8e39-8b1dbce24052" name="Changes" comment="" />
-      <created>1729669129578</created>
+      <changelist id="5338d278-2e09-40d0-8047-f0efcab8280b" name="Changes" comment="" />
+      <created>1729756340923</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1729669129578</updated>
+      <updated>1729756340923</updated>
     </task>
     <servers />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="FILTERS">
-                <map>
-                  <entry key="branch">
-                    <value>
-                      <list>
-                        <option value="develop" />
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </State>
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
 </project>
