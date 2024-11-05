@@ -6,7 +6,7 @@ QWidget#centralwidget {
 }
 
 #frame {
-    border-image: url("./images/TASKFLOW (5).png");
+    border-image: url("./images/TASKFLOW (3).png");
     border-size: cover; /* Redimensionne l'image pour couvrir tout le widget */
 }
 
@@ -23,6 +23,11 @@ QWidget#centralwidget {
 
 /* Style pour frameLogin */
 #frameLogin {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/* Style pour frameCreerCompte */
+#frameCreerCompte {
     background-color: rgba(0, 0, 0, 0);
 }
 
