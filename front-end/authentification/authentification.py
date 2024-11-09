@@ -189,11 +189,11 @@ class Ui_MainWindow(object):
         # Store MainWindow reference
         self.main_window = MainWindow
 
+        # Initialize the form state and connections
+        self.update_form_state()
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-        self.inputMail.returnPressed.connect(self.handle_login)
-        self.inputPassword.returnPressed.connect(self.handle_login)
 
     # def bouton_animation(self):
     #     self.boutonValider.setFocus()
@@ -201,18 +201,21 @@ class Ui_MainWindow(object):
     #     QtCore.QTimer.singleShot(100, self.boutonValider.clearFocus)
 
     def show_signup_form(self):
-        print("Switch to sign-up form")
-        if self.is_login_form:
-            # Change to signup form
-            self.is_login_form = False
-            self.update_form_state()
-        else:
-            # Change back to login form
-            self.is_login_form = True
-            self.update_form_state()
+        """Toggle between login and signup forms"""
+        self.is_login_form = not self.is_login_form
+        self.update_form_state()
 
     def update_form_state(self):
+        """Update form labels and button connections based on current state"""
         _translate = QtCore.QCoreApplication.translate
+
+        # Disconnect any existing connections
+        try:
+            self.boutonValider.clicked.disconnect()
+            self.inputMail.returnPressed.disconnect()
+            self.inputPassword.returnPressed.disconnect()
+        except:
+            pass  # No connections to disconnect
 
         if self.is_login_form:
             # Login form state
@@ -222,6 +225,11 @@ class Ui_MainWindow(object):
             self.boutonCreerCompte.setText("<a href='#'>Créer un compte</a>")
             self.inputPassword.setPlaceholderText("")
             self.inputMail.setPlaceholderText("")
+
+            # Set login form connections
+            self.boutonValider.clicked.connect(self.handle_login)
+            self.inputMail.returnPressed.connect(self.handle_login)
+            self.inputPassword.returnPressed.connect(self.handle_login)
         else:
             # Signup form state
             self.main_window.setWindowTitle(_translate("MainWindow", "TaskFlow - Inscription"))
@@ -231,6 +239,11 @@ class Ui_MainWindow(object):
             self.inputPassword.setPlaceholderText("Minimum 8 caractères")
             self.inputMail.setPlaceholderText("exemple@email.com")
 
+            # Set signup form connections
+            self.boutonValider.clicked.connect(self.handle_signup)
+            self.inputMail.returnPressed.connect(self.handle_signup)
+            self.inputPassword.returnPressed.connect(self.handle_signup)
+
     def handle_login(self):
         email = self.inputMail.text()
         password = self.inputPassword.text()
@@ -238,15 +251,77 @@ class Ui_MainWindow(object):
 
         hashpass = DB_API.get_email_hashpass(email)
         if isinstance(hashpass, Exception) or not hashpass:
+            self.show_error_message("Échec de connexion", "Email ou mot de passe incorrect")
             print("echec")
             return False
 
         elif hashpass[0] == password:
+            self.show_success_message("Connexion réussie", "Bienvenue!")
             print("succes")
             return True
         else:
+            self.show_error_message("Échec de connexion", "Email ou mot de passe incorrect")
             print("echec")
             return False
+
+    def handle_signup(self):
+        """Handle signup form submission"""
+        email = self.inputMail.text()
+        password = self.inputPassword.text()
+
+        # Basic validation
+        if not self.validate_email(email):
+            self.show_error_message("Erreur d'inscription", "Veuillez entrer une adresse email valide")
+            return False
+
+        if len(password) < 8:
+            self.show_error_message("Erreur d'inscription", "Le mot de passe doit contenir au moins 8 caractères")
+            return False
+
+        # Check if email already exists
+        existing_user = DB_API.get_email_hashpass(email)
+        if existing_user and not isinstance(existing_user, Exception):
+            self.show_error_message("Erreur d'inscription", "Cette adresse email est déjà utilisée")
+            return False
+
+        # Create new user
+        try:
+            # Assuming DB_API has a create_user method - you'll need to implement this
+            success = DB_API.create_user(email, password)
+            if success:
+                self.show_success_message("Inscription réussie", "Votre compte a été créé avec succès!")
+                # Switch back to login form
+                self.is_login_form = True
+                self.update_form_state()
+                return True
+            else:
+                self.show_error_message("Erreur d'inscription", "Erreur lors de la création du compte")
+                return False
+        except Exception as e:
+            self.show_error_message("Erreur d'inscription", f"Une erreur est survenue: {str(e)}")
+            return False
+
+    def validate_email(self, email):
+        """Basic email validation"""
+        import re
+        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        return re.match(pattern, email) is not None
+
+    def show_error_message(self, title, message):
+        """Show error message dialog"""
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Critical)
+        msg.setWindowTitle(title)
+        msg.setText(message)
+        msg.exec_()
+
+    def show_success_message(self, title, message):
+        """Show success message dialog"""
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.setWindowTitle(title)
+        msg.setText(message)
+        msg.exec_()
 
     def load_stylesheet(self, MainWindow):
         with open("style.qss", "r") as file:

@@ -5,14 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5338d278-2e09-40d0-8047-f0efcab8280b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/front-end/authentification/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/SAE502-TaskFlow.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SAE502-TaskFlow.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front-end/authentification/authentification.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/authentification.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/authentification/authentification.ui" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/authentification.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/authentification/res.qrc" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/res.qrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/authentification/style.qss" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/style.qss" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
