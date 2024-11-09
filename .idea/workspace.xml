@@ -5,18 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5338d278-2e09-40d0-8047-f0efcab8280b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/front-end/authentification/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/SAE502-TaskFlow.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SAE502-TaskFlow.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front-end/authentification/authentification.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/authentification.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front-end/authentification/authentification.ui" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/authentification.ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front-end/authentification/res.qrc" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/res.qrc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front-end/authentification/style.qss" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/style.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/authentification/temp.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/temp.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -46,18 +54,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.authentification.executor&quot;: &quot;Run&quot;,
-    &quot;Python.temp.executor&quot;: &quot;Run&quot;,
-    &quot;Python.temp01.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/z.assens/AppData/Local/miniconda3/conda.exe&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.authentification.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.temp.executor": "Run",
+    "Python.temp01.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "develop",
+    "last_opened_file_path": "C:/Users/defaultuser0/miniconda3/condabin/conda.bat",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
-  <component name="RunManager" selected="Python.temp">
+}]]></component>
+  <component name="RunManager" selected="Python.main">
     <configuration name="authentification" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SAE502-TaskFlow" />
       <option name="ENV_FILES" value="" />
@@ -72,6 +81,28 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/front-end/authentification/authentification.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="SAE502-TaskFlow" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/front-end/authentification" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/front-end/authentification/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -126,8 +157,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.temp" />
+        <item itemvalue="Python.main" />
         <item itemvalue="Python.authentification" />
+        <item itemvalue="Python.temp" />
         <item itemvalue="Python.temp01" />
       </list>
     </recent_temporary>

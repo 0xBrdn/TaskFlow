@@ -60,8 +60,6 @@ QPushButton:pressed {
     background-color: rgb(92, 92, 92);
 }
 
-QPushButton:focus {
-    background-color: rgb(2, 80, 196);
-}
+
 
 

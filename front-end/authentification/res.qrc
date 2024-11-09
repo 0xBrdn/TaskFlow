@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="images">
+    <file>C:/Users/defaultuser0/Downloads/fleche.png</file>
     <file>images/TASKFLOW (3).png</file>
     <file>images/TASKFLOW (2).png</file>
     <file>images/TASKFLOW (1).png</file>

@@ -183,31 +183,69 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.frame_2, 3, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
 
+        # Add a state variable to track current form
+        self.is_login_form = True
+
+        # Store MainWindow reference
+        self.main_window = MainWindow
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        self.inputMail.returnPressed.connect(self.bouton_animation)
-        self.inputPassword.returnPressed.connect(self.bouton_animation)
+        self.inputMail.returnPressed.connect(self.handle_login)
+        self.inputPassword.returnPressed.connect(self.handle_login)
 
-    def bouton_animation(self):
-        self.boutonValider.setFocus()
-        self.handle_login()
-        QtCore.QTimer.singleShot(100, self.boutonValider.clearFocus)
+    # def bouton_animation(self):
+    #     self.boutonValider.setFocus()
+    #     self.handle_login()
+    #     QtCore.QTimer.singleShot(100, self.boutonValider.clearFocus)
 
     def show_signup_form(self):
         print("Switch to sign-up form")
+        if self.is_login_form:
+            # Change to signup form
+            self.is_login_form = False
+            self.update_form_state()
+        else:
+            # Change back to login form
+            self.is_login_form = True
+            self.update_form_state()
+
+    def update_form_state(self):
+        _translate = QtCore.QCoreApplication.translate
+
+        if self.is_login_form:
+            # Login form state
+            self.main_window.setWindowTitle(_translate("MainWindow", "TaskFlow - Login"))
+            self.label.setText(_translate("MainWindow", "S'identifier"))
+            self.boutonValider.setText(_translate("MainWindow", "Valider"))
+            self.boutonCreerCompte.setText("<a href='#'>Créer un compte</a>")
+            self.inputPassword.setPlaceholderText("")
+            self.inputMail.setPlaceholderText("")
+        else:
+            # Signup form state
+            self.main_window.setWindowTitle(_translate("MainWindow", "TaskFlow - Inscription"))
+            self.label.setText(_translate("MainWindow", "Créer un compte"))
+            self.boutonValider.setText(_translate("MainWindow", "S'inscrire"))
+            self.boutonCreerCompte.setText("<a href='#'>Retour</a>")
+            self.inputPassword.setPlaceholderText("Minimum 8 caractères")
+            self.inputMail.setPlaceholderText("exemple@email.com")
 
     def handle_login(self):
         email = self.inputMail.text()
         password = self.inputPassword.text()
+        print("Authentification...")
 
         hashpass = DB_API.get_email_hashpass(email)
         if isinstance(hashpass, Exception) or not hashpass:
+            print("echec")
             return False
 
         elif hashpass[0] == password:
+            print("succes")
             return True
         else:
+            print("echec")
             return False
 
     def load_stylesheet(self, MainWindow):
@@ -222,13 +260,3 @@ class Ui_MainWindow(object):
         self.titreMail.setText(_translate("MainWindow", "E-Mail"))
         self.titrePassword.setText(_translate("MainWindow", "Mot de passe"))
         self.boutonValider.setText(_translate("MainWindow", "Valider"))
-
-if __name__ == "__main__":
-    import sys
-
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
