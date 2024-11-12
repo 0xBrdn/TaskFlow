@@ -6,7 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="5338d278-2e09-40d0-8047-f0efcab8280b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/authentification/authentification.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/authentification.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front-end/authentification/authentificationLogic.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/authentificationLogic.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front-end/authentification/temp.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/temp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front-end/authentification/temp01.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,18 +50,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.authentification.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.temp.executor": "Run",
-    "Python.temp01.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "develop",
-    "last_opened_file_path": "C:/Users/defaultuser0/miniconda3/condabin/conda.bat",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.authentification.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.temp.executor&quot;: &quot;Run&quot;,
+    &quot;Python.temp01.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/defaultuser0/miniconda3/condabin/conda.bat&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Python.main">
     <configuration name="authentification" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SAE502-TaskFlow" />

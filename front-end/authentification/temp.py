@@ -4,231 +4,87 @@ from backend.db_api import DB_API
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1035, 774)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("./images/logo_alternatif.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
+        # ... (keep all existing setup code until frameMire) ...
 
-        # Charger le fichier QSS
-        self.load_stylesheet(MainWindow)
-
-        # Setup existing design
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
-        self.gridLayout.setObjectName("gridLayout")
-
-        # Existing frames and widgets
+        # Modify the frameMire setup to enable animations
         self.frameMire = QtWidgets.QFrame(self.centralwidget)
         self.frameMire.setMinimumSize(QtCore.QSize(350, 500))
         self.frameMire.setMaximumSize(QtCore.QSize(350, 500))
         self.frameMire.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameMire.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameMire.setObjectName("frameMire")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.frameMire)
-        self.verticalLayout.setObjectName("verticalLayout")
 
-        # Frame title
-        self.frameTitre = QtWidgets.QFrame(self.frameMire)
-        self.frameTitre.setMinimumSize(QtCore.QSize(100, 60))
-        self.frameTitre.setMaximumSize(QtCore.QSize(300, 60))
-        self.frameTitre.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frameTitre.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frameTitre.setObjectName("frameTitre")
-        self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.frameTitre)
-        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        # Add opacity effect for fade animation
+        self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(self.frameMire)
+        self.opacity_effect.setOpacity(1.0)
+        self.frameMire.setGraphicsEffect(self.opacity_effect)
 
-        # Title label
-        self.label = QtWidgets.QLabel(self.frameTitre)
-        self.label.setMinimumSize(QtCore.QSize(100, 60))
-        self.label.setMaximumSize(QtCore.QSize(1500, 60))
-        font = QtGui.QFont()
-        font.setFamily("Tahoma")
-        font.setPointSize(17)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label.setFont(font)
-        self.label.setObjectName("label")
-        self.verticalLayout_5.addWidget(self.label)
-        self.verticalLayout.addWidget(self.frameTitre, 0, QtCore.Qt.AlignHCenter)
+        # Create animations
+        self.fade_out_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.fade_out_animation.setDuration(300)  # 300ms duration
+        self.fade_out_animation.setStartValue(1.0)
+        self.fade_out_animation.setEndValue(0.0)
+        self.fade_out_animation.setEasingCurve(QtCore.QEasingCurve.InOutQuad)
 
-        # Frame for email input
-        self.frameLogin = QtWidgets.QFrame(self.frameMire)
-        self.frameLogin.setMinimumSize(QtCore.QSize(350, 100))
-        self.frameLogin.setMaximumSize(QtCore.QSize(350, 100))
-        self.frameLogin.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frameLogin.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frameLogin.setObjectName("frameLogin")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.frameLogin)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.fade_in_animation = QtCore.QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.fade_in_animation.setDuration(300)  # 300ms duration
+        self.fade_in_animation.setStartValue(0.0)
+        self.fade_in_animation.setEndValue(1.0)
+        self.fade_in_animation.setEasingCurve(QtCore.QEasingCurve.InOutQuad)
 
-        # Email title and input
-        self.titreMail = QtWidgets.QLabel(self.frameLogin)
-        self.titreMail.setMinimumSize(QtCore.QSize(60, 30))
-        self.titreMail.setMaximumSize(QtCore.QSize(60, 30))
-        font = QtGui.QFont()
-        font.setFamily("Tahoma")
-        font.setPointSize(13)
-        font.setBold(True)
-        font.setWeight(75)
-        self.titreMail.setFont(font)
-        self.verticalLayout_2.addWidget(self.titreMail)
+        # Create slide animation
+        self.slide_animation = QtCore.QPropertyAnimation(self.frameMire, b"geometry")
+        self.slide_animation.setDuration(300)  # 300ms duration
+        self.slide_animation.setEasingCurve(QtCore.QEasingCurve.InOutQuad)
 
-        self.inputMail = QtWidgets.QLineEdit(self.frameLogin)
-        self.inputMail.setMinimumSize(QtCore.QSize(300, 30))
-        self.inputMail.setMaximumSize(QtCore.QSize(300, 30))
-        font = QtGui.QFont()
-        font.setFamily("Tahoma")
-        font.setPointSize(10)
-        self.inputMail.setFont(font)
-        self.inputMail.setObjectName("inputMail")
-        self.verticalLayout_2.addWidget(self.inputMail)
+        # Connect animation finished signals
+        self.fade_out_animation.finished.connect(self.on_fade_out_finished)
+        self.fade_in_animation.finished.connect(self.on_fade_in_finished)
 
-        self.verticalLayout.addWidget(self.frameLogin, 0, QtCore.Qt.AlignHCenter)
-
-        # Frame for password input
-        self.framePassword = QtWidgets.QFrame(self.frameMire)
-        self.framePassword.setMinimumSize(QtCore.QSize(350, 100))
-        self.framePassword.setMaximumSize(QtCore.QSize(350, 100))
-        self.framePassword.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.framePassword.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.framePassword.setObjectName("framePassword")
-        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.framePassword)
-        self.verticalLayout_3.setObjectName("verticalLayout_3")
-
-        # Password title and input
-        self.titrePassword = QtWidgets.QLabel(self.framePassword)
-        self.titrePassword.setMaximumSize(QtCore.QSize(120, 30))
-        font = QtGui.QFont()
-        font.setFamily("Tahoma")
-        font.setPointSize(13)
-        font.setBold(True)
-        font.setWeight(75)
-        self.titrePassword.setFont(font)
-        self.verticalLayout_3.addWidget(self.titrePassword)
-
-        self.inputPassword = QtWidgets.QLineEdit(self.framePassword)
-        self.inputPassword.setMinimumSize(QtCore.QSize(300, 30))
-        self.inputPassword.setMaximumSize(QtCore.QSize(300, 30))
-        font = QtGui.QFont()
-        font.setFamily("Tahoma")
-        font.setPointSize(10)
-        self.inputPassword.setFont(font)
-        self.inputPassword.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.inputPassword.setObjectName("inputPassword")
-        self.verticalLayout_3.addWidget(self.inputPassword)
-
-        self.verticalLayout.addWidget(self.framePassword, 0, QtCore.Qt.AlignHCenter)
-
-        # Frame for the submit button
-        self.frameBouton = QtWidgets.QFrame(self.frameMire)
-        self.frameBouton.setMinimumSize(QtCore.QSize(150, 100))
-        self.frameBouton.setMaximumSize(QtCore.QSize(150, 100))
-        self.frameBouton.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frameBouton.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frameBouton.setObjectName("frameBouton")
-        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.frameBouton)
-        self.verticalLayout_4.setObjectName("verticalLayout_4")
-
-        # Submit button
-        self.boutonValider = QtWidgets.QPushButton(self.frameBouton)
-        self.boutonValider.setMaximumSize(QtCore.QSize(150, 50))
-        font = QtGui.QFont()
-        font.setFamily("Tahoma")
-        font.setPointSize(13)
-        font.setBold(True)
-        font.setWeight(75)
-        self.boutonValider.setFont(font)
-        self.boutonValider.setObjectName("boutonValider")
-        self.verticalLayout_4.addWidget(self.boutonValider)
-        self.boutonValider.clicked.connect(self.handle_login)
-
-        self.verticalLayout.addWidget(self.frameBouton, 0, QtCore.Qt.AlignHCenter)
-
-        # "Créer un compte" label (link)
-        self.frameCreerCompte = QtWidgets.QFrame(self.frameMire)
-        self.frameCreerCompte.setMinimumSize(QtCore.QSize(100, 50))
-        self.frameCreerCompte.setMaximumSize(QtCore.QSize(100, 50))
-        self.frameCreerCompte.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frameCreerCompte.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frameCreerCompte.setObjectName("frameCreerCompte")
-        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.frameCreerCompte)
-        self.verticalLayout_6.setObjectName("verticalLayout_6")
-
-        self.boutonCreerCompte = QtWidgets.QLabel("<a href='#'>Créer un compte</a>", self.frameCreerCompte)
-        self.boutonCreerCompte.setMinimumSize(QtCore.QSize(25, 25))
-        self.boutonCreerCompte.setMaximumSize(QtCore.QSize(80, 25))
-        self.boutonCreerCompte.setObjectName("boutonCreerCompte")
-        self.boutonCreerCompte.setAlignment(QtCore.Qt.AlignCenter)
-        self.boutonCreerCompte.linkActivated.connect(self.show_signup_form)  # Connect the label to open signup form
-        self.verticalLayout_6.addWidget(self.boutonCreerCompte)
-        self.verticalLayout.addWidget(self.frameCreerCompte, 0, QtCore.Qt.AlignHCenter)
-
-        self.gridLayout.addWidget(self.frameMire, 2, 0, 1, 1)
-
-        self.frame = QtWidgets.QFrame(self.centralwidget)
-        self.frame.setMinimumSize(QtCore.QSize(300, 140))
-        self.frame.setMaximumSize(QtCore.QSize(300, 160))
-        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame.setObjectName("frame")
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.frame)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.gridLayout.addWidget(self.frame, 0, 0, 1, 1, QtCore.Qt.AlignHCenter)
-        self.frame_2 = QtWidgets.QFrame(self.centralwidget)
-        self.frame_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_2.setObjectName("frame_2")
-        self.gridLayout.addWidget(self.frame_2, 3, 0, 1, 1)
-        MainWindow.setCentralWidget(self.centralwidget)
-
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-        self.inputMail.returnPressed.connect(self.bouton_animation)
-        self.inputPassword.returnPressed.connect(self.bouton_animation)
-
-    def bouton_animation(self):
-        self.boutonValider.setFocus()
-        self.handle_login()
-        QtCore.QTimer.singleShot(100, self.boutonValider.clearFocus)
+        # ... (keep rest of the existing setup code) ...
 
     def show_signup_form(self):
-        print("Switch to sign-up form")
+        """Start the animation sequence to switch forms"""
+        if not self.fade_out_animation.state() == QtCore.QAbstractAnimation.Running:
+            # Store the target state
+            self.target_is_login_form = not self.is_login_form
+            # Start fade out animation
+            self.fade_out_animation.start()
 
-    def handle_login(self):
-        email = self.inputMail.text()
-        password = self.inputPassword.text()
+            # Setup and start slide animation
+            current_geometry = self.frameMire.geometry()
+            if self.is_login_form:
+                # Slide left for signup
+                self.slide_animation.setStartValue(current_geometry)
+                end_geometry = current_geometry.translated(-50, 0)
+                self.slide_animation.setEndValue(end_geometry)
+            else:
+                # Slide right for login
+                self.slide_animation.setStartValue(current_geometry)
+                end_geometry = current_geometry.translated(50, 0)
+                self.slide_animation.setEndValue(end_geometry)
+            self.slide_animation.start()
 
-        hashpass = DB_API.get_email_hashpass(email)
-        if isinstance(hashpass, Exception) or not hashpass:
-            return False
+    def on_fade_out_finished(self):
+        """Called when fade out animation completes"""
+        # Update the form state
+        self.is_login_form = self.target_is_login_form
+        self.update_form_state()
 
-        elif hashpass[0] == password:
-            return True
-        else:
-            return False
+        # Reset position
+        current_geometry = self.frameMire.geometry()
+        self.frameMire.setGeometry(
+            current_geometry.adjusted(50 if self.is_login_form else -50, 0, 50 if self.is_login_form else -50, 0))
 
-    def load_stylesheet(self, MainWindow):
-        with open("style.qss", "r") as file:
-            stylesheet = file.read()
-            MainWindow.setStyleSheet(stylesheet)
+        # Start fade in animation
+        self.fade_in_animation.start()
 
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("TaskFlow - Login", "TaskFlow - Login"))
-        self.label.setText(_translate("MainWindow", "S'identifier"))
-        self.titreMail.setText(_translate("MainWindow", "E-Mail"))
-        self.titrePassword.setText(_translate("MainWindow", "Mot de passe"))
-        self.boutonValider.setText(_translate("MainWindow", "Valider"))
+        # Setup and start reverse slide animation
+        self.slide_animation.setStartValue(self.frameMire.geometry())
+        self.slide_animation.setEndValue(current_geometry)
+        self.slide_animation.start()
 
-if __name__ == "__main__":
-    import sys
-
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+    def on_fade_in_finished(self):
+        """Called when fade in animation completes"""
+        # Reset the opacity effect
+        self.opacity_effect.setOpacity(1.0)
