@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from backend.db_api import DB_API
-from front_end2 import Ui_MainWindow as MainWindowUI
+from pagePrincipale import Ui_MainWindow as MainWindowUI
 
 
 class Ui_MainWindow(object):
@@ -8,7 +8,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1035, 774)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("./images/logo_alternatif.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("images/authentification/logo_alternatif.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
 
         # Charger le fichier QSS
@@ -328,7 +328,7 @@ class Ui_MainWindow(object):
         msg.exec_()
 
     def load_stylesheet(self, MainWindow):
-        with open("style.qss", "r") as file:
+        with open("authentification.qss", "r") as file:
             stylesheet = file.read()
             MainWindow.setStyleSheet(stylesheet)
 

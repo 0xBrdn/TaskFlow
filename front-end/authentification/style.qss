@@ -1,12 +1,12 @@
 /* Styles globaux pour tous les QWidget */
 QWidget#centralwidget {
-    border-image: url("./images/colorkit (5).png");
+    border-image: url("./images/authentification/colorkit (5).png");
     border-repeat: no-repeat; /* Empêche la répétition de l'image */
     border-size: cover; /* Redimensionne l'image pour couvrir tout le widget */
 }
 
 #frame {
-    border-image: url("./images/TASKFLOW (3).png");
+    border-image: url("./images/authentification/TASKFLOW (3).png");
     border-size: cover; /* Redimensionne l'image pour couvrir tout le widget */
 }
 

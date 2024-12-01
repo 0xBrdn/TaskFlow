@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        with open('style.qss', 'r') as f:
+        with open('pagePrincipale.qss', 'r') as f:
                 style = f.read()
                 MainWindow.setStyleSheet(style)
         MainWindow.setObjectName("MainWindow")
@@ -34,7 +34,7 @@ class Ui_MainWindow(object):
         self.label.setMinimumSize(QtCore.QSize(50, 50))
         self.label.setMaximumSize(QtCore.QSize(50, 50))
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap(":/newPrefix/image et recources/Design_sans_titre__3_-removebg-preview_1.png"))
+        self.label.setPixmap(QtGui.QPixmap("images/authentification/logo.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         self.horizontalLayout_3.addWidget(self.label)
@@ -46,8 +46,8 @@ class Ui_MainWindow(object):
         self.bouton_project1 = QtWidgets.QPushButton(self.icon_name_widget)
         self.bouton_project1.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/dashboard_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/dashboard.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        icon.addPixmap(QtGui.QPixmap("images/pagePrincipale/dashboard_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("images/pagePrincipale/dashboard.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.bouton_project1.setIcon(icon)
         self.bouton_project1.setCheckable(True)
         self.bouton_project1.setAutoExclusive(True)
@@ -56,8 +56,8 @@ class Ui_MainWindow(object):
         self.bouton_profile1 = QtWidgets.QPushButton(self.icon_name_widget)
         self.bouton_profile1.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/profile_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon1.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/profile.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        icon1.addPixmap(QtGui.QPixmap("images/pagePrincipale/profile_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("images/pagePrincipale/profile.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.bouton_profile1.setIcon(icon1)
         self.bouton_profile1.setCheckable(True)
         self.bouton_profile1.setAutoExclusive(True)
@@ -66,8 +66,8 @@ class Ui_MainWindow(object):
         self.bouton_message1 = QtWidgets.QPushButton(self.icon_name_widget)
         self.bouton_message1.setText("")
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/messages_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon2.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/messages.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        icon2.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.bouton_message1.setIcon(icon2)
         self.bouton_message1.setCheckable(True)
         self.bouton_message1.setAutoExclusive(True)
@@ -79,8 +79,8 @@ class Ui_MainWindow(object):
         self.bouton_quitter1 = QtWidgets.QPushButton(self.icon_name_widget)
         self.bouton_quitter1.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/log_out_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon3.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/log_out.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        icon3.addPixmap(QtGui.QPixmap("images/pagePrincipale/log_out_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap("images/pagePrincipale/log_out.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.bouton_quitter1.setIcon(icon3)
         self.bouton_quitter1.setCheckable(True)
         self.bouton_quitter1.setAutoExclusive(True)
@@ -117,9 +117,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.bouton_profile2)
         self.bouton_message2 = QtWidgets.QPushButton(self.icon_only_widget)
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/messages_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon4.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/messages.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
-        icon4.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/messages.png"), QtGui.QIcon.Selected, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        icon4.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages.png"), QtGui.QIcon.Selected, QtGui.QIcon.Off)
         self.bouton_message2.setIcon(icon4)
         self.bouton_message2.setCheckable(True)
         self.bouton_message2.setAutoExclusive(True)
@@ -132,11 +132,13 @@ class Ui_MainWindow(object):
         self.label_4.setMinimumSize(QtCore.QSize(50, 50))
         self.label_4.setMaximumSize(QtCore.QSize(50, 50))
         self.label_4.setText("")
-        self.label_4.setPixmap(QtGui.QPixmap(":/newPrefix/image et recources/Design_sans_titre__3_-removebg-preview_1.png"))
+        self.label_4.setPixmap(QtGui.QPixmap("images/authentification/logo.png"))
         self.label_4.setScaledContents(True)
         self.label_4.setObjectName("label_4")
         self.horizontalLayout_2.addWidget(self.label_4)
         self.label_3 = QtWidgets.QLabel(self.icon_only_widget)
+        self.label_3.setMinimumSize(QtCore.QSize(100, 50))
+        self.label_3.setMaximumSize(QtCore.QSize(100, 50))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -160,7 +162,7 @@ class Ui_MainWindow(object):
         self.bouton_menu.setStyleSheet("border:none;")
         self.bouton_menu.setText("")
         icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/menu.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon5.addPixmap(QtGui.QPixmap("images/pagePrincipale/menu.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.bouton_menu.setIcon(icon5)
         self.bouton_menu.setIconSize(QtCore.QSize(20, 20))
         self.bouton_menu.setCheckable(True)
@@ -177,7 +179,7 @@ class Ui_MainWindow(object):
         self.pushButton_14 = QtWidgets.QPushButton(self.widget)
         self.pushButton_14.setText("")
         icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/search.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon6.addPixmap(QtGui.QPixmap("images/pagePrincipale/search.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_14.setIcon(icon6)
         self.pushButton_14.setObjectName("pushButton_14")
         self.horizontalLayout.addWidget(self.pushButton_14)
@@ -188,7 +190,7 @@ class Ui_MainWindow(object):
         self.pushButton_15.setStyleSheet("border:none;")
         self.pushButton_15.setText("")
         icon7 = QtGui.QIcon()
-        icon7.addPixmap(QtGui.QPixmap(":/newPrefix/image et recources/image (1).png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon7.addPixmap(QtGui.QPixmap("images/pagePrincipale/image (1).png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_15.setIcon(icon7)
         self.pushButton_15.setObjectName("pushButton_15")
         self.horizontalLayout_4.addWidget(self.pushButton_15)
@@ -209,7 +211,7 @@ class Ui_MainWindow(object):
         self.label_2 = QtWidgets.QLabel(self.tab_2)
         self.label_2.setGeometry(QtCore.QRect(20, 30, 1389, 808))
         self.label_2.setText("")
-        self.label_2.setPixmap(QtGui.QPixmap(":/newPrefix/colorkit (5).png"))
+        self.label_2.setPixmap(QtGui.QPixmap("images/authentification/colorkit (5).png"))
         self.label_2.setObjectName("label_2")
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
@@ -262,6 +264,18 @@ class Ui_MainWindow(object):
         self.bouton_menu.toggled['bool'].connect(self.icon_only_widget.setVisible) # type: ignore
         self.bouton_menu.toggled['bool'].connect(self.icon_name_widget.setHidden) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+        # Dans votre méthode setupUi
+
+        # Connexion des boutons aux changements de page
+        self.bouton_project1.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.project))
+        self.bouton_project2.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.project))
+
+        self.bouton_profile1.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Profile))
+        self.bouton_profile2.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Profile))
+
+        self.bouton_message1.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.message))
+        self.bouton_message2.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.message))
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

@@ -322,6 +322,18 @@ QPushButton:checked{
          </item>
          <item>
           <widget class="QLabel" name="label_3">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>50</height>
+            </size>
+           </property>
            <property name="font">
             <font>
              <pointsize>10</pointsize>
@@ -488,7 +500,7 @@ QPushButton:checked{
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap resource="recources.qrc">:/newPrefix/colorkit (5).png</pixmap>
+              <pixmap>:/newPrefix/colorkit (5).png</pixmap>
              </property>
             </widget>
            </widget>
