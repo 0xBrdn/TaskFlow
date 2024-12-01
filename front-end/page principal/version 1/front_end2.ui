@@ -6,15 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1198</width>
-    <height>679</height>
+    <width>1769</width>
+    <height>1098</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(235, 244, 255);</string>
+   <string notr="true">background-color: rgb(189, 247, 254);</string>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>24</width>
+    <height>25</height>
+   </size>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
@@ -28,7 +34,7 @@
       </property>
       <property name="styleSheet">
        <string notr="true">QWidget{
-background-color: rgb(201, 214, 255);
+	background-color: rgb(60, 139, 238);
 }
 QPushButton{
 	color:white;
@@ -64,7 +70,7 @@ QPushButton:checked{
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="../version 1/recources.qrc">:/newPrefix/image et recources/Design_sans_titre__3_-removebg-preview_1.png</pixmap>
+            <pixmap resource="recources.qrc">:/newPrefix/image et recources/Design_sans_titre__3_-removebg-preview_1.png</pixmap>
            </property>
            <property name="scaledContents">
             <bool>true</bool>
@@ -87,7 +93,7 @@ QPushButton:checked{
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../version 1/recources.qrc">
+            <iconset resource="recources.qrc">
              <normaloff>:/newPrefix/image et recources/dashboard_white.png</normaloff>
              <normalon>:/newPrefix/image et recources/dashboard.png</normalon>:/newPrefix/image et recources/dashboard_white.png</iconset>
            </property>
@@ -105,7 +111,7 @@ QPushButton:checked{
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../version 1/recources.qrc">
+            <iconset resource="recources.qrc">
              <normaloff>:/newPrefix/image et recources/profile_white.png</normaloff>
              <normalon>:/newPrefix/image et recources/profile.png</normalon>:/newPrefix/image et recources/profile_white.png</iconset>
            </property>
@@ -123,7 +129,7 @@ QPushButton:checked{
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../version 1/recources.qrc">
+            <iconset resource="recources.qrc">
              <normaloff>:/newPrefix/image et recources/messages_white.png</normaloff>
              <normalon>:/newPrefix/image et recources/messages.png</normalon>:/newPrefix/image et recources/messages_white.png</iconset>
            </property>
@@ -156,7 +162,7 @@ QPushButton:checked{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../version 1/recources.qrc">
+          <iconset resource="recources.qrc">
            <normaloff>:/newPrefix/image et recources/log_out_white.png</normaloff>
            <normalon>:/newPrefix/image et recources/log_out.png</normalon>:/newPrefix/image et recources/log_out_white.png</iconset>
          </property>
@@ -181,7 +187,7 @@ QPushButton:checked{
       </property>
       <property name="styleSheet">
        <string notr="true">QWidget{
-	background-color: rgb(201, 214, 255);
+	background-color: rgb(60, 139, 238);
 	color:white;
 }
 QPushButton{
@@ -204,6 +210,24 @@ QPushButton:checked{
        <property name="rightMargin">
         <number>0</number>
        </property>
+       <item row="3" column="0">
+        <widget class="QPushButton" name="bouton_quitter2">
+         <property name="text">
+          <string>Quitter</string>
+         </property>
+         <property name="icon">
+          <iconset resource="recources.qrc">
+           <normaloff>:/newPrefix/image et recources/log_out_white.png</normaloff>
+           <normalon>:/newPrefix/image et recources/log_out.png</normalon>:/newPrefix/image et recources/log_out_white.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="0">
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <property name="spacing">
@@ -218,7 +242,7 @@ QPushButton:checked{
             <string>Project</string>
            </property>
            <property name="icon">
-            <iconset resource="../version 1/recources.qrc">
+            <iconset resource="recources.qrc">
              <normaloff>:/newPrefix/image et recources/dashboard_white.png</normaloff>
              <normalon>:/newPrefix/image et recources/dashboard.png</normalon>:/newPrefix/image et recources/dashboard_white.png</iconset>
            </property>
@@ -236,7 +260,7 @@ QPushButton:checked{
             <string>Profile</string>
            </property>
            <property name="icon">
-            <iconset resource="../version 1/recources.qrc">
+            <iconset resource="recources.qrc">
              <normaloff>:/newPrefix/image et recources/profile_white.png</normaloff>
              <normalon>:/newPrefix/image et recources/profile.png</normalon>:/newPrefix/image et recources/profile_white.png</iconset>
            </property>
@@ -254,7 +278,7 @@ QPushButton:checked{
             <string>Messages</string>
            </property>
            <property name="icon">
-            <iconset resource="../version 1/recources.qrc">
+            <iconset resource="recources.qrc">
              <normaloff>:/newPrefix/image et recources/messages_white.png</normaloff>
              <normalon>:/newPrefix/image et recources/messages.png</normalon>
              <selectedoff>:/newPrefix/image et recources/messages.png</selectedoff>:/newPrefix/image et recources/messages_white.png</iconset>
@@ -268,24 +292,6 @@ QPushButton:checked{
           </widget>
          </item>
         </layout>
-       </item>
-       <item row="3" column="0">
-        <widget class="QPushButton" name="bouton_quitter2">
-         <property name="text">
-          <string>Quitter</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../version 1/recources.qrc">
-           <normaloff>:/newPrefix/image et recources/log_out_white.png</normaloff>
-           <normalon>:/newPrefix/image et recources/log_out.png</normalon>:/newPrefix/image et recources/log_out_white.png</iconset>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="autoExclusive">
-          <bool>true</bool>
-         </property>
-        </widget>
        </item>
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -307,7 +313,7 @@ QPushButton:checked{
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="../version 1/recources.qrc">:/newPrefix/image et recources/Design_sans_titre__3_-removebg-preview_1.png</pixmap>
+            <pixmap resource="recources.qrc">:/newPrefix/image et recources/Design_sans_titre__3_-removebg-preview_1.png</pixmap>
            </property>
            <property name="scaledContents">
             <bool>true</bool>
@@ -346,226 +352,211 @@ QPushButton:checked{
       </layout>
      </widget>
     </item>
-    <item row="0" column="2">
+    <item row="0" column="3">
      <widget class="QWidget" name="main_menu" native="true">
-      <widget class="QWidget" name="widget" native="true">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>10</y>
-         <width>831</width>
-         <height>46</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <item>
-         <widget class="QPushButton" name="bouton_menu">
-          <property name="styleSheet">
-           <string notr="true">border:none;</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="../version 1/recources.qrc">
-            <normaloff>:/newPrefix/image et recources/menu.png</normaloff>:/newPrefix/image et recources/menu.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="autoExclusive">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>18</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QWidget" name="widget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QLineEdit" name="lineEdit"/>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_14">
+           <widget class="QPushButton" name="bouton_menu">
+            <property name="styleSheet">
+             <string notr="true">border:none;</string>
+            </property>
             <property name="text">
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../version 1/recources.qrc">
-              <normaloff>:/newPrefix/image et recources/search.png</normaloff>:/newPrefix/image et recources/search.png</iconset>
+             <iconset resource="recources.qrc">
+              <normaloff>:/newPrefix/image et recources/menu.png</normaloff>:/newPrefix/image et recources/menu.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>18</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLineEdit" name="lineEdit"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_14">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="recources.qrc">
+                <normaloff>:/newPrefix/image et recources/search.png</normaloff>:/newPrefix/image et recources/search.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>308</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_15">
+            <property name="styleSheet">
+             <string notr="true">border:none;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="recources.qrc">
+              <normaloff>:/newPrefix/image et recources/image (1).png</normaloff>:/newPrefix/image et recources/image (1).png</iconset>
             </property>
            </widget>
           </item>
          </layout>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>308</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_15">
-          <property name="styleSheet">
-           <string notr="true">border:none;</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="../version 1/recources.qrc">
-            <normaloff>:/newPrefix/image et recources/image (1).png</normaloff>:/newPrefix/image et recources/image (1).png</iconset>
-          </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QStackedWidget" name="stackedWidget">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(118, 132, 134);</string>
+         </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="project">
+          <widget class="QTabWidget" name="tabWidget">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>10</y>
+             <width>1441</width>
+             <height>991</height>
+            </rect>
+           </property>
+           <property name="currentIndex">
+            <number>1</number>
+           </property>
+           <widget class="QWidget" name="tab">
+            <attribute name="title">
+             <string>Tab 1</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="tab_2">
+            <attribute name="title">
+             <string>Tab 2</string>
+            </attribute>
+            <widget class="QLabel" name="label_2">
+             <property name="geometry">
+              <rect>
+               <x>20</x>
+               <y>30</y>
+               <width>1389</width>
+               <height>808</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="pixmap">
+              <pixmap resource="recources.qrc">:/newPrefix/colorkit (5).png</pixmap>
+             </property>
+            </widget>
+           </widget>
+           <widget class="QWidget" name="tab_3">
+            <attribute name="title">
+             <string>Page</string>
+            </attribute>
+           </widget>
+          </widget>
          </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QStackedWidget" name="stackedWidget">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>50</y>
-         <width>831</width>
-         <height>571</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 255, 255);</string>
-       </property>
-       <widget class="QWidget" name="project">
-        <widget class="QLabel" name="label_2">
-         <property name="geometry">
-          <rect>
-           <x>50</x>
-           <y>20</y>
-           <width>411</width>
-           <height>141</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>40</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Project page </string>
-         </property>
+         <widget class="QWidget" name="Profile">
+          <widget class="QLabel" name="label_5">
+           <property name="geometry">
+            <rect>
+             <x>110</x>
+             <y>170</y>
+             <width>411</width>
+             <height>141</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>40</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Profile page </string>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QWidget" name="message">
+          <widget class="QLabel" name="label_6">
+           <property name="geometry">
+            <rect>
+             <x>60</x>
+             <y>150</y>
+             <width>411</width>
+             <height>141</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>40</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Message page </string>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QWidget" name="page_5"/>
+         <widget class="QWidget" name="page_2"/>
         </widget>
-       </widget>
-       <widget class="QWidget" name="Profile">
-        <widget class="QLabel" name="label_5">
-         <property name="geometry">
-          <rect>
-           <x>110</x>
-           <y>170</y>
-           <width>411</width>
-           <height>141</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>40</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Profile page </string>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="message">
-        <widget class="QLabel" name="label_6">
-         <property name="geometry">
-          <rect>
-           <x>60</x>
-           <y>150</y>
-           <width>411</width>
-           <height>141</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>40</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Message page </string>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="page_5"/>
-       <widget class="QWidget" name="page_2"/>
-      </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>
   </widget>
  </widget>
  <resources>
-  <include location="../version 1/recources.qrc"/>
+  <include location="recources.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>bouton_menu</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>icon_name_widget</receiver>
-   <slot>setHidden(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>334</x>
-     <y>51</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>45</x>
-     <y>300</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>bouton_menu</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>icon_only_widget</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>342</x>
-     <y>47</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>234</x>
-     <y>399</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>bouton_message1</sender>
    <signal>toggled(bool)</signal>
@@ -691,6 +682,38 @@ QPushButton:checked{
     <hint type="destinationlabel">
      <x>174</x>
      <y>777</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bouton_menu</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>icon_only_widget</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>342</x>
+     <y>47</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>234</x>
+     <y>399</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bouton_menu</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>icon_name_widget</receiver>
+   <slot>setHidden(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>334</x>
+     <y>51</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>45</x>
+     <y>300</y>
     </hint>
    </hints>
   </connection>
