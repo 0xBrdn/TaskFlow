@@ -89,7 +89,7 @@ def create_conn(
             _log.error(f"Erreur MySQL: {err}")
         connexion = None
     conn = connexion
-    return connexion
+    return conn
 
 
 _create_conn = partial(
@@ -131,3 +131,7 @@ def cm_conn() -> Callable:
         return wrapper
 
     return decorator
+
+
+if __name__ == "__main__":
+    _create_conn()

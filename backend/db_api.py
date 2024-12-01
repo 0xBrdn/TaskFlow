@@ -40,6 +40,32 @@ class DB_API:
 
     @staticmethod
     @cm_cursor()
+    def get_project_id_by_project_name(project_name: str, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer le project id en fonction du project name de la DB.
+
+        Cette fonction renvoie un tuple comprenant le project id
+        sous la forme (project_id,).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param project_name: Nom du projet
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> project_id = DB_API.get_project_id_by_project_name()
+        >>> if not isinstance(project_id, Exception):
+        >>>     print(project_id)
+
+        """
+        cursor.execute(_Requests.get_project_id_by_project_name.format(project_name))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
     def get_user_hashpass(user_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer le mdp hash d'un user dans la DB.
@@ -514,4 +540,5 @@ class DB_API:
 
 
 if __name__ == "__main__":
-    pass
+    # print(DB_API.add_project('tebgfbgrsbs'))
+    v = DB_API.get_project_id_by_project_name("tebgfbgrsbs")
