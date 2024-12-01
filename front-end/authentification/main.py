@@ -7,6 +7,7 @@ def main():
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
+    ui.main_window = MainWindow  # Passer la référence de la fenêtre principale à l'UI
     MainWindow.show()
     sys.exit(app.exec_())
 

@@ -13,9 +13,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        with open('style.qss', 'r') as f:
+                style = f.read()
+                MainWindow.setStyleSheet(style)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1769, 1098)
-        MainWindow.setStyleSheet("background-color: rgb(189, 247, 254);")
         MainWindow.setIconSize(QtCore.QSize(24, 25))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -23,21 +25,6 @@ class Ui_MainWindow(object):
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.icon_name_widget = QtWidgets.QWidget(self.centralwidget)
         self.icon_name_widget.setMaximumSize(QtCore.QSize(70, 16777215))
-        self.icon_name_widget.setStyleSheet("QWidget{\n"
-"    background-color: rgb(60, 139, 238);\n"
-"}\n"
-"QPushButton{\n"
-"    color:white;\n"
-"    height:30px;\n"
-"    border:none;\n"
-"    border-radius:10px;\n"
-"}\n"
-"\n"
-"QPushButton:checked{\n"
-"    background-color:  #F5FAFE;\n"
-"    color:#1F95EF;\n"
-"    font-weight:bold;\n"
-"}")
         self.icon_name_widget.setObjectName("icon_name_widget")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.icon_name_widget)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
@@ -102,25 +89,6 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.icon_name_widget, 0, 0, 1, 1)
         self.icon_only_widget = QtWidgets.QWidget(self.centralwidget)
         self.icon_only_widget.setMaximumSize(QtCore.QSize(200, 16777215))
-        self.icon_only_widget.setStyleSheet("QWidget{\n"
-"    background-color: rgb(60, 139, 238);\n"
-"    color:white;\n"
-"}\n"
-"QPushButton{\n"
-"    color:white;\n"
-"    text-align:left;\n"
-"    height:30px;\n"
-"    border:none;\n"
-"    padding-left:10px;\n"
-"    border-top-left-radius:10px;\n"
-"    border-bottom-left-radius:10px;\n"
-"}\n"
-"\n"
-"QPushButton:checked{\n"
-"    background-color:  #F5FAFE;\n"
-"    color:#1F95EF;\n"
-"    font-weight:bold;\n"
-"}")
         self.icon_only_widget.setObjectName("icon_only_widget")
         self.gridLayout = QtWidgets.QGridLayout(self.icon_only_widget)
         self.gridLayout.setContentsMargins(-1, -1, 0, -1)
@@ -308,4 +276,3 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Page"))
         self.label_5.setText(_translate("MainWindow", "Profile page "))
         self.label_6.setText(_translate("MainWindow", "Message page "))
-import recources_rc

@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from backend.db_api import DB_API
+from front_end2 import Ui_MainWindow as MainWindowUI
 
 
 class Ui_MainWindow(object):
@@ -258,7 +259,10 @@ class Ui_MainWindow(object):
         elif hashpass[0] == password:
             self.show_success_message("Connexion réussie", "Bienvenue!")
             print("succes")
+
+            self.open_main_window()
             return True
+
         else:
             self.show_error_message("Échec de connexion", "Email ou mot de passe incorrect")
             print("echec")
@@ -327,6 +331,16 @@ class Ui_MainWindow(object):
         with open("style.qss", "r") as file:
             stylesheet = file.read()
             MainWindow.setStyleSheet(stylesheet)
+
+    def open_main_window(self):
+        # Fermer la fenêtre de connexion actuelle
+        self.main_window.close()
+
+        # Créer et afficher la fenêtre principale
+        self.main_window_instance = QtWidgets.QMainWindow()
+        self.main_window_ui = MainWindowUI()
+        self.main_window_ui.setupUi(self.main_window_instance)
+        self.main_window_instance.show()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

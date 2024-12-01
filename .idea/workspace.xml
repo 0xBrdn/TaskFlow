@@ -6,8 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="5338d278-2e09-40d0-8047-f0efcab8280b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/page principal/version 1/front_end2.ui" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/page principal/version 1/front_end2.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/page principal/version 1/recources_rc.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/page principal/version 1/recources_rc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front-end/authentification/authentification.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/authentification.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front-end/authentification/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front-end/authentification/style.qss" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/style.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front-end/page principal/version 1/front_end2.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/front_end2.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,18 +51,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.authentification.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.temp.executor&quot;: &quot;Run&quot;,
-    &quot;Python.temp01.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/defaultuser0/miniconda3/condabin/conda.bat&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.authentification.executor": "Run",
+    "Python.front_end2.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.temp.executor": "Run",
+    "Python.temp01.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "develop",
+    "last_opened_file_path": "C:/Users/defaultuser0/miniconda3/condabin/conda.bat",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\godot\projets\SAE502-TaskFlow\front-end\authentification" />
+    </key>
+  </component>
   <component name="RunManager" selected="Python.main">
     <configuration name="authentification" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SAE502-TaskFlow" />
@@ -76,6 +84,28 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/front-end/authentification/authentification.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="front_end2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="SAE502-TaskFlow" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/front-end/page principal/version 1" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="D:\godot\projets\SAE502-TaskFlow\front-end\authentification\front_end2.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -153,6 +183,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.front_end2" />
         <item itemvalue="Python.authentification" />
         <item itemvalue="Python.temp" />
         <item itemvalue="Python.temp01" />
