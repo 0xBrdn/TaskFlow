@@ -1,11 +1,10 @@
-import db_api  # Module contenant les requêtes pour manipuler les données
+import db_api
 from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from db_api import DB_API
 
-# Configuration des comptes Gmail pour l'envoi d'emails
 accounts = [
     {'email': 'taskflowreminder1@gmail.com', 'password': 'bgnt irxw fblu vemb'},
     {'email': 'taskflowreminder2@gmail.com', 'password': 'lkya wtsu opzy pnse'},
@@ -15,7 +14,6 @@ current_account_index = 0
 
 
 def send_email(subject, body, to):
-    """Envoie un email de rappel ou d'invitation."""
     global current_account_index
     account = accounts[current_account_index]
 
@@ -40,7 +38,6 @@ def send_email(subject, body, to):
 
 
 def invite_user_to_project(user_email, project_name):
-    """Envoie une invitation à un utilisateur pour rejoindre un projet."""
     project = DB_API.get_project_id_by_project_name(project_name)
     if not project:
         print(f"Projet '{project_name}' introuvable.")
@@ -57,7 +54,7 @@ def check_tasks():
     now = datetime.now()
     print(f'Vérification des tâches à {now.strftime("%d/%m/%Y %H:%M")}...')
 
-    tasks = db_api.get_all_tasks()
+    tasks = DB_API.get_all_tasks()
 
     for task in tasks:
         due_date = datetime.fromisoformat(task['due_date'])
@@ -78,7 +75,6 @@ L'équipe de gestion de projet."""
 
 
 def main():
-    """Menu principal de gestion des projets et tâches."""
     while True:
         print("\nMenu principal :")
         print("1. Créer un utilisateur")
@@ -142,15 +138,15 @@ def main():
                 print(f"Projet '{project_name}' introuvable.")
 
         elif choice == '5':
-            projects = db_api.get_all_projects()
+            projects = DB_API.get_all_projects()
             for idx, project in enumerate(projects, start=1):
                 print(f"{idx}. {project['name']} - {project['description']}")
 
         elif choice == '6':
             project_name = input("Nom du projet : ")
-            project = db_api.get_project_by_name(project_name)
+            project = DB_API.get_project_by_name(project_name)
             if project:
-                tasks = db_api.get_tasks_by_project(project['id'])
+                tasks = DB_API.get_tasks_by_project(project['id'])
                 for idx, task in enumerate(tasks, start=1):
                     print(f"{idx}. {task['title']} - {task['priority']} - {task['status']}")
             else:
