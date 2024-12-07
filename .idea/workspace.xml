@@ -5,12 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5338d278-2e09-40d0-8047-f0efcab8280b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/front-end/authentification/todo liste.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/SAE502-TaskFlow.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SAE502-TaskFlow.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/page principal/version 1/front_end.ui" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/page principal/version 1/front_end.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/page principal/version 1/sidebar.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/front-end/authentification/pagePrincipale.py" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/authentification/pagePrincipale.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,23 +53,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.authentification.executor": "Run",
-    "Python.front_end2 (1).executor": "Debug",
-    "Python.front_end2.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.pagePrincipale (1).executor": "Run",
-    "Python.temp.executor": "Run",
-    "Python.temp01.executor": "Run",
-    "Python.todo liste.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "develop",
-    "last_opened_file_path": "C:/Users/defaultuser0/miniconda3/condabin/conda.bat",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.authentification.executor&quot;: &quot;Run&quot;,
+    &quot;Python.front_end2 (1).executor&quot;: &quot;Debug&quot;,
+    &quot;Python.front_end2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.pagePrincipale (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.temp.executor&quot;: &quot;Run&quot;,
+    &quot;Python.temp01.executor&quot;: &quot;Run&quot;,
+    &quot;Python.todo liste.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/defaultuser0/miniconda3/condabin/conda.bat&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\godot\projets\SAE502-TaskFlow\front-end\authentification\images\pagePrincipale" />
@@ -79,7 +77,7 @@
       <recent name="D:\godot\projets\SAE502-TaskFlow\front-end\authentification" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.todo liste">
+  <component name="RunManager" selected="Python.main">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SAE502-TaskFlow" />
       <option name="ENV_FILES" value="" />
@@ -214,9 +212,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.todo liste" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.pagePrincipale (1)" />
+        <item itemvalue="Python.todo liste" />
         <item itemvalue="Python.pagePrincipale" />
         <item itemvalue="Python.pagePrincipale" />
       </list>
@@ -225,7 +223,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-fb887030ada0-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.21565.199" />
+        <option value="bundled-python-sdk-d7ad00fb9fc3-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23726.102" />
       </set>
     </attachedChunks>
   </component>

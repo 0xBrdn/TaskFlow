@@ -205,6 +205,52 @@ class Ui_MainWindow(object):
         self.tabWidget.setObjectName("tabWidget")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
+
+        self.tab_layout = QtWidgets.QVBoxLayout(self.tab)
+        # Todo List Title
+        self.title_label = QtWidgets.QLabel(self.tab)
+        self.title_label.setText("Ma Todo Liste")
+        self.title_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.title_label.setStyleSheet("font-size: 28px; font-weight: bold; color: #2c3e50;")
+        self.tab_layout.addWidget(self.title_label)
+        # Tableau pour afficher les tâches
+        self.table = QtWidgets.QTableWidget(self.tab)
+        self.table.setColumnCount(3)
+        self.table.setHorizontalHeaderLabels(["Tâche", "Date", "Commentaire"])
+        self.table.setStyleSheet("background-color: #ecf0f1; font-size: 14px;")
+        self.tab_layout.addWidget(self.table)
+
+        # Zone d'entrée pour ajouter une nouvelle tâche
+        self.form_layout = QtWidgets.QFormLayout()
+        self.task_input = QtWidgets.QLineEdit(self.tab)
+        self.date_input = QtWidgets.QDateEdit(self.tab)
+        self.date_input.setCalendarPopup(True)
+        self.comment_input = QtWidgets.QLineEdit(self.tab)
+
+        self.form_layout.addRow("Tâche :", self.task_input)
+        self.form_layout.addRow("Date :", self.date_input)
+        self.form_layout.addRow("Commentaire :", self.comment_input)
+        self.tab_layout.addLayout(self.form_layout)
+
+        # Boutons pour les actions
+        self.button_layout = QtWidgets.QHBoxLayout()
+        self.add_button = QtWidgets.QPushButton("Ajouter", self.tab)
+        self.delete_button = QtWidgets.QPushButton("Supprimer", self.tab)
+        self.complete_button = QtWidgets.QPushButton("Marquer comme terminé", self.tab)
+
+        # Style des boutons
+        self.add_button.setStyleSheet("background-color: #27ae60; color: white; font-weight: bold; padding: 10px;")
+        self.delete_button.setStyleSheet("background-color: #e74c3c; color: white; font-weight: bold; padding: 10px;")
+        self.complete_button.setStyleSheet("background-color: #f39c12; color: white; font-weight: bold; padding: 10px;")
+
+        self.button_layout.addWidget(self.add_button)
+        self.button_layout.addWidget(self.delete_button)
+        self.button_layout.addWidget(self.complete_button)
+        self.tab_layout.addLayout(self.button_layout)
+
+        # Add the tab to tabWidget
+        self.tabWidget.addTab(self.tab, "Todo List")
+
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
@@ -277,6 +323,54 @@ class Ui_MainWindow(object):
         self.bouton_message1.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.message))
         self.bouton_message2.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.message))
 
+        self.add_button.clicked.connect(self.add_task)
+        self.delete_button.clicked.connect(self.delete_task)
+        self.complete_button.clicked.connect(self.mark_completed)
+
+    def add_task(self):
+        """Ajoute une nouvelle tâche à la liste."""
+        task = self.task_input.text().strip()
+        date = self.date_input.date().toString("dd/MM/yyyy")
+        comment = self.comment_input.text().strip()
+
+        if not task:
+            QMessageBox.warning(None, "Erreur", "Veuillez entrer une tâche.")
+            return
+
+        row = self.table.rowCount()
+        self.table.insertRow(row)
+        self.table.setItem(row, 0, QTableWidgetItem(task))
+        self.table.setItem(row, 1, QTableWidgetItem(date))
+        self.table.setItem(row, 2, QTableWidgetItem(comment))
+
+        # Réinitialisation des champs
+        self.task_input.clear()
+        self.comment_input.clear()
+
+    def delete_task(self):
+        """Supprime la tâche sélectionnée."""
+        rows = sorted(set(index.row() for index in self.table.selectedIndexes()), reverse=True)
+        if not rows:
+            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à supprimer.")
+            return
+        for row in rows:
+            self.table.removeRow(row)
+
+    def mark_completed(self):
+        """Marque la tâche sélectionnée comme terminée."""
+        rows = sorted(set(index.row() for index in self.table.selectedIndexes()), reverse=True)
+        if not rows:
+            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à marquer comme terminée.")
+            return
+        for row in rows:
+            item = self.table.item(row, 0)
+            font = item.font()
+            font.setStrikeOut(True)  # Appliquer la barre sur le texte
+            font.setBold(False)  # Optionnel : Rendre la police plus fine une fois terminée
+            item.setFont(font)
+            item.setForeground(QtGui.QColor(128, 128, 128))  # Changer la couleur du texte
+            item.setText(item.text() + " (Completed)")  # Ajouter "(Completed)"
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -290,3 +384,4 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Page"))
         self.label_5.setText(_translate("MainWindow", "Profile page "))
         self.label_6.setText(_translate("MainWindow", "Message page "))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Todo List"))
