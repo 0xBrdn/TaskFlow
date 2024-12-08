@@ -1,3 +1,5 @@
+import time
+
 import db_api
 from datetime import datetime
 import smtplib
@@ -123,16 +125,21 @@ def main():
                 print("erreur")
             description = input("Description : ")
             due_date_str = input("Date d'échéance (YYYY-MM-DD HH:MM) : ")
-            user = input("Utilisateur assigné : ")
+            username = input("Utilisateur assigné : ")
+            userID = DB_API.get_userID_by_username(username)
+            print(userID)
             covered = 0
             status = 0
             due_date = datetime.strptime(due_date_str, '%Y-%m-%d %H:%M')
             project = DB_API.get_project_id_by_project_name(project_name)
 
             if project:
-                DB_API.add_task_info(status, priority, task_title, description, due_date, covered, user)
-                """Comment chercher le task_info_id créé pour la task ?"""
-                DB_API.add_task(project, task_info_id, user_id)
+                userID = 1
+                DB_API.add_task_info(status, priority, task_title, description, due_date, covered, userID)
+                time.sleep(1)
+                task_infoID = DB_API.get_last_taskID()
+                print(task_infoID)
+                DB_API.add_task(project, task_infoID, userID)
                 print(f"Tâche '{task_title}' ajoutée au projet '{project_name}'.")
             else:
                 print(f"Projet '{project_name}' introuvable.")
