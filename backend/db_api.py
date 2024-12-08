@@ -291,6 +291,25 @@ class DB_API:
         return result
 
     @staticmethod
+    @cm_cursor()
+    def get_last_taskID(*, cursor: MySQLCursor) -> ResultType:
+        """
+
+        :param cursor:
+        :return:
+        """
+        cursor.execute(_Requests.get_last_task_infoID)
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_userID_by_username(username: str, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_userID_by_username.format(username))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
     @cm_conn()
     @cm_cursor()
     def add_user(
