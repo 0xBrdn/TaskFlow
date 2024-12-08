@@ -48,6 +48,15 @@ class _Requests:
 
     get_all_status = "SELECT userID, status FROM status;"
 
+    get_last_task_infoID = (
+        "SELECT task_infoID"
+        "FROM tasks_infos"
+        "ORDER BY task_infoID DESC"
+        "LIMIT 1;"
+        )
+
+    get_userID_by_username = "SELECT userID FROM users where username = '{}';"
+
     add_user = (
         "INSERT INTO users (username, password, email, is_google_user) "
         "VALUES ('{}', '{}', '{}', '{}');"
