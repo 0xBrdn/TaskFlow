@@ -1,6 +1,6 @@
 import logging
 from functools import partial
-from typing import Callable, Optional, List, Union, TypeAlias
+from typing import Callable, Optional, List, Union, TypeAlias, Any
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -108,7 +108,7 @@ def cm_conn() -> Callable:
     """
 
     def decorator(func: Callable) -> Callable:
-        def wrapper(*args, **kwargs) -> Union[bool, Exception]:
+        def wrapper(*args, **kwargs) -> Union[Any, Exception]:
             global conn
             if not isinstance(conn, MySQLConnectionAbstract):
                 _conn: Optional[Union[MySQLConnectionAbstract, PooledMySQLConnection]] = (
@@ -122,11 +122,10 @@ def cm_conn() -> Callable:
             if isinstance(res, Exception):
                 conn.rollback()
                 _log.debug("Rollback effectué")
-                return res
             else:
                 conn.commit()
                 _log.debug("Commit effectué")
-                return True
+            return res
 
         return wrapper
 
