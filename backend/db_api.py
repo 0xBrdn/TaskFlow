@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import Optional
+from typing import Optional, Union
 
 from mysql.connector.cursor import MySQLCursor
 
@@ -300,7 +300,7 @@ class DB_API:
         is_google_user: bool,
         *,
         cursor: MySQLCursor,
-    ):
+    ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter un nouvel utilisateur à la DB.
 
@@ -315,18 +315,19 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> success = DB_API.add_user("new_user", "hashed_password", "user@Exemple.com")
-        >>> assert success is True # Soit celui çi, raise une exc si pas True
-        >>> if not isinstance(success, Exception): # Soit celui ça
-        >>>     print(success)
+        >>> user_id = DB_API.add_user("new_user", "hashed_password", "user@Exemple.com")
+        >>> if user_id and not isinstance(user_id, Exception):
+        >>>     print(user_id)
         """
-
-        return cursor.execute(_Requests.add_user.format(username, password, email, is_google_user))
+        cursor.execute(_Requests.add_user.format(username, password, email, is_google_user))
+        return cursor.lastrowid
 
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_status(user_id: int, status: int, *, cursor: MySQLCursor):
+    def add_status(
+        user_id: int, status: int, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter un statut à un utilisateur.
 
@@ -339,18 +340,17 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> success = DB_API.add_status(1, 0)
-        >>> assert success is True # Soit celui çi, raise une exc si pas True
-        >>> if not isinstance(success, Exception): # Soit celui ça
-        >>>     print(success)
+        >>> status_id = DB_API.add_status(1, 0)
+        >>> if status_id and not isinstance(status_id, Exception):
+        >>>     print(status_id)
         """
-
-        return cursor.execute(_Requests.add_status.format(user_id, status))
+        cursor.execute(_Requests.add_status.format(user_id, status))
+        return cursor.lastrowid
 
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_project(name: str, *, cursor: MySQLCursor):
+    def add_project(name: str, *, cursor: MySQLCursor) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter un nouveau projet à la DB.
 
@@ -362,19 +362,19 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> success = DB_API.add_project("project_test")
-        >>> assert success is True # Soit celui çi, raise une exc si pas True
-        >>> if not isinstance(success, Exception): # Soit celui ça
-        >>>     print(success)
+        >>> project_id = DB_API.add_project("project_test")
+        >>> if project_id and not isinstance(project_id, Exception):
+        >>>     print(project_id)
         """
-        return cursor.execute(_Requests.add_project.format(name))
+        cursor.execute(_Requests.add_project.format(name))
+        return cursor.lastrowid
 
     @staticmethod
     @cm_conn()
     @cm_cursor()
     def add_user_to_group(
         project_id: int, user_id: int, permission: int, joined: bool, *, cursor: MySQLCursor
-    ):
+    ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter un utilisateur à un groupe de projet.
 
@@ -390,14 +390,12 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> success = DB_API.add_user_to_group(1, 1, 1, True)
-        >>> assert success is True # Soit celui çi, raise une exc si pas True
-        >>> if not isinstance(success, Exception): # Soit celui ça
-        >>>     print(success)
+        >>> user_group_id = DB_API.add_user_to_group(1, 1, 1, True)
+        >>> if user_group_id and not isinstance(user_group_id, Exception):
+        >>>     print(user_group_id)
         """
-        return cursor.execute(
-            _Requests.add_user_to_group.format(project_id, user_id, permission, joined)
-        )
+        cursor.execute(_Requests.add_user_to_group.format(project_id, user_id, permission, joined))
+        return cursor.lastrowid
 
     @staticmethod
     @cm_conn()
@@ -412,7 +410,7 @@ class DB_API:
         assign: int,
         *,
         cursor: MySQLCursor,
-    ):
+    ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter des informations sur une tâche.
 
@@ -432,22 +430,25 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> success = DB_API.add_task_info(1, 2, "titre tache",
+        >>> taskinfo_id = DB_API.add_task_info(1, 2, "titre tache",
         "ceci est une description de la tache", datetime.datetime.now(), False, 1)
-        >>> assert success is True # Soit celui çi, raise une exc si pas True
-        >>> if not isinstance(success, Exception): # Soit celui ça
-        >>>     print(success)
+        >>> if taskinfo_id and not isinstance(taskinfo_id, Exception):
+        >>>     print(taskinfo_id)
         """
-        return cursor.execute(
+        cursor.execute(
             _Requests.add_task_info.format(
                 status, priority, title, description, dead_line, covered, assign
             )
         )
 
+        return cursor.lastrowid
+
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_task(project_id: int, task_info_id: int, user_id: int, *, cursor: MySQLCursor):
+    def add_task(
+        project_id: int, task_info_id: int, user_id: int, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter une tâche à un projet.
 
@@ -461,17 +462,19 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> success = DB_API.add_task(1, 1, 1)
-        >>> assert success is True # Soit celui çi, raise une exc si pas True
-        >>> if not isinstance(success, Exception): # Soit celui ça
-        >>>     print(success)
+        >>> task_id = DB_API.add_task(1, 1, 1)
+        >>> if task_id and not isinstance(task_id, Exception):
+        >>>     print(task_id)
         """
-        return cursor.execute(_Requests.add_task.format(project_id, task_info_id, user_id))
+        cursor.execute(_Requests.add_task.format(project_id, task_info_id, user_id))
+        return cursor.lastrowid
 
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_subtask(task_id: int, task_info_id: int, *, cursor: MySQLCursor):
+    def add_subtask(
+        task_id: int, task_info_id: int, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter une sous-tâche à une tâche.
 
@@ -484,17 +487,19 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> success = DB_API.add_subtask(1, 1)
-        >>> assert success is True # Soit celui çi, raise une exc si pas True
-        >>> if not isinstance(success, Exception): # Soit celui ça
-        >>>     print(success)
+        >>> subtask_id = DB_API.add_subtask(1, 1)
+        >>> if subtask_id and not isinstance(subtask_id, Exception):
+        >>>     print(subtask_id)
         """
-        return cursor.execute(_Requests.add_subtask.format(task_id, task_info_id))
+        cursor.execute(_Requests.add_subtask.format(task_id, task_info_id))
+        return cursor.lastrowid
 
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_user_to_task_group(task_project_id: int, user_id: int, *, cursor: MySQLCursor):
+    def add_user_to_task_group(
+        task_project_id: int, user_id: int, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter un utilisateur à un groupe de tâches.
 
@@ -507,17 +512,19 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> success = DB_API.add_user_to_task_group(1, 1)
-        >>> assert success is True # Soit celui çi, raise une exc si pas True
-        >>> if not isinstance(success, Exception): # Soit celui ça
-        >>>     print(success)
+        >>> users_tasks_groups_id = DB_API.add_user_to_task_group(1, 1)
+        >>> if users_tasks_groups_id and not isinstance(users_tasks_groups_id, Exception):
+        >>>     print(users_tasks_groups_id)
         """
-        return cursor.execute(_Requests.add_user_to_task_group.format(task_project_id, user_id))
+        cursor.execute(_Requests.add_user_to_task_group.format(task_project_id, user_id))
+        return cursor.lastrowid
 
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_user_log(user_id: int, action: str, details: str, *, cursor: MySQLCursor):
+    def add_user_log(
+        user_id: int, action: str, details: str, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter une log d'action pour un utilisateur.
 
@@ -531,12 +538,12 @@ class DB_API:
         (optionnel, géré automatiquement par le décorateur cm_cursor())
 
         Exemple:
-        >>> success = DB_API.add_user_log(1, "affect", "user to task")
-        >>> assert success is True # Soit celui çi, raise une exc si pas True
-        >>> if not isinstance(success, Exception): # Soit celui ça
-        >>>     print(success)
+        >>> user_log_id = DB_API.add_user_log(1, "affect", "user to task")
+        >>> if user_log_id and not isinstance(user_log_id, Exception):
+        >>>     print(user_log_id)
         """
-        return cursor.execute(_Requests.add_user_log.format(user_id, action, details))
+        cursor.execute(_Requests.add_user_log.format(user_id, action, details))
+        return cursor.lastrowid
 
 
 if __name__ == "__main__":
