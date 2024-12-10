@@ -35,15 +35,17 @@ class Ui_MainWindow(object):
         MainWindow.setWindowIcon(icon)
 
         # Charger le fichier QSS
-        self.load_stylesheet(MainWindow)
+        with open("authentification.qss", "r") as file:
+            stylesheet = file.read()
+            MainWindow.setStyleSheet(stylesheet)
 
-        # Setup existing design
+        # Instanciation de la page dans sa globalité
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
 
-        # Existing frames and widgets
+        # Frame de la mire d'authentification
         self.frameMire = QtWidgets.QFrame(self.centralwidget)
         self.frameMire.setMinimumSize(QtCore.QSize(350, 500))
         self.frameMire.setMaximumSize(QtCore.QSize(350, 500))
@@ -53,7 +55,7 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtWidgets.QVBoxLayout(self.frameMire)
         self.verticalLayout.setObjectName("verticalLayout")
 
-        # Frame title
+        # Frame du titre
         self.frameTitre = QtWidgets.QFrame(self.frameMire)
         self.frameTitre.setMinimumSize(QtCore.QSize(100, 60))
         self.frameTitre.setMaximumSize(QtCore.QSize(300, 60))
@@ -63,7 +65,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.frameTitre)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
 
-        # Title label
+        # Label du titre
         self.label = QtWidgets.QLabel(self.frameTitre)
         self.label.setMinimumSize(QtCore.QSize(100, 60))
         self.label.setMaximumSize(QtCore.QSize(1500, 60))
@@ -73,11 +75,11 @@ class Ui_MainWindow(object):
         font.setBold(True)
         font.setWeight(75)
         self.label.setFont(font)
-        self.label.setObjectName("label")
+        self.label.setObjectName("titre")
         self.verticalLayout_5.addWidget(self.label)
         self.verticalLayout.addWidget(self.frameTitre, 0, QtCore.Qt.AlignHCenter)
 
-        # Frame for email input
+        # Frame pour le champs Email
         self.frameLogin = QtWidgets.QFrame(self.frameMire)
         self.frameLogin.setMinimumSize(QtCore.QSize(350, 100))
         self.frameLogin.setMaximumSize(QtCore.QSize(350, 100))
@@ -87,7 +89,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.frameLogin)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
 
-        # Email title and input
+        # Titre et champ de l'Email
         self.titreMail = QtWidgets.QLabel(self.frameLogin)
         self.titreMail.setMinimumSize(QtCore.QSize(60, 30))
         self.titreMail.setMaximumSize(QtCore.QSize(60, 30))
@@ -111,7 +113,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.frameLogin, 0, QtCore.Qt.AlignHCenter)
 
-        # Frame for password input
+        # Frame pour le champ mot de passe
         self.framePassword = QtWidgets.QFrame(self.frameMire)
         self.framePassword.setMinimumSize(QtCore.QSize(350, 100))
         self.framePassword.setMaximumSize(QtCore.QSize(350, 100))
@@ -121,7 +123,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.framePassword)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
 
-        # Password title and input
+        # # Titre et champ du mot de passe
         self.titrePassword = QtWidgets.QLabel(self.framePassword)
         self.titrePassword.setMaximumSize(QtCore.QSize(120, 30))
         font = QtGui.QFont()
@@ -145,7 +147,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.framePassword, 0, QtCore.Qt.AlignHCenter)
 
-        # Add a new frame for error messages
+        # Frame pour les message d'erreur
         self.frameErreur = QtWidgets.QFrame(self.frameMire)
         self.frameErreur.setMinimumSize(QtCore.QSize(350, 50))
         self.frameErreur.setMaximumSize(QtCore.QSize(350, 50))
@@ -153,11 +155,10 @@ class Ui_MainWindow(object):
         self.frameErreur.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameErreur.setObjectName("frameErreur")
 
-        # Vertical layout for error frame
         self.verticalLayoutErreur = QtWidgets.QVBoxLayout(self.frameErreur)
         self.verticalLayoutErreur.setObjectName("verticalLayoutErreur")
 
-        # Error label
+        # Label pour les erreurs
         self.labelErreur = QtWidgets.QLabel(self.frameErreur)
         self.labelErreur.setObjectName("labelErreur")
         font = QtGui.QFont()
@@ -169,10 +170,10 @@ class Ui_MainWindow(object):
         self.labelErreur.setWordWrap(True)
         self.verticalLayoutErreur.addWidget(self.labelErreur)
 
-        # Add error frame to the vertical layout, right after password frame and before submit button
+        # Organise le frame des erreurs pour qu'ils se place entre le champ mot de passe et le bouton Valider.
         self.verticalLayout.insertWidget(3, self.frameErreur, 0, QtCore.Qt.AlignHCenter)
 
-        # Frame for the submit button
+        # Frame pour le bouton Valider.
         self.frameBouton = QtWidgets.QFrame(self.frameMire)
         self.frameBouton.setMinimumSize(QtCore.QSize(150, 100))
         self.frameBouton.setMaximumSize(QtCore.QSize(150, 100))
@@ -182,7 +183,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.frameBouton)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
 
-        # Submit button
+        # Bouton Valider
         self.boutonValider = QtWidgets.QPushButton(self.frameBouton)
         self.boutonValider.setMaximumSize(QtCore.QSize(150, 50))
         font = QtGui.QFont()
@@ -197,7 +198,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.frameBouton, 0, QtCore.Qt.AlignHCenter)
 
-        # "Créer un compte" label (link)
+        # "Créer un compte" label (lien)
         self.frameCreerCompte = QtWidgets.QFrame(self.frameMire)
         self.frameCreerCompte.setMinimumSize(QtCore.QSize(100, 50))
         self.frameCreerCompte.setMaximumSize(QtCore.QSize(100, 50))
@@ -212,7 +213,7 @@ class Ui_MainWindow(object):
         self.boutonCreerCompte.setMaximumSize(QtCore.QSize(80, 25))
         self.boutonCreerCompte.setObjectName("boutonCreerCompte")
         self.boutonCreerCompte.setAlignment(QtCore.Qt.AlignCenter)
-        self.boutonCreerCompte.linkActivated.connect(self.show_signup_form)  # Connect the label to open signup form
+        self.boutonCreerCompte.linkActivated.connect(self.show_signup_form)  # Connecte le lien à la fonction qui permett le changement de forme
         self.verticalLayout_6.addWidget(self.boutonCreerCompte)
         self.verticalLayout.addWidget(self.frameCreerCompte, 0, QtCore.Qt.AlignHCenter)
 
@@ -234,42 +235,65 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.frame_2, 3, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
 
-        # Add a state variable to track current form
+        # Variable qui vérifie la forme actuelle
         self.is_login_form = True
 
-        # Store MainWindow reference
+        # Stocke la reference MainWindow
         self.main_window = MainWindow
 
-        # Initialize the form state and connections
+        # Initialise l'était du formulaire et les connections.
         self.update_form_state()
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    # def bouton_animation(self):
-    #     self.boutonValider.setFocus()
-    #     self.handle_login()
-    #     QtCore.QTimer.singleShot(100, self.boutonValider.clearFocus)
-
     def show_signup_form(self):
-        """Toggle between login and signup forms"""
+        """
+        Permute entre les formulaires de connexion et d'inscription.
+        Cette méthode met à jour l'état de l'interface utilisateur en basculant
+        entre les deux formulaires disponibles: connexion et inscription.
+
+        Fonctionnalités principales:
+        - Basculer entre l'état de connexion et d'inscription.
+        - Mettre à jour l'affichage des champs, titres, et boutons associés.
+
+        Exemple d'utilisation:
+        self.show_signup_form()
+        """
         self.is_login_form = not self.is_login_form
         self.update_form_state()
 
     def update_form_state(self):
-        """Update form labels and button connections based on current state"""
+        """
+        Met à jour l'état et l'apparence des formulaires selon le contexte.
+
+        Cette méthode est appelée pour ajuster dynamiquement les éléments de l'interface,
+        en fonction de l'état actuel du formulaire (connexion ou inscription). Elle adapte
+        notamment les labels, les placeholders, les textes des boutons, et les connexions
+        des événements.
+
+        Fonctionnalités principales:
+        - Mise à jour des textes affichés (titres, boutons, placeholders).
+        - Déconnexion des anciens événements et création de nouveaux.
+        - Gestion des connexions pour valider l'action courante (connexion/inscription).
+
+        Exemple d'utilisation:
+            self.is_login_form = False
+            self.update_form_state()
+        """
+
         _translate = QtCore.QCoreApplication.translate
 
-        # Disconnect any existing connections
+        # Déconnecte les connections existantes
         try:
             self.boutonValider.clicked.disconnect()
             self.inputMail.returnPressed.disconnect()
             self.inputPassword.returnPressed.disconnect()
         except:
-            pass  # No connections to disconnect
+            pass
 
         if self.is_login_form:
-            # Login form state
+            # Formulaire d'authentification
             self.main_window.setWindowTitle(_translate("MainWindow", "TaskFlow - Login"))
             self.label.setText(_translate("MainWindow", "S'identifier"))
             self.boutonValider.setText(_translate("MainWindow", "Valider"))
@@ -277,12 +301,12 @@ class Ui_MainWindow(object):
             self.inputPassword.setPlaceholderText("")
             self.inputMail.setPlaceholderText("")
 
-            # Set login form connections
+            # Met en place les connection du formulaire d'authentification.
             self.boutonValider.clicked.connect(self.handle_login)
             self.inputMail.returnPressed.connect(self.handle_login)
             self.inputPassword.returnPressed.connect(self.handle_login)
         else:
-            # Signup form state
+            # Formulaire de création de compte
             self.main_window.setWindowTitle(_translate("MainWindow", "TaskFlow - Inscription"))
             self.label.setText(_translate("MainWindow", "Créer un compte"))
             self.boutonValider.setText(_translate("MainWindow", "S'inscrire"))
@@ -290,14 +314,30 @@ class Ui_MainWindow(object):
             self.inputPassword.setPlaceholderText("Minimum 8 caractères")
             self.inputMail.setPlaceholderText("exemple@email.com")
 
-            # Set signup form connections
+            # Met en place les connection du formulaire d'authentification.
             self.boutonValider.clicked.connect(self.handle_signup)
             self.inputMail.returnPressed.connect(self.handle_signup)
             self.inputPassword.returnPressed.connect(self.handle_signup)
 
     def handle_login(self):
+        """
+        Gère la soumission du formulaire de connexion.
 
-        # Clear any previous error messages
+        Cette méthode valide les champs de saisie, récupère les informations d'authentification
+        depuis la base de données, et affiche un message de succès ou d'erreur en conséquence.
+        En cas de succès, elle redirige vers la fenêtre principale.
+
+        Fonctionnalités principales:
+        - Validation des champs email et mot de passe.
+        - Comparaison des données avec celles stockées en base de données.
+        - Affichage des messages d'erreur ou de succès.
+        - Navigation vers la fenêtre principale en cas de connexion réussie.
+
+        Exemple d'utilisation:
+        self.handle_login()
+        """
+
+        # Nettoie les potentiels messages d'erreur existants
         self.clear_error_message()
 
         email = self.inputMail.text()
@@ -323,15 +363,28 @@ class Ui_MainWindow(object):
             return False
 
     def handle_signup(self):
-        """Handle signup form submission"""
+        """
+        Gère la soumission du formulaire d'inscription.
 
-        # Clear any previous error messages
+        Cette méthode valide les champs de saisie (email et mot de passe), vérifie la disponibilité
+        de l'email, et crée un nouvel utilisateur si toutes les conditions sont remplies.
+        Elle retourne ensuite à l'écran de connexion.
+
+        Fonctionnalités principales:
+        - Validation du format de l'email.
+        - Vérification que l'email n'existe pas déjà en base de données.
+        - Création d'un nouvel utilisateur dans la base de données.
+        - Affichage des messages d'erreur ou de succès.
+
+        Exemple d'utilisation:
+            self.handle_signup()
+        """
         self.clear_error_message()
 
         email = self.inputMail.text()
         password = self.inputPassword.text()
 
-        # Basic validation
+        # Vérification des éléments remplis
         if not self.validate_email(email):
             self.show_error_message("Erreur d'inscription", "Veuillez entrer une adresse email valide")
             return False
@@ -340,15 +393,14 @@ class Ui_MainWindow(object):
             self.show_error_message("Erreur d'inscription", "Le mot de passe doit contenir au moins 8 caractères")
             return False
 
-        # Check if email already exists
+        # Vérifie si l'adresse mail est existante
         existing_user = DB_API.get_email_hashpass(email)
         if existing_user and not isinstance(existing_user, Exception):
             self.show_error_message("Erreur d'inscription", "Cette adresse email est déjà utilisée")
             return False
 
-        # Create new user
+        # Créé le nouvel utilisateur
         try:
-            # Assuming DB_API has a create_user method - you'll need to implement this
             success = DB_API.add_user(email, password)
             if success:
                 self.show_success_message("Inscription réussie", "Votre compte a été créé avec succès!")
@@ -364,36 +416,96 @@ class Ui_MainWindow(object):
             return False
 
     def validate_email(self, email):
-        """Basic email validation"""
+        """
+        Valide le format de l'email saisi par l'utilisateur.
+
+        Cette méthode utilise une expression régulière pour vérifier si l'email
+        respecte le format standard.
+
+        :param email: Adresse email à valider
+        :type email: str
+        :return: `True` si le format est valide, sinon `False`
+        :rtype: bool
+
+        Exemple d'utilisation:
+        if not self.validate_email(email):
+            print("Email invalide")
+        """
+
         import re
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return re.match(pattern, email) is not None
 
     def show_error_message(self, title, message):
-        """Show error message in the error label"""
+        """
+        Affiche un message d'erreur dans le label prévu à cet effet.
+
+        Cette méthode met à jour le contenu du label `labelErreur` avec un message d'erreur.
+        Le message est automatiquement effacé après un délai de 3 secondes.
+
+        :param title: Titre du message d'erreur (non affiché ici, prévu pour une extension future)
+        :type title: str
+        :param message: Contenu du message d'erreur
+        :type message: str
+
+        Exemple d'utilisation:
+        self.show_error_message("Erreur", "Email ou mot de passe incorrect")
+        """
+
         self.labelErreur.setText(message)
-        # Optional: Add a timer to clear the error message after a few seconds
+        # Délais de supression de message. Ici 3 secondes.
         QtCore.QTimer.singleShot(3000, self.clear_error_message)
 
     def clear_error_message(self):
-        """Clear the error message label"""
+        """
+        Efface le message d'erreur affiché dans `labelErreur`.
+
+        Cette méthode remet le contenu du label à une chaîne vide.
+
+        Exemple d'utilisation:
+        self.clear_error_message()
+        """
+
         self.labelErreur.clear()
 
     def show_success_message(self, title, message):
-        """Show success message in the error label (can be styled differently)"""
-        self.labelErreur.setStyleSheet("color: green;")
+        """
+        Affiche un message de succès dans le label prévu à cet effet.
+
+        Cette méthode modifie temporairement le style du label `labelErreur` pour afficher
+        un message de succès en blanc, puis le réinitialise après un délai de 3 secondes.
+
+        :param title: Titre du message de succès (non affiché ici, prévu pour une extension future)
+        :type title: str
+        :param message: Contenu du message de succès
+        :type message: str
+
+        Exemple d'utilisation:
+        self.show_success_message("Succès", "Votre compte a été créé avec succès")
+        """
+
+        self.labelErreur.setStyleSheet("color: white;")
         self.labelErreur.setText(message)
-        # Clear success message after 3 seconds
+        # Nettoie les messages de succès au bout de 3 secondes
         QtCore.QTimer.singleShot(3000, self.clear_error_message)
-        # Reset label color
+        # Réinitialise la couleur du label.
         QtCore.QTimer.singleShot(3000, lambda: self.labelErreur.setStyleSheet("color: red;"))
 
-    def load_stylesheet(self, MainWindow):
-        with open("authentification.qss", "r") as file:
-            stylesheet = file.read()
-            MainWindow.setStyleSheet(stylesheet)
-
     def open_main_window(self):
+        """
+        Redirige vers la fenêtre principale après une connexion réussie.
+
+        Cette méthode ferme la fenêtre d'authentification et instancie la fenêtre principale
+        de l'application.
+
+        Fonctionnalités principales:
+        - Fermeture de la fenêtre actuelle.
+        - Création et affichage de la fenêtre principale.
+
+        Exemple d'utilisation:
+        self.open_main_window()
+        """
+
         # Fermer la fenêtre de connexion actuelle
         self.main_window.close()
 
