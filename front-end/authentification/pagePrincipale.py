@@ -1,30 +1,35 @@
-# -*- coding: utf-8 -*-
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QInputDialog
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        # Charger le fichier de style CSS
         with open('pagePrincipale.qss', 'r') as f:
             style = f.read()
             MainWindow.setStyleSheet(style)
+
+        # Configuration de la fenêtre principale
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1769, 1098)
         MainWindow.setIconSize(QtCore.QSize(24, 25))
 
+        # Création du widget central
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout_2.setObjectName("gridLayout_2")
 
+        # Création du widget avec icône et nom
         self.icon_name_widget = QtWidgets.QWidget(self.centralwidget)
         self.icon_name_widget.setMaximumSize(QtCore.QSize(70, 16777215))
         self.icon_name_widget.setObjectName("icon_name_widget")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.icon_name_widget)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
 
+        # Configuration du logo
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-
         self.label = QtWidgets.QLabel(self.icon_name_widget)
         self.label.setMinimumSize(QtCore.QSize(50, 50))
         self.label.setMaximumSize(QtCore.QSize(50, 50))
@@ -35,11 +40,13 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.addWidget(self.label)
         self.verticalLayout_3.addLayout(self.horizontalLayout_3)
 
+        # Configuration des boutons de navigation
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setContentsMargins(-1, 15, -1, -1)
         self.verticalLayout.setSpacing(15)
         self.verticalLayout.setObjectName("verticalLayout")
 
+        # Bouton Project
         self.bouton_project1 = QtWidgets.QPushButton(self.icon_name_widget)
         self.bouton_project1.setText("")
         icon = QtGui.QIcon()
@@ -51,6 +58,7 @@ class Ui_MainWindow(object):
         self.bouton_project1.setObjectName("bouton_project1")
         self.verticalLayout.addWidget(self.bouton_project1)
 
+        # Bouton Profile
         self.bouton_profile1 = QtWidgets.QPushButton(self.icon_name_widget)
         self.bouton_profile1.setText("")
         icon1 = QtGui.QIcon()
@@ -62,68 +70,71 @@ class Ui_MainWindow(object):
         self.bouton_profile1.setObjectName("bouton_profile1")
         self.verticalLayout.addWidget(self.bouton_profile1)
 
+        # Configuration des boutons de message
         self.bouton_message1 = QtWidgets.QPushButton(self.icon_name_widget)
         self.bouton_message1.setText("")
+
+        # Configuration de l'icône du bouton message
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         icon2.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.bouton_message1.setIcon(icon2)
+
+        # Paramètres du bouton message
         self.bouton_message1.setCheckable(True)
         self.bouton_message1.setAutoExclusive(True)
         self.bouton_message1.setObjectName("bouton_message1")
         self.verticalLayout.addWidget(self.bouton_message1)
-
         self.verticalLayout_3.addLayout(self.verticalLayout)
 
+        # Ajout d'un espace extensible vertical
         spacerItem = QtWidgets.QSpacerItem(20, 418, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_3.addItem(spacerItem)
 
+        # Configuration du bouton de sortie
         self.bouton_quitter1 = QtWidgets.QPushButton(self.icon_name_widget)
         self.bouton_quitter1.setText("")
+
+        # Configuration de l'icône du bouton de sortie
         icon3 = QtGui.QIcon()
         icon3.addPixmap(QtGui.QPixmap("images/pagePrincipale/log_out_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         icon3.addPixmap(QtGui.QPixmap("images/pagePrincipale/log_out.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.bouton_quitter1.setIcon(icon3)
+
+        # Paramètres du bouton de sortie
         self.bouton_quitter1.setCheckable(True)
         self.bouton_quitter1.setAutoExclusive(True)
         self.bouton_quitter1.setObjectName("bouton_quitter1")
         self.verticalLayout_3.addWidget(self.bouton_quitter1)
-
         self.gridLayout_2.addWidget(self.icon_name_widget, 0, 0, 1, 1)
-
         self.icon_only_widget = QtWidgets.QWidget(self.centralwidget)
         self.icon_only_widget.setMaximumSize(QtCore.QSize(200, 16777215))
         self.icon_only_widget.setObjectName("icon_only_widget")
         self.gridLayout = QtWidgets.QGridLayout(self.icon_only_widget)
         self.gridLayout.setContentsMargins(-1, -1, 0, -1)
         self.gridLayout.setObjectName("gridLayout")
-
         self.bouton_quitter2 = QtWidgets.QPushButton(self.icon_only_widget)
         self.bouton_quitter2.setIcon(icon3)
         self.bouton_quitter2.setCheckable(True)
         self.bouton_quitter2.setAutoExclusive(True)
         self.bouton_quitter2.setObjectName("bouton_quitter2")
         self.gridLayout.addWidget(self.bouton_quitter2, 3, 0, 1, 1)
-
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setContentsMargins(-1, 15, -1, -1)
         self.verticalLayout_2.setSpacing(15)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-
         self.bouton_project2 = QtWidgets.QPushButton(self.icon_only_widget)
         self.bouton_project2.setIcon(icon)
         self.bouton_project2.setCheckable(True)
         self.bouton_project2.setAutoExclusive(True)
         self.bouton_project2.setObjectName("bouton_project2")
         self.verticalLayout_2.addWidget(self.bouton_project2)
-
         self.bouton_profile2 = QtWidgets.QPushButton(self.icon_only_widget)
         self.bouton_profile2.setIcon(icon1)
         self.bouton_profile2.setCheckable(True)
         self.bouton_profile2.setAutoExclusive(True)
         self.bouton_profile2.setObjectName("bouton_profile2")
         self.verticalLayout_2.addWidget(self.bouton_profile2)
-
         self.bouton_message2 = QtWidgets.QPushButton(self.icon_only_widget)
         icon4 = QtGui.QIcon()
         icon4.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -135,7 +146,6 @@ class Ui_MainWindow(object):
         self.bouton_message2.setObjectName("bouton_message2")
         self.verticalLayout_2.addWidget(self.bouton_message2)
         self.gridLayout.addLayout(self.verticalLayout_2, 1, 0, 1, 1)
-
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.label_4 = QtWidgets.QLabel(self.icon_only_widget)
@@ -215,52 +225,6 @@ class Ui_MainWindow(object):
         self.tabWidget.setObjectName("tabWidget")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
-
-        self.tab_layout = QtWidgets.QVBoxLayout(self.tab)
-        # Todo List Title
-        self.title_label = QtWidgets.QLabel(self.tab)
-        self.title_label.setText("Ma Todo Liste")
-        self.title_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.title_label.setStyleSheet("font-size: 28px; font-weight: bold; color: #2c3e50;")
-        self.tab_layout.addWidget(self.title_label)
-        # Tableau pour afficher les tâches
-        self.table = QtWidgets.QTableWidget(self.tab)
-        self.table.setColumnCount(3)
-        self.table.setHorizontalHeaderLabels(["Tâche", "Date", "Commentaire"])
-        self.table.setStyleSheet("background-color: #ecf0f1; font-size: 14px;")
-        self.tab_layout.addWidget(self.table)
-
-        # Zone d'entrée pour ajouter une nouvelle tâche
-        self.form_layout = QtWidgets.QFormLayout()
-        self.task_input = QtWidgets.QLineEdit(self.tab)
-        self.date_input = QtWidgets.QDateEdit(self.tab)
-        self.date_input.setCalendarPopup(True)
-        self.comment_input = QtWidgets.QLineEdit(self.tab)
-
-        self.form_layout.addRow("Tâche :", self.task_input)
-        self.form_layout.addRow("Date :", self.date_input)
-        self.form_layout.addRow("Commentaire :", self.comment_input)
-        self.tab_layout.addLayout(self.form_layout)
-
-        # Boutons pour les actions
-        self.button_layout = QtWidgets.QHBoxLayout()
-        self.add_button = QtWidgets.QPushButton("Ajouter", self.tab)
-        self.delete_button = QtWidgets.QPushButton("Supprimer", self.tab)
-        self.complete_button = QtWidgets.QPushButton("Marquer comme terminé", self.tab)
-
-        # Style des boutons
-        self.add_button.setStyleSheet("background-color: #27ae60; color: white; font-weight: bold; padding: 10px;")
-        self.delete_button.setStyleSheet("background-color: #e74c3c; color: white; font-weight: bold; padding: 10px;")
-        self.complete_button.setStyleSheet("background-color: #f39c12; color: white; font-weight: bold; padding: 10px;")
-
-        self.button_layout.addWidget(self.add_button)
-        self.button_layout.addWidget(self.delete_button)
-        self.button_layout.addWidget(self.complete_button)
-        self.tab_layout.addLayout(self.button_layout)
-
-        # Add the tab to tabWidget
-        self.tabWidget.addTab(self.tab, "Todo List")
-
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
@@ -321,9 +285,7 @@ class Ui_MainWindow(object):
         self.bouton_menu.toggled['bool'].connect(self.icon_name_widget.setHidden) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        # Dans votre méthode setupUi
-
-        # Connexion des boutons aux changements de page
+        # Configuration des connexions et événements
         self.bouton_project1.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.project))
         self.bouton_project2.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.project))
 
@@ -333,55 +295,8 @@ class Ui_MainWindow(object):
         self.bouton_message1.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.message))
         self.bouton_message2.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.message))
 
-        self.add_button.clicked.connect(self.add_task)
-        self.delete_button.clicked.connect(self.delete_task)
-        self.complete_button.clicked.connect(self.mark_completed)
-
-    def add_task(self):
-        """Ajoute une nouvelle tâche à la liste."""
-        task = self.task_input.text().strip()
-        date = self.date_input.date().toString("dd/MM/yyyy")
-        comment = self.comment_input.text().strip()
-
-        if not task:
-            QMessageBox.warning(None, "Erreur", "Veuillez entrer une tâche.")
-            return
-
-        row = self.table.rowCount()
-        self.table.insertRow(row)
-        self.table.setItem(row, 0, QTableWidgetItem(task))
-        self.table.setItem(row, 1, QTableWidgetItem(date))
-        self.table.setItem(row, 2, QTableWidgetItem(comment))
-
-        # Réinitialisation des champs
-        self.task_input.clear()
-        self.comment_input.clear()
-
-    def delete_task(self):
-        """Supprime la tâche sélectionnée."""
-        rows = sorted(set(index.row() for index in self.table.selectedIndexes()), reverse=True)
-        if not rows:
-            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à supprimer.")
-            return
-        for row in rows:
-            self.table.removeRow(row)
-
-    def mark_completed(self):
-        """Marque la tâche sélectionnée comme terminée."""
-        rows = sorted(set(index.row() for index in self.table.selectedIndexes()), reverse=True)
-        if not rows:
-            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à marquer comme terminée.")
-            return
-        for row in rows:
-            item = self.table.item(row, 0)
-            font = item.font()
-            font.setStrikeOut(True)  # Appliquer la barre sur le texte
-            font.setBold(False)  # Optionnel : Rendre la police plus fine une fois terminée
-            item.setFont(font)
-            item.setForeground(QtGui.QColor(128, 128, 128))  # Changer la couleur du texte
-            item.setText(item.text() + " (Completed)")  # Ajouter "(Completed)"
-
     def retranslateUi(self, MainWindow):
+        # Traduction des textes de l'interface
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.bouton_quitter2.setText(_translate("MainWindow", "Quitter"))
@@ -394,4 +309,3 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Page"))
         self.label_5.setText(_translate("MainWindow", "Profile page "))
         self.label_6.setText(_translate("MainWindow", "Message page "))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Todo List"))
