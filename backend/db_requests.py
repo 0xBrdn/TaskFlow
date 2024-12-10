@@ -46,16 +46,24 @@ class _Requests:
         "WHERE utg.task_projectID = '{}';"
     )
 
+    get_userID_by_username = "SELECT userID FROM users where username = '{}';"
+
     get_all_status = "SELECT userID, status FROM status;"
 
-    get_last_task_infoID = (
-        "SELECT task_infoID"
-        "FROM tasks_infos"
-        "ORDER BY task_infoID DESC"
-        "LIMIT 1;"
-        )
+    get_all_projects = "SELECT projectID, name FROM projects;"
 
-    get_userID_by_username = "SELECT userID FROM users where username = '{}';"
+    get_all_tasks = (
+        "SELECT t.taskID, ti.title, ti.description, ti.status, ti.priority, ti.covered, "
+        "ti.assign, ti.dead_line FROM tasks t JOIN tasks_infos ti ON t.task_infoID = "
+        "ti.task_infoID;"
+    )
+
+    get_user_email = "SELECT email FROM users WHERE userID = '{}';"
+
+    get_emails_by_task_projectID = (
+        "SELECT u.email FROM users_tasks_groups utg JOIN users u ON utg.userID = u.userID "
+        "WHERE utg.task_projectID = '{}';"
+    )
 
     add_user = (
         "INSERT INTO users (username, password, email, is_google_user) "
@@ -85,6 +93,8 @@ class _Requests:
     )
 
     add_user_log = "INSERT INTO users_logs (userID, action, details) VALUES ('{}', '{}', '{}');"
+
+    add_task_group = "INSERT INTO tasks_groups () VALUES ();"
 
 
 if __name__ == "__main__":
