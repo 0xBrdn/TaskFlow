@@ -5,6 +5,29 @@ from pagePrincipale import Ui_MainWindow as MainWindowUI
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        """
+            Initialise et configure l'interface utilisateur pour la fenêtre de connexion/inscription.
+
+            Cette méthode met en place tous les éléments graphiques de la fenêtre d'authentification,
+            incluant les champs de saisie email et mot de passe, les boutons, et la gestion des états
+            de formulaire (connexion/inscription).
+
+            Principales fonctionnalités:
+            - Configuration des widgets PyQt5
+            - Création des frames, labels, champs de saisie et boutons
+            - Mise en place des connexions pour la gestion des événements
+            - Chargement de la feuille de style
+            - Initialisation de l'état du formulaire
+
+            :param MainWindow: La fenêtre principale de l'application à configurer
+            :type MainWindow: QtWidgets.QMainWindow
+
+            Exemple d'utilisation:
+            main_window = QtWidgets.QMainWindow()
+            ui = Ui_MainWindow()
+            ui.setupUi(main_window)
+            main_window.show()
+            """
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1035, 774)
         icon = QtGui.QIcon()
