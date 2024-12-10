@@ -122,6 +122,33 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.framePassword, 0, QtCore.Qt.AlignHCenter)
 
+        # Add a new frame for error messages
+        self.frameErreur = QtWidgets.QFrame(self.frameMire)
+        self.frameErreur.setMinimumSize(QtCore.QSize(350, 50))
+        self.frameErreur.setMaximumSize(QtCore.QSize(350, 50))
+        self.frameErreur.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameErreur.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameErreur.setObjectName("frameErreur")
+
+        # Vertical layout for error frame
+        self.verticalLayoutErreur = QtWidgets.QVBoxLayout(self.frameErreur)
+        self.verticalLayoutErreur.setObjectName("verticalLayoutErreur")
+
+        # Error label
+        self.labelErreur = QtWidgets.QLabel(self.frameErreur)
+        self.labelErreur.setObjectName("labelErreur")
+        font = QtGui.QFont()
+        font.setFamily("Tahoma")
+        font.setPointSize(10)
+        self.labelErreur.setFont(font)
+        self.labelErreur.setStyleSheet("color: red;")
+        self.labelErreur.setAlignment(QtCore.Qt.AlignCenter)
+        self.labelErreur.setWordWrap(True)
+        self.verticalLayoutErreur.addWidget(self.labelErreur)
+
+        # Add error frame to the vertical layout, right after password frame and before submit button
+        self.verticalLayout.insertWidget(3, self.frameErreur, 0, QtCore.Qt.AlignHCenter)
+
         # Frame for the submit button
         self.frameBouton = QtWidgets.QFrame(self.frameMire)
         self.frameBouton.setMinimumSize(QtCore.QSize(150, 100))
@@ -246,6 +273,10 @@ class Ui_MainWindow(object):
             self.inputPassword.returnPressed.connect(self.handle_signup)
 
     def handle_login(self):
+
+        # Clear any previous error messages
+        self.clear_error_message()
+
         email = self.inputMail.text()
         password = self.inputPassword.text()
         print("Authentification...")
@@ -270,6 +301,10 @@ class Ui_MainWindow(object):
 
     def handle_signup(self):
         """Handle signup form submission"""
+
+        # Clear any previous error messages
+        self.clear_error_message()
+
         email = self.inputMail.text()
         password = self.inputPassword.text()
 
@@ -291,7 +326,7 @@ class Ui_MainWindow(object):
         # Create new user
         try:
             # Assuming DB_API has a create_user method - you'll need to implement this
-            success = DB_API.create_user(email, password)
+            success = DB_API.add_user(email, password)
             if success:
                 self.show_success_message("Inscription réussie", "Votre compte a été créé avec succès!")
                 # Switch back to login form
@@ -312,20 +347,23 @@ class Ui_MainWindow(object):
         return re.match(pattern, email) is not None
 
     def show_error_message(self, title, message):
-        """Show error message dialog"""
-        msg = QtWidgets.QMessageBox()
-        msg.setIcon(QtWidgets.QMessageBox.Critical)
-        msg.setWindowTitle(title)
-        msg.setText(message)
-        msg.exec_()
+        """Show error message in the error label"""
+        self.labelErreur.setText(message)
+        # Optional: Add a timer to clear the error message after a few seconds
+        QtCore.QTimer.singleShot(3000, self.clear_error_message)
+
+    def clear_error_message(self):
+        """Clear the error message label"""
+        self.labelErreur.clear()
 
     def show_success_message(self, title, message):
-        """Show success message dialog"""
-        msg = QtWidgets.QMessageBox()
-        msg.setIcon(QtWidgets.QMessageBox.Information)
-        msg.setWindowTitle(title)
-        msg.setText(message)
-        msg.exec_()
+        """Show success message in the error label (can be styled differently)"""
+        self.labelErreur.setStyleSheet("color: green;")
+        self.labelErreur.setText(message)
+        # Clear success message after 3 seconds
+        QtCore.QTimer.singleShot(3000, self.clear_error_message)
+        # Reset label color
+        QtCore.QTimer.singleShot(3000, lambda: self.labelErreur.setStyleSheet("color: red;"))
 
     def load_stylesheet(self, MainWindow):
         with open("authentification.qss", "r") as file:
