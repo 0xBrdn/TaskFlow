@@ -1,6 +1,3 @@
-import time
-
-import db_api
 from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
@@ -39,17 +36,25 @@ def send_email(subject, body, to):
         print(f'Erreur lors de l\'envoi de l\'email: {e}')
 
 
-def invite_user_to_project(user_email, project_name):
+def invite_user_to_project(username, project_name):
     project = DB_API.get_project_id_by_project_name(project_name)
+    userID = DB_API.get_userID_by_username(username)
+    email = DB_API.get_user_email(userID)
+    permission = 1
+    joined = 1
+    email = email[0]
     if not project:
         print(f"Projet '{project_name}' introuvable.")
         return
-
+    if not userID:
+        print(f"Utilisateur '{username}' introuvable.")
+        return
     subject = f'Invitation à rejoindre le projet "{project_name}"'
-    body = f'Bonjour,\n\nVous avez été invité à rejoindre le projet "{project.name}".\n\n\nCordialement,\nL\'équipe de gestion de projet.'
+    body = f'Bonjour,\n\nVous avez été invité à rejoindre le projet "{project_name}".\n\n\nCordialement,\nL\'équipe ' \
+           f'de gestion de projet.'
 
-    send_email(subject, body, user_email)
-    DB_API.add_user_to_group(user_email, project['id'])
+    send_email(subject, body, email)
+    DB_API.add_user_to_group(project, userID, permission, joined)
 
 
 def check_tasks():
@@ -57,23 +62,35 @@ def check_tasks():
     print(f'Vérification des tâches à {now.strftime("%d/%m/%Y %H:%M")}...')
 
     tasks = DB_API.get_all_tasks()
-
-    for task in tasks:
-        due_date = datetime.fromisoformat(task['due_date'])
+    colonnes = ["taskID", "title", "description", "status", "priority", "covered", "assign", "due_date"]
+    for task_tuple in tasks:
+        task = dict(zip(colonnes, task_tuple))
+        due_date = task['due_date']
         time_remaining = (due_date - now).total_seconds()
-        user_email = task['user_email']
-
+        user_emails = DB_API.get_emails_by_task_projectID(task["assign"])
         if time_remaining < 0:
-            print(f"La tâche '{task['title']}' est en retard.")
-        elif time_remaining < 86400:  # Moins de 24h
-            subject = f'Rappel: {task["title"]} approche de son échéance'
-            body = f"""Bonjour,
+            for user_email in user_emails:
+                subject = f'Tâche en retard : {task["title"]}'
+                body = f"""Bonjour,
 
-N'oubliez pas que la tâche "{task['title']}" doit être terminée avant le {due_date.strftime('%d/%m/%Y %H:%M')}.
+        La tâche "{task['title']}" est en retard. Veuillez la terminer dans les meilleurs délais.
 
-Cordialement,
-L'équipe de gestion de projet."""
-            send_email(subject, body, user_email)
+        Cordialement,
+        L'équipe de gestion de projet."""
+                send_email(subject, body, user_email)
+                print(f"Email envoyé à {user_email} concernant une tâche en retard.")
+
+        elif 0 < time_remaining < 86400:  # Moins de 24 heures
+            for user_email in user_emails:
+                subject = f'Rappel : La date limite approche pour "{task["title"]}"'
+                body = f"""Bonjour,
+
+        N'oubliez pas que la tâche "{task['title']}" doit être terminée avant le {due_date.strftime('%d/%m/%Y %H:%M')}.
+
+        Cordialement,
+        L'équipe de gestion de projet."""
+                send_email(subject, body, user_email)
+                print(f"Rappel envoyé à {user_email}.")
 
 
 def main():
@@ -107,9 +124,9 @@ def main():
             print(f"Projet '{name}' créé avec succès.")
 
         elif choice == '3':
-            user_email = input("Email de l'utilisateur : ")
+            username = input("Nom de l'utilisateur : ")
             project_name = input("Nom du projet : ")
-            invite_user_to_project(user_email, project_name)
+            invite_user_to_project(username, project_name)
 
         elif choice == '4':
             project_name = input("Nom du projet : ")
@@ -127,18 +144,16 @@ def main():
             due_date_str = input("Date d'échéance (YYYY-MM-DD HH:MM) : ")
             username = input("Utilisateur assigné : ")
             userID = DB_API.get_userID_by_username(username)
-            print(userID)
+            task_projectID = DB_API.add_task_group()
+            DB_API.add_user_to_task_group(task_projectID, userID)
             covered = 0
             status = 0
             due_date = datetime.strptime(due_date_str, '%Y-%m-%d %H:%M')
             project = DB_API.get_project_id_by_project_name(project_name)
 
             if project:
-                userID = 1
-                DB_API.add_task_info(status, priority, task_title, description, due_date, covered, userID)
-                time.sleep(1)
-                task_infoID = DB_API.get_last_taskID()
-                print(task_infoID)
+                task_infoID = DB_API.add_task_info(status, priority, task_title, description, due_date, covered,
+                                                   task_projectID)
                 DB_API.add_task(project, task_infoID, userID)
                 print(f"Tâche '{task_title}' ajoutée au projet '{project_name}'.")
             else:
@@ -147,15 +162,16 @@ def main():
         elif choice == '5':
             projects = DB_API.get_all_projects()
             for idx, project in enumerate(projects, start=1):
-                print(f"{idx}. {project['name']} - {project['description']}")
+                print(f"{idx}. {project[1]}")
 
         elif choice == '6':
             project_name = input("Nom du projet : ")
-            project = DB_API.get_project_by_name(project_name)
+            project = DB_API.get_project_id_by_project_name(project_name)
             if project:
-                tasks = DB_API.get_tasks_by_project(project['id'])
+                tasks = DB_API.get_tasks_by_project_id(project[0])
+                print(tasks)
                 for idx, task in enumerate(tasks, start=1):
-                    print(f"{idx}. {task['title']} - {task['priority']} - {task['status']}")
+                    print(f"{idx}. {task[1]} - {task[2]} - {task[3]}")
             else:
                 print(f"Projet '{project_name}' introuvable.")
 
