@@ -96,6 +96,8 @@ class _Requests:
 
     add_task_group = "INSERT INTO tasks_groups () VALUES ();"
 
+    delete_user = "DELETE FROM users WHERE userID = '{}';"
+
 
 if __name__ == "__main__":
     _Requests.get_user_hashpass.format("test")
