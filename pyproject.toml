@@ -49,5 +49,6 @@ lint.ignore = [
     "PGH003", # Use specific rule codes when ignoring type issues
     "PLC1901", # compare-to-empty-string
     "B026",
-    "ISC001"
+    "ISC001",
+    "T201"
 ]
