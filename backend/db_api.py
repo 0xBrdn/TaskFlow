@@ -62,7 +62,7 @@ class DB_API:
         """
         cursor.execute(_Requests.get_project_id_by_project_name.format(project_name))
         result = cursor.fetchone()
-        return result[0]
+        return result
 
     @staticmethod
     @cm_cursor()
@@ -291,50 +291,15 @@ class DB_API:
         return result
 
     @staticmethod
-    @cm_cursor()
-    def get_userID_by_username(username: str, *, cursor: MySQLCursor) -> Optional[int]:
-        cursor.execute(_Requests.get_userID_by_username.format(username))
-        result = cursor.fetchone()
-        return result[0]
-
-    @staticmethod
-    @cm_cursor()
-    def get_all_projects(*, cursor: MySQLCursor) -> ResultType:
-        cursor.execute(_Requests.get_all_projects)
-        result = cursor.fetchall()
-        return result
-
-    @staticmethod
-    @cm_cursor()
-    def get_all_tasks(*, cursor: MySQLCursor) -> ResultType:
-        cursor.execute(_Requests.get_all_tasks)
-        result = cursor.fetchall()
-        return result
-
-    @staticmethod
-    @cm_cursor()
-    def get_user_email(user_id: int, *, cursor: MySQLCursor) -> ResultType:
-        cursor.execute(_Requests.get_user_email.format(user_id))
-        result = cursor.fetchone()
-        return result
-
-    @staticmethod
-    @cm_cursor()
-    def get_emails_by_task_projectID(task_project_id: int, *, cursor: MySQLCursor) -> list:
-        cursor.execute(_Requests.get_emails_by_task_projectID.format(task_project_id))
-        result = cursor.fetchall()
-        return [row[0] for row in result]
-
-    @staticmethod
     @cm_conn()
     @cm_cursor()
     def add_user(
-            username: str,
-            password: Optional[str],
-            email: str,
-            is_google_user: bool,
-            *,
-            cursor: MySQLCursor,
+        username: str,
+        password: Optional[str],
+        email: str,
+        is_google_user: bool,
+        *,
+        cursor: MySQLCursor,
     ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter un nouvel utilisateur à la DB.
@@ -361,7 +326,7 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def add_status(
-            user_id: int, status: int, *, cursor: MySQLCursor
+        user_id: int, status: int, *, cursor: MySQLCursor
     ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter un statut à un utilisateur.
@@ -408,7 +373,7 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def add_user_to_group(
-            project_id: int, user_id: int, permission: int, joined: bool, *, cursor: MySQLCursor
+        project_id: int, user_id: int, permission: int, joined: bool, *, cursor: MySQLCursor
     ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter un utilisateur à un groupe de projet.
@@ -436,15 +401,15 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def add_task_info(
-            status: int,
-            priority: int,
-            title: str,
-            description: str,
-            dead_line: datetime.datetime,
-            covered: bool,
-            assign: int,
-            *,
-            cursor: MySQLCursor,
+        status: int,
+        priority: int,
+        title: str,
+        description: str,
+        dead_line: datetime.datetime,
+        covered: bool,
+        assign: int,
+        *,
+        cursor: MySQLCursor,
     ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter des informations sur une tâche.
@@ -482,7 +447,7 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def add_task(
-            project_id: int, task_info_id: int, user_id: int, *, cursor: MySQLCursor
+        project_id: int, task_info_id: int, user_id: int, *, cursor: MySQLCursor
     ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter une tâche à un projet.
@@ -508,7 +473,7 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def add_subtask(
-            task_id: int, task_info_id: int, *, cursor: MySQLCursor
+        task_id: int, task_info_id: int, *, cursor: MySQLCursor
     ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter une sous-tâche à une tâche.
@@ -533,7 +498,7 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def add_user_to_task_group(
-            task_project_id: int, user_id: int, *, cursor: MySQLCursor
+        task_project_id: int, user_id: int, *, cursor: MySQLCursor
     ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter un utilisateur à un groupe de tâches.
@@ -558,7 +523,7 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def add_user_log(
-            user_id: int, action: str, details: str, *, cursor: MySQLCursor
+        user_id: int, action: str, details: str, *, cursor: MySQLCursor
     ) -> Union[Exception, Optional[int]]:
         """
         Permet d'ajouter une log d'action pour un utilisateur.
@@ -578,13 +543,6 @@ class DB_API:
         >>>     print(user_log_id)
         """
         cursor.execute(_Requests.add_user_log.format(user_id, action, details))
-        return cursor.lastrowid
-
-    @staticmethod
-    @cm_conn()
-    @cm_cursor()
-    def add_task_group(*, cursor: MySQLCursor) -> Union[Exception, Optional[int]]:
-        cursor.execute(_Requests.add_task_group)
         return cursor.lastrowid
 
 
