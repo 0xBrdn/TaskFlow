@@ -40,7 +40,7 @@ def send_email(subject, body, to):
 
 def invite_user_to_project(username, project_name):
     project = DB_API.get_project_id_by_project_name(project_name)
-    userID = DB_API.get_userID_by_username(username)
+    userID = DB_API.get_user_id_by_username(username)
     email = DB_API.get_user_email(userID)
     permission = 1
     joined = 1
@@ -80,7 +80,7 @@ def check_tasks():
         task = dict(zip(colonnes, task_tuple))
         due_date = task["due_date"]
         time_remaining = (due_date - now).total_seconds()
-        user_emails = DB_API.get_emails_by_task_projectID(task["assign"])
+        user_emails = DB_API.get_emails_by_task_project_id(task["assign"])
         if time_remaining < 0:
             for user_email in user_emails:
                 subject = f'Tâche en retard : {task["title"]}'
@@ -157,7 +157,7 @@ def main():
             description = input("Description : ")
             due_date_str = input("Date d'échéance (YYYY-MM-DD HH:MM) : ")
             username = input("Utilisateur assigné : ")
-            userID = DB_API.get_userID_by_username(username)
+            userID = DB_API.get_user_id_by_username(username)
             task_projectID = DB_API.add_task_group()
             DB_API.add_user_to_task_group(task_projectID, userID)
             covered = 0
@@ -220,7 +220,7 @@ def delete_user(username: str, user_id: Optional[int] = None) -> bool:
     >>>     print("supprimé avec succes")
     """
     if not user_id:
-        user_id = DB_API.get_userID_by_username(username)
+        user_id = DB_API.get_user_id_by_username(username)
         if isinstance(user_id, Exception):
             return False
     err = DB_API.delete_user(user_id)
@@ -229,5 +229,51 @@ def delete_user(username: str, user_id: Optional[int] = None) -> bool:
     return True
 
 
+def update_task_info(
+    task_info_id: int,
+    status: Optional[int] = None,  # noqa
+    priority: Optional[int] = None,  # noqa
+    title: Optional[str] = None,  # noqa
+    description: Optional[str] = None,  # noqa
+    dead_line: Optional[datetime] = None,  # noqa
+    covered: Optional[bool] = None,  # noqa
+    assign: Optional[int] = None,  # noqa
+):
+    """
+    Met à jour une tâche dans la table tasks_infos.
+
+    Cette fonction renvoie un boolean. En cas d'échec,
+    elle renverra False et en cas de succes, elle renverra True.
+
+    :param task_info_id: ID de la tâche à modifier.
+    :param status: (optionnel) Nouveau statut de la tâche.
+    :param priority: (optionnel) Nouvelle priorité de la tâche.
+    :param title: (optionnel) Nouveau titre de la tâche.
+    :param description: (optionnel) Nouvelle description de la tâche.
+    :param dead_line: (optionnel) Nouvelle échéance (format datetime).
+    :param covered: (optionnel) Nouvel état "covered" (booléen).
+    :param assign: (optionnel) Nouvel assigné (ID de tasks_groups).
+
+    Exemple:
+    >>> success = update_task_info(task_info_id=4, title='nouveau title', priority=2, assign=2)
+    >>> if success:
+    >>>     print("supprimé avec succes")
+    >>> success = update_task_info(task_info_id=4, status=2)
+    >>> if success:
+    >>>     print("supprimé avec succes")
+    """
+    _dict = {
+        field: value
+        for field, value in vars().items()
+        if value is not None and field != "task_info_id"
+    }
+
+    err = DB_API.update_task_infos(task_info_id, _dict.keys(), _dict.values())
+    if isinstance(err, Exception):
+        return False
+    return True
+
+
 if __name__ == "__main__":
-    main()
+    # main()
+    update_task_info(1, 1, 1, description="ds")
