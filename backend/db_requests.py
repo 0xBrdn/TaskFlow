@@ -98,6 +98,12 @@ class _Requests:
 
     delete_user = "DELETE FROM users WHERE userID = '{}';"
 
+    delete_task = "DELETE FROM tasks WHERE taskID = '{}';"
+
+    delete_subtask = "DELETE FROM subtasks WHERE subtaskID = '{}';"
+
+    update_task_infos = "UPDATE tasks_infos SET {} WHERE task_infoID = '{}';"
+
 
 if __name__ == "__main__":
     _Requests.get_user_hashpass.format("test")
