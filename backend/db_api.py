@@ -545,7 +545,71 @@ class DB_API:
         cursor.execute(_Requests.add_user_log.format(user_id, action, details))
         return cursor.lastrowid
 
+    @staticmethod
+    @cm_cursor()
+    def get_userID_by_username(username: str, *, cursor: MySQLCursor) -> Optional[int]:
+        cursor.execute(_Requests.get_userID_by_username.format(username))
+        result = cursor.fetchone()
+        return result[0]
+
+    @staticmethod
+    @cm_cursor()
+    def get_all_projects(*, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_all_projects)
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_all_tasks(*, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_all_tasks)
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_user_email(user_id: int, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_user_email.format(user_id))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_emails_by_task_projectID(task_project_id: int, *, cursor: MySQLCursor) -> list:
+        cursor.execute(_Requests.get_emails_by_task_projectID.format(task_project_id))
+        result = cursor.fetchall()
+        return [row[0] for row in result]
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def add_task_group(*, cursor: MySQLCursor) -> Union[Exception, Optional[int]]:
+        cursor.execute(_Requests.add_task_group)
+        return cursor.lastrowid
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_user(user_id, *, cursor: MySQLCursor) -> Optional[Exception]:
+        """
+        Permet de delete un utilisateur de la db et toutes ses dépendances.
+
+        Cette fonction renvoie None ou une exception. En cas d'échec,
+        elle renverra une exc et en cas de succes, elle renverra None.
+
+        :param user_id: ID de l'utilisateur
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> err = DB_API.delete_user(1)
+        >>> if not isinstance(err, Exception):
+        >>>     print("delete avec succes")
+        """
+        return cursor.execute(_Requests.delete_user.format(user_id))
+
 
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
-    v = DB_API.get_project_id_by_project_name("tebgfbgrsbs")
+    # v = DB_API.get_project_id_by_project_name("tebgfbgrsbs")
+    pass
