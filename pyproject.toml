@@ -50,5 +50,6 @@ lint.ignore = [
     "PLC1901", # compare-to-empty-string
     "B026",
     "ISC001",
-    "T201"
+    "T201", # pas d'erreur sur les prints
+    "PGH004" # pas d'erreur sur les noqa
 ]
