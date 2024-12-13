@@ -547,7 +547,23 @@ class DB_API:
 
     @staticmethod
     @cm_cursor()
-    def get_userID_by_username(username: str, *, cursor: MySQLCursor) -> Optional[int]:
+    def get_user_id_by_username(username: str, *, cursor: MySQLCursor) -> Optional[int]:
+        """
+        Permet de recup les projets dans la db.
+
+        Cette fonction renvoie l'user id.
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param username: Username de l'utilisateur
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> user_id = DB_API.get_user_id_by_username("toto")
+        >>> if user_id and not isinstance(user_id, Exception):
+        >>>     print(f"user_id = {user_id}")
+        """
         cursor.execute(_Requests.get_userID_by_username.format(username))
         result = cursor.fetchone()
         return result[0]
@@ -555,6 +571,22 @@ class DB_API:
     @staticmethod
     @cm_cursor()
     def get_all_projects(*, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de recup les projets dans la db.
+
+        Cette fonction renvoie une liste de tuples comprenant les
+        taches sous la forme (projectID, name).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> all_projects = DB_API.get_all_projects()
+        >>> if all_projects and not isinstance(all_projects, Exception):
+        >>>     print(f"all_projects = {all_projects}")
+        """
         cursor.execute(_Requests.get_all_projects)
         result = cursor.fetchall()
         return result
@@ -562,6 +594,23 @@ class DB_API:
     @staticmethod
     @cm_cursor()
     def get_all_tasks(*, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de recup toutes les tasks dans la db.
+
+        Cette fonction renvoie une liste de tuples comprenant les
+        taches sous la forme (taskID, title, description, status,
+        priority, covered, assign, dead_line).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> all_tasks = DB_API.get_all_tasks()
+        >>> if all_tasks and not isinstance(all_tasks, Exception):
+        >>>     print(f"all_tasks = {all_tasks}")
+        """
         cursor.execute(_Requests.get_all_tasks)
         result = cursor.fetchall()
         return result
@@ -569,13 +618,47 @@ class DB_API:
     @staticmethod
     @cm_cursor()
     def get_user_email(user_id: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de recup l'email de l'userid dans la db.
+
+        Cette fonction renvoie un tuple ou une exception.
+        En cas d'échec, elle renverra une exc et en cas de succes,
+        elle renverra le mail de l'user dans un tuple.
+
+        :param user_id: L'id de l'user
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> email = DB_API.get_user_email(2)
+        >>> if email and not isinstance(email, Exception):
+        >>>     print(f"email = {email}")
+        """
         cursor.execute(_Requests.get_user_email.format(user_id))
         result = cursor.fetchone()
         return result
 
     @staticmethod
     @cm_cursor()
-    def get_emails_by_task_projectID(task_project_id: int, *, cursor: MySQLCursor) -> list:
+    def get_emails_by_task_project_id(
+        task_project_id: int, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[list]]:
+        """
+        Permet d'ajouter un task_group dans la db.
+
+        Cette fonction renvoie l'id du task_group ou une exception.
+        En cas d'échec, elle renverra une exc et en cas de succes,
+        elle renverra l'id du task_group.
+
+        :param task_project_id: L'id du task_project
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> emails = DB_API.get_emails_by_task_project_id(2)
+        >>> if emails and not isinstance(emails, Exception):
+        >>>     print(f"emails = {emails}")
+        """
         cursor.execute(_Requests.get_emails_by_task_projectID.format(task_project_id))
         result = cursor.fetchall()
         return [row[0] for row in result]
@@ -584,6 +667,21 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def add_task_group(*, cursor: MySQLCursor) -> Union[Exception, Optional[int]]:
+        """
+        Permet d'ajouter un task_group dans la db.
+
+        Cette fonction renvoie l'id du task_group ou une exception.
+        En cas d'échec, elle renverra une exc et en cas de succes,
+        elle renverra l'id du task_group.
+
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> err = DB_API.add_task_group()
+        >>> if err and not isinstance(err, Exception):
+        >>>     print(f"taskgroup_id = {err}")
+        """
         cursor.execute(_Requests.add_task_group)
         return cursor.lastrowid
 
@@ -607,6 +705,75 @@ class DB_API:
         >>>     print("delete avec succes")
         """
         return cursor.execute(_Requests.delete_user.format(user_id))
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def update_task_infos(
+        taskinfos_id: int, update_fields: list, values: list, *, cursor: MySQLCursor
+    ) -> Optional[Exception]:
+        """
+        Permet d'update un ou plusieurs objets d'une task_infos.
+
+        Cette fonction renvoie None ou une exception. En cas d'échec,
+        elle renverra une exc et en cas de succes, elle renverra None.
+
+        :param taskinfos_id: ID de la task info
+        :param update_fields: Tous les objets a modifier
+        :param values: Les valeurs des objets a modifier
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> err = DB_API.update_task_infos(4, ['status', 'title'], [3, 'nouveau title'])
+        >>> if not isinstance(err, Exception):
+        >>>     print("delete avec succes")
+        """
+        return cursor.execute(
+            _Requests.update_task_infos.format(", ".join(update_fields), taskinfos_id), values
+        )
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_task(task_id, *, cursor: MySQLCursor) -> Optional[Exception]:
+        """
+        Permet de delete une task de la db et toutes ses dépendances.
+
+        Cette fonction renvoie None ou une exception. En cas d'échec,
+        elle renverra une exc et en cas de succes, elle renverra None.
+
+        :param task_id: ID de la tache
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> err = DB_API.delete_task(1)
+        >>> if not isinstance(err, Exception):
+        >>>     print("delete avec succes")
+        """
+        return cursor.execute(_Requests.delete_task.format(task_id))
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_subtask(subtask_id, *, cursor: MySQLCursor) -> Optional[Exception]:
+        """
+        Permet de delete une subtask de la db et toutes ses dépendances.
+
+        Cette fonction renvoie None ou une exception. En cas d'échec,
+        elle renverra une exc et en cas de succes, elle renverra None.
+
+        :param subtask_id: ID de la tache
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> err = DB_API.delete_subtask(1)
+        >>> if not isinstance(err, Exception):
+        >>>     print("delete avec succes")
+        """
+        return cursor.execute(_Requests.delete_task.format(subtask_id))
 
 
 if __name__ == "__main__":
