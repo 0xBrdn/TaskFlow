@@ -2,12 +2,14 @@ from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from typing import Optional
+
 from db_api import DB_API
 
 accounts = [
-    {'email': 'taskflowreminder1@gmail.com', 'password': 'bgnt irxw fblu vemb'},
-    {'email': 'taskflowreminder2@gmail.com', 'password': 'lkya wtsu opzy pnse'},
-    {'email': 'taskflowreminder3@gmail.com', 'password': 'jjnw nuhq eopy azfw'},
+    {"email": "taskflowreminder1@gmail.com", "password": "bgnt irxw fblu vemb"},
+    {"email": "taskflowreminder2@gmail.com", "password": "lkya wtsu opzy pnse"},
+    {"email": "taskflowreminder3@gmail.com", "password": "jjnw nuhq eopy azfw"},
 ]
 current_account_index = 0
 
@@ -17,23 +19,23 @@ def send_email(subject, body, to):
     account = accounts[current_account_index]
 
     try:
-        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
             server.starttls()
-            server.login(account['email'], account['password'])
+            server.login(account["email"], account["password"])
 
             msg = MIMEMultipart()
-            msg['From'] = account['email']
-            msg['To'] = to
-            msg['Subject'] = subject
+            msg["From"] = account["email"]
+            msg["To"] = to
+            msg["Subject"] = subject
 
-            msg.attach(MIMEText(body, 'plain', 'utf-8'))
+            msg.attach(MIMEText(body, "plain", "utf-8"))
 
-            server.sendmail(account['email'], to, msg.as_string())
+            server.sendmail(account["email"], to, msg.as_string())
             print(f'Email envoyé à {to} avec succès depuis {account["email"]}.')
             current_account_index = (current_account_index + 1) % len(accounts)
 
     except Exception as e:
-        print(f'Erreur lors de l\'envoi de l\'email: {e}')
+        print(f"Erreur lors de l'envoi de l'email: {e}")
 
 
 def invite_user_to_project(username, project_name):
@@ -50,8 +52,10 @@ def invite_user_to_project(username, project_name):
         print(f"Utilisateur '{username}' introuvable.")
         return
     subject = f'Invitation à rejoindre le projet "{project_name}"'
-    body = f'Bonjour,\n\nVous avez été invité à rejoindre le projet "{project_name}".\n\n\nCordialement,\nL\'équipe ' \
-           f'de gestion de projet.'
+    body = (
+        f'Bonjour,\n\nVous avez été invité à rejoindre le projet "{project_name}"'
+        f".\n\n\nCordialement,\nL'équipe de gestion de projet."
+    )
 
     send_email(subject, body, email)
     DB_API.add_user_to_group(project, userID, permission, joined)
@@ -62,10 +66,19 @@ def check_tasks():
     print(f'Vérification des tâches à {now.strftime("%d/%m/%Y %H:%M")}...')
 
     tasks = DB_API.get_all_tasks()
-    colonnes = ["taskID", "title", "description", "status", "priority", "covered", "assign", "due_date"]
+    colonnes = [
+        "taskID",
+        "title",
+        "description",
+        "status",
+        "priority",
+        "covered",
+        "assign",
+        "due_date",
+    ]
     for task_tuple in tasks:
         task = dict(zip(colonnes, task_tuple))
-        due_date = task['due_date']
+        due_date = task["due_date"]
         time_remaining = (due_date - now).total_seconds()
         user_emails = DB_API.get_emails_by_task_projectID(task["assign"])
         if time_remaining < 0:
@@ -85,7 +98,8 @@ def check_tasks():
                 subject = f'Rappel : La date limite approche pour "{task["title"]}"'
                 body = f"""Bonjour,
 
-        N'oubliez pas que la tâche "{task['title']}" doit être terminée avant le {due_date.strftime('%d/%m/%Y %H:%M')}.
+        N'oubliez pas que la tâche "{task['title']}"
+        doit être terminée avant le {due_date.strftime('%d/%m/%Y %H:%M')}.
 
         Cordialement,
         L'équipe de gestion de projet."""
@@ -106,7 +120,7 @@ def main():
         print("8. Quitter")
         choice = input("Choisissez une option : ")
 
-        if choice == '1':
+        if choice == "1":
             username = input("Nom d'utilisateur : ")
             email = input("Adresse e-mail : ")
             password = input("Mot de passe : ")
@@ -118,17 +132,17 @@ def main():
             DB_API.add_user(username, password, email, is_google_user)
             print(f"Utilisateur {username} créé avec succès.")
 
-        elif choice == '2':
+        elif choice == "2":
             name = input("Nom du projet : ")
             DB_API.add_project(name)
             print(f"Projet '{name}' créé avec succès.")
 
-        elif choice == '3':
+        elif choice == "3":
             username = input("Nom de l'utilisateur : ")
             project_name = input("Nom du projet : ")
             invite_user_to_project(username, project_name)
 
-        elif choice == '4':
+        elif choice == "4":
             project_name = input("Nom du projet : ")
             task_title = input("Titre de la tâche : ")
             priority = input("Priorité (Haute, Moyenne, Basse) : ")
@@ -148,23 +162,24 @@ def main():
             DB_API.add_user_to_task_group(task_projectID, userID)
             covered = 0
             status = 0
-            due_date = datetime.strptime(due_date_str, '%Y-%m-%d %H:%M')
+            due_date = datetime.strptime(due_date_str, "%Y-%m-%d %H:%M")
             project = DB_API.get_project_id_by_project_name(project_name)
 
             if project:
-                task_infoID = DB_API.add_task_info(status, priority, task_title, description, due_date, covered,
-                                                   task_projectID)
+                task_infoID = DB_API.add_task_info(
+                    status, priority, task_title, description, due_date, covered, task_projectID
+                )
                 DB_API.add_task(project, task_infoID, userID)
                 print(f"Tâche '{task_title}' ajoutée au projet '{project_name}'.")
             else:
                 print(f"Projet '{project_name}' introuvable.")
 
-        elif choice == '5':
+        elif choice == "5":
             projects = DB_API.get_all_projects()
             for idx, project in enumerate(projects, start=1):
                 print(f"{idx}. {project[1]}")
 
-        elif choice == '6':
+        elif choice == "6":
             project_name = input("Nom du projet : ")
             project = DB_API.get_project_id_by_project_name(project_name)
             if project:
@@ -175,10 +190,10 @@ def main():
             else:
                 print(f"Projet '{project_name}' introuvable.")
 
-        elif choice == '7':
+        elif choice == "7":
             check_tasks()
 
-        elif choice == '8':
+        elif choice == "8":
             print("Au revoir !")
             break
 
@@ -186,5 +201,33 @@ def main():
             print("Option invalide. Veuillez réessayer.")
 
 
-if __name__ == '__main__':
+def delete_user(username: str, user_id: Optional[int] = None) -> bool:
+    """
+    Permet de delete un utilisateur de la db et toutes ses dépendances.
+
+    Cette fonction renvoie un boolean. En cas d'échec,
+    elle renverra False et en cas de succes, elle renverra True.
+
+    :param username: Username de l'utilisateur
+    :param user_id: ID de l'utilisateur (optionnel)
+
+    Exemple:
+    >>> err = delete_user("toto")
+    >>> if err:
+    >>>     print("supprimé avec succes")
+    >>> err = delete_user(user_id=4)
+    >>> if err:
+    >>>     print("supprimé avec succes")
+    """
+    if not user_id:
+        user_id = DB_API.get_userID_by_username(username)
+        if isinstance(user_id, Exception):
+            return False
+    err = DB_API.delete_user(user_id)
+    if isinstance(err, Exception):
+        return False
+    return True
+
+
+if __name__ == "__main__":
     main()
