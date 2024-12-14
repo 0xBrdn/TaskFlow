@@ -513,6 +513,12 @@ class Ui_MainWindow(object):
         self.main_window_instance = QtWidgets.QMainWindow()
         self.main_window_ui = MainWindowUI()
         self.main_window_ui.setupUi(self.main_window_instance)
+
+        # Passer l'email de l'utilisateur connecté
+        self.main_window_ui.set_current_user(self.inputMail.text())
+
+        # Stocker une référence à la fenêtre principale
+        self.main_window_ui.main_window = self.main_window_instance
         self.main_window_instance.show()
 
     def retranslateUi(self, MainWindow):

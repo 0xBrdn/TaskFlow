@@ -1,97 +1,68 @@
-/* Styles globaux pour tous les QWidget */
+/* Styles globaux */
 QWidget#centralwidget {
-    border-image: url("./images/authentification/colorkit (5).png");
-    border-repeat: no-repeat; /* Empêche la répétition de l'image */
-    border-size: cover; /* Redimensionne l'image pour couvrir tout le widget */
+    background-color: #E6F2FF; /* Bleu très clair */
+    border: none;
 }
 
-#frame {
-    border-image: url("./images/authentification/TASKFLOW (3).png");
-    border-size: cover; /* Redimensionne l'image pour couvrir tout le widget */
-}
-
-/* Style pour frameMire */
-#frameMire {
-    background-color: rgba(92, 92, 92, 190);
-    border-radius: 15;
-}
-
-/* Style pour frameTitre */
-#frameTitre {
-    background-color: rgba(0, 0, 0, 0);
-}
-
-/* Style pour frameLogin */
-#frameLogin {
-    background-color: rgba(0, 0, 0, 0);
-}
-
-/* Style pour frameCreerCompte */
-#frameCreerCompte {
-    background-color: rgba(0, 0, 0, 0);
-}
-
-/* Style pour titres */
+/* Style pour les labels */
 QLabel {
-    color: rgb(255, 255, 255);
+    color: #2C3E50; /* Gris bleuté foncé pour le texte */
 }
 
-/* Style pour inputMail et inputPassword */
-#inputMail, #inputPassword {
-    background-color: rgb(92, 92, 92);
-    color: rgb(255, 255, 255);
-    selection-color: rgb(92, 92, 92);
-    selection-background-color: rgb(255, 255, 255);
-    border-radius: 5;
-}
-
-/* Style pour boutonValider */
+/* Style pour les boutons */
 QPushButton {
-    color: rgb(255, 255, 255);
-    background-color: rgb(92, 92, 92);
-    border-radius: 5;
+    color: white;
+    background-color: #3498DB; /* Bleu moyen */
+    border-radius: 8px;
+    padding: 8px 16px;
 }
 
 QPushButton:hover {
-    background-color: rgb(2, 80, 196);
+    background-color: #2980B9; /* Bleu un peu plus foncé au survol */
 }
 
 QPushButton:pressed {
-    background-color: rgb(92, 92, 92);
+    background-color: #21618C; /* Bleu encore plus foncé au clic */
 }
 
-/* Nouveaux styles de l'interface principale */
-#icon_name_widget, #icon_only_widget {
-    background-color: rgb(60, 139, 238);
+/* Style pour les inputs et combos */
+QLineEdit, QComboBox, QDateEdit {
+    background-color: white;
+    border: 1px solid #3498DB;
+    border-radius: 5px;
+    padding: 6px;
+    color: #2C3E50;
+}
+
+/* Style pour les tableaux */
+QTableWidget {
+    background-color: white;
+    alternate-background-color: #F0F8FF; /* Bleu très clair pour les lignes alternées */
+    selection-background-color: #3498DB;
+    selection-color: white;
+}
+
+QHeaderView::section {
+    background-color: #3498DB;
     color: white;
+    padding: 5px;
+    border: 1px solid #2980B9;
 }
 
-#icon_name_widget QPushButton,
-#icon_only_widget QPushButton {
+/* Style pour les onglets */
+QTabWidget::pane {
+    border: 1px solid #3498DB;
+}
+
+QTabBar::tab {
+    background-color: #E6F2FF;
+    color: #2C3E50;
+    padding: 8px 16px;
+    border: 1px solid #3498DB;
+    border-bottom: none;
+}
+
+QTabBar::tab:selected {
+    background-color: #3498DB;
     color: white;
-    height: 30px;
-    border: none;
-    border-radius: 10px;
-}
-
-#icon_name_widget QPushButton:checked,
-#icon_only_widget QPushButton:checked {
-    background-color: #F5FAFE;
-    color: #1F95EF;
-    font-weight: bold;
-}
-
-#icon_only_widget QPushButton {
-    text-align: left;
-    padding-left: 10px;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-}
-
-.bouton_menu {
-    border: none;
-}
-
-#stackedWidget {
-    background-color: rgb(118, 132, 134);
 }

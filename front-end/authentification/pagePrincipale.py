@@ -1,311 +1,287 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QInputDialog
+from PyQt5.QtWidgets import QTableWidgetItem, QMessageBox, QLabel, QVBoxLayout, QPushButton
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        # Charger le fichier de style CSS
-        with open('pagePrincipale.qss', 'r') as f:
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(1200, 800)
+
+        # Chargement du fichier de style
+        with open('style.qss', 'r') as f:
             style = f.read()
             MainWindow.setStyleSheet(style)
 
-        # Configuration de la fenêtre principale
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1769, 1098)
-        MainWindow.setIconSize(QtCore.QSize(24, 25))
-
-        # Création du widget central
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
-        self.gridLayout_2.setObjectName("gridLayout_2")
 
-        # Création du widget avec icône et nom
-        self.icon_name_widget = QtWidgets.QWidget(self.centralwidget)
-        self.icon_name_widget.setMaximumSize(QtCore.QSize(70, 16777215))
-        self.icon_name_widget.setObjectName("icon_name_widget")
-        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.icon_name_widget)
-        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.layout = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.layout.setObjectName("layout")
 
-        # Configuration du logo
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.label = QtWidgets.QLabel(self.icon_name_widget)
-        self.label.setMinimumSize(QtCore.QSize(50, 50))
-        self.label.setMaximumSize(QtCore.QSize(50, 50))
-        self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("images/authentification/logo.png"))
-        self.label.setScaledContents(True)
-        self.label.setObjectName("label")
-        self.horizontalLayout_3.addWidget(self.label)
-        self.verticalLayout_3.addLayout(self.horizontalLayout_3)
+        # Onglets pour séparer les projets, les tâches et le compte
+        self.tabs = QtWidgets.QTabWidget(self.centralwidget)
+        self.project_tab = QtWidgets.QWidget()
+        self.task_tab = QtWidgets.QWidget()
+        self.account_tab = QtWidgets.QWidget()
+        self.tabs.addTab(self.project_tab, "Projets")
+        self.tabs.addTab(self.task_tab, "Tâches")
+        self.tabs.addTab(self.account_tab, "Compte")
+        self.layout.addWidget(self.tabs)
 
-        # Configuration des boutons de navigation
-        self.verticalLayout = QtWidgets.QVBoxLayout()
-        self.verticalLayout.setContentsMargins(-1, 15, -1, -1)
-        self.verticalLayout.setSpacing(15)
-        self.verticalLayout.setObjectName("verticalLayout")
+        # Configurations des onglets existants (projets et tâches)
+        self._setup_project_tab()
+        self._setup_task_tab()
+        self._setup_account_tab()
 
-        # Bouton Project
-        self.bouton_project1 = QtWidgets.QPushButton(self.icon_name_widget)
-        self.bouton_project1.setText("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("images/pagePrincipale/dashboard_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon.addPixmap(QtGui.QPixmap("images/pagePrincipale/dashboard.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
-        self.bouton_project1.setIcon(icon)
-        self.bouton_project1.setCheckable(True)
-        self.bouton_project1.setAutoExclusive(True)
-        self.bouton_project1.setObjectName("bouton_project1")
-        self.verticalLayout.addWidget(self.bouton_project1)
-
-        # Bouton Profile
-        self.bouton_profile1 = QtWidgets.QPushButton(self.icon_name_widget)
-        self.bouton_profile1.setText("")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("images/pagePrincipale/profile_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon1.addPixmap(QtGui.QPixmap("images/pagePrincipale/profile.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
-        self.bouton_profile1.setIcon(icon1)
-        self.bouton_profile1.setCheckable(True)
-        self.bouton_profile1.setAutoExclusive(True)
-        self.bouton_profile1.setObjectName("bouton_profile1")
-        self.verticalLayout.addWidget(self.bouton_profile1)
-
-        # Configuration des boutons de message
-        self.bouton_message1 = QtWidgets.QPushButton(self.icon_name_widget)
-        self.bouton_message1.setText("")
-
-        # Configuration de l'icône du bouton message
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon2.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
-        self.bouton_message1.setIcon(icon2)
-
-        # Paramètres du bouton message
-        self.bouton_message1.setCheckable(True)
-        self.bouton_message1.setAutoExclusive(True)
-        self.bouton_message1.setObjectName("bouton_message1")
-        self.verticalLayout.addWidget(self.bouton_message1)
-        self.verticalLayout_3.addLayout(self.verticalLayout)
-
-        # Ajout d'un espace extensible vertical
-        spacerItem = QtWidgets.QSpacerItem(20, 418, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_3.addItem(spacerItem)
-
-        # Configuration du bouton de sortie
-        self.bouton_quitter1 = QtWidgets.QPushButton(self.icon_name_widget)
-        self.bouton_quitter1.setText("")
-
-        # Configuration de l'icône du bouton de sortie
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("images/pagePrincipale/log_out_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon3.addPixmap(QtGui.QPixmap("images/pagePrincipale/log_out.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
-        self.bouton_quitter1.setIcon(icon3)
-
-        # Paramètres du bouton de sortie
-        self.bouton_quitter1.setCheckable(True)
-        self.bouton_quitter1.setAutoExclusive(True)
-        self.bouton_quitter1.setObjectName("bouton_quitter1")
-        self.verticalLayout_3.addWidget(self.bouton_quitter1)
-        self.gridLayout_2.addWidget(self.icon_name_widget, 0, 0, 1, 1)
-        self.icon_only_widget = QtWidgets.QWidget(self.centralwidget)
-        self.icon_only_widget.setMaximumSize(QtCore.QSize(200, 16777215))
-        self.icon_only_widget.setObjectName("icon_only_widget")
-        self.gridLayout = QtWidgets.QGridLayout(self.icon_only_widget)
-        self.gridLayout.setContentsMargins(-1, -1, 0, -1)
-        self.gridLayout.setObjectName("gridLayout")
-        self.bouton_quitter2 = QtWidgets.QPushButton(self.icon_only_widget)
-        self.bouton_quitter2.setIcon(icon3)
-        self.bouton_quitter2.setCheckable(True)
-        self.bouton_quitter2.setAutoExclusive(True)
-        self.bouton_quitter2.setObjectName("bouton_quitter2")
-        self.gridLayout.addWidget(self.bouton_quitter2, 3, 0, 1, 1)
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_2.setContentsMargins(-1, 15, -1, -1)
-        self.verticalLayout_2.setSpacing(15)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.bouton_project2 = QtWidgets.QPushButton(self.icon_only_widget)
-        self.bouton_project2.setIcon(icon)
-        self.bouton_project2.setCheckable(True)
-        self.bouton_project2.setAutoExclusive(True)
-        self.bouton_project2.setObjectName("bouton_project2")
-        self.verticalLayout_2.addWidget(self.bouton_project2)
-        self.bouton_profile2 = QtWidgets.QPushButton(self.icon_only_widget)
-        self.bouton_profile2.setIcon(icon1)
-        self.bouton_profile2.setCheckable(True)
-        self.bouton_profile2.setAutoExclusive(True)
-        self.bouton_profile2.setObjectName("bouton_profile2")
-        self.verticalLayout_2.addWidget(self.bouton_profile2)
-        self.bouton_message2 = QtWidgets.QPushButton(self.icon_only_widget)
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages_white.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon4.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
-        icon4.addPixmap(QtGui.QPixmap("images/pagePrincipale/messages.png"), QtGui.QIcon.Selected, QtGui.QIcon.Off)
-        self.bouton_message2.setIcon(icon4)
-        self.bouton_message2.setCheckable(True)
-        self.bouton_message2.setAutoExclusive(True)
-        self.bouton_message2.setObjectName("bouton_message2")
-        self.verticalLayout_2.addWidget(self.bouton_message2)
-        self.gridLayout.addLayout(self.verticalLayout_2, 1, 0, 1, 1)
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.label_4 = QtWidgets.QLabel(self.icon_only_widget)
-        self.label_4.setMinimumSize(QtCore.QSize(50, 50))
-        self.label_4.setMaximumSize(QtCore.QSize(50, 50))
-        self.label_4.setText("")
-        self.label_4.setPixmap(QtGui.QPixmap("images/authentification/logo.png"))
-        self.label_4.setScaledContents(True)
-        self.label_4.setObjectName("label_4")
-        self.horizontalLayout_2.addWidget(self.label_4)
-        self.label_3 = QtWidgets.QLabel(self.icon_only_widget)
-        self.label_3.setMinimumSize(QtCore.QSize(100, 50))
-        self.label_3.setMaximumSize(QtCore.QSize(100, 50))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_3.setFont(font)
-        self.label_3.setObjectName("label_3")
-        self.horizontalLayout_2.addWidget(self.label_3)
-        self.gridLayout.addLayout(self.horizontalLayout_2, 0, 0, 1, 1)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 418, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout.addItem(spacerItem1, 2, 0, 1, 1)
-        self.gridLayout_2.addWidget(self.icon_only_widget, 0, 1, 1, 1)
-        self.main_menu = QtWidgets.QWidget(self.centralwidget)
-        self.main_menu.setObjectName("main_menu")
-        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.main_menu)
-        self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.widget = QtWidgets.QWidget(self.main_menu)
-        self.widget.setObjectName("widget")
-        self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.widget)
-        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        self.bouton_menu = QtWidgets.QPushButton(self.widget)
-        self.bouton_menu.setStyleSheet("border:none;")
-        self.bouton_menu.setText("")
-        icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap("images/pagePrincipale/menu.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.bouton_menu.setIcon(icon5)
-        self.bouton_menu.setIconSize(QtCore.QSize(20, 20))
-        self.bouton_menu.setCheckable(True)
-        self.bouton_menu.setAutoExclusive(True)
-        self.bouton_menu.setObjectName("bouton_menu")
-        self.horizontalLayout_4.addWidget(self.bouton_menu)
-        spacerItem2 = QtWidgets.QSpacerItem(18, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem2)
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.lineEdit = QtWidgets.QLineEdit(self.widget)
-        self.lineEdit.setObjectName("lineEdit")
-        self.horizontalLayout.addWidget(self.lineEdit)
-        self.pushButton_14 = QtWidgets.QPushButton(self.widget)
-        self.pushButton_14.setText("")
-        icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap("images/pagePrincipale/search.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_14.setIcon(icon6)
-        self.pushButton_14.setObjectName("pushButton_14")
-        self.horizontalLayout.addWidget(self.pushButton_14)
-        self.horizontalLayout_4.addLayout(self.horizontalLayout)
-        spacerItem3 = QtWidgets.QSpacerItem(308, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem3)
-        self.pushButton_15 = QtWidgets.QPushButton(self.widget)
-        self.pushButton_15.setStyleSheet("border:none;")
-        self.pushButton_15.setText("")
-        icon7 = QtGui.QIcon()
-        icon7.addPixmap(QtGui.QPixmap("images/pagePrincipale/image (1).png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_15.setIcon(icon7)
-        self.pushButton_15.setObjectName("pushButton_15")
-        self.horizontalLayout_4.addWidget(self.pushButton_15)
-        self.verticalLayout_4.addWidget(self.widget)
-        self.stackedWidget = QtWidgets.QStackedWidget(self.main_menu)
-        self.stackedWidget.setStyleSheet("background-color: rgb(118, 132, 134);")
-        self.stackedWidget.setObjectName("stackedWidget")
-        self.project = QtWidgets.QWidget()
-        self.project.setObjectName("project")
-        self.tabWidget = QtWidgets.QTabWidget(self.project)
-        self.tabWidget.setGeometry(QtCore.QRect(10, 10, 1441, 991))
-        self.tabWidget.setObjectName("tabWidget")
-        self.tab = QtWidgets.QWidget()
-        self.tab.setObjectName("tab")
-        self.tabWidget.addTab(self.tab, "")
-        self.tab_2 = QtWidgets.QWidget()
-        self.tab_2.setObjectName("tab_2")
-        self.label_2 = QtWidgets.QLabel(self.tab_2)
-        self.label_2.setGeometry(QtCore.QRect(20, 30, 1389, 808))
-        self.label_2.setText("")
-        self.label_2.setPixmap(QtGui.QPixmap("images/authentification/colorkit (5).png"))
-        self.label_2.setObjectName("label_2")
-        self.tabWidget.addTab(self.tab_2, "")
-        self.tab_3 = QtWidgets.QWidget()
-        self.tab_3.setObjectName("tab_3")
-        self.tabWidget.addTab(self.tab_3, "")
-        self.stackedWidget.addWidget(self.project)
-        self.Profile = QtWidgets.QWidget()
-        self.Profile.setObjectName("Profile")
-        self.label_5 = QtWidgets.QLabel(self.Profile)
-        self.label_5.setGeometry(QtCore.QRect(110, 170, 411, 141))
-        font = QtGui.QFont()
-        font.setPointSize(40)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_5.setFont(font)
-        self.label_5.setObjectName("label_5")
-        self.stackedWidget.addWidget(self.Profile)
-        self.message = QtWidgets.QWidget()
-        self.message.setObjectName("message")
-        self.label_6 = QtWidgets.QLabel(self.message)
-        self.label_6.setGeometry(QtCore.QRect(60, 150, 411, 141))
-        font = QtGui.QFont()
-        font.setPointSize(40)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_6.setFont(font)
-        self.label_6.setObjectName("label_6")
-        self.stackedWidget.addWidget(self.message)
-        self.page_5 = QtWidgets.QWidget()
-        self.page_5.setObjectName("page_5")
-        self.stackedWidget.addWidget(self.page_5)
-        self.page_2 = QtWidgets.QWidget()
-        self.page_2.setObjectName("page_2")
-        self.stackedWidget.addWidget(self.page_2)
-        self.verticalLayout_4.addWidget(self.stackedWidget)
-        self.gridLayout_2.addWidget(self.main_menu, 0, 3, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(0)
-        self.tabWidget.setCurrentIndex(1)
-        self.bouton_message1.toggled['bool'].connect(self.bouton_message2.setChecked) # type: ignore
-        self.bouton_profile1.toggled['bool'].connect(self.bouton_profile2.setChecked) # type: ignore
-        self.bouton_project1.toggled['bool'].connect(self.bouton_project2.setChecked) # type: ignore
-        self.bouton_project2.toggled['bool'].connect(self.bouton_project1.setChecked) # type: ignore
-        self.bouton_profile2.toggled['bool'].connect(self.bouton_profile1.setChecked) # type: ignore
-        self.bouton_message2.toggled['bool'].connect(self.bouton_message1.setChecked) # type: ignore
-        self.bouton_quitter1.toggled['bool'].connect(MainWindow.close) # type: ignore
-        self.bouton_quitter2.toggled['bool'].connect(MainWindow.close) # type: ignore
-        self.bouton_menu.toggled['bool'].connect(self.icon_only_widget.setVisible) # type: ignore
-        self.bouton_menu.toggled['bool'].connect(self.icon_name_widget.setHidden) # type: ignore
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        # Connexions
+        self.add_project_button.clicked.connect(self.add_project)
+        self.project_list_widget.currentRowChanged.connect(self.project_clicked)
+        self.add_task_button.clicked.connect(self.add_task)
+        self.delete_task_button.clicked.connect(self.delete_task)
+        self.complete_task_button.clicked.connect(self.mark_completed)
 
-        # Configuration des connexions et événements
-        self.bouton_project1.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.project))
-        self.bouton_project2.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.project))
+        # Données internes
+        self.projects = {}
+        self.current_user = None
 
-        self.bouton_profile1.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Profile))
-        self.bouton_profile2.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Profile))
+    def _setup_project_tab(self):
+        self.project_layout = QtWidgets.QVBoxLayout(self.project_tab)
+        self.project_label = QtWidgets.QLabel("Liste des Projets")
+        self.project_label.setObjectName("project_label")
+        self.project_layout.addWidget(self.project_label)
 
-        self.bouton_message1.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.message))
-        self.bouton_message2.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.message))
+        self.project_list_widget = QtWidgets.QListWidget()
+        self.project_layout.addWidget(self.project_list_widget)
+
+        self.add_project_button = QtWidgets.QPushButton("Ajouter un Projet")
+        self.add_project_button.setObjectName("add_project_button")
+        self.project_layout.addWidget(self.add_project_button)
+
+    def _setup_task_tab(self):
+        self.task_layout = QtWidgets.QVBoxLayout(self.task_tab)
+
+        self.title_label = QtWidgets.QLabel(self.task_tab)
+        self.title_label.setText("Gestionnaire de Tâches")
+        self.title_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.title_label.setObjectName("title_label")
+        self.task_layout.addWidget(self.title_label)
+
+        self.current_project_label = QtWidgets.QLabel(self.task_tab)
+        self.current_project_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.current_project_label.setObjectName("current_project_label")
+        self.task_layout.addWidget(self.current_project_label)
+
+        self.table = QtWidgets.QTableWidget(self.task_tab)
+        self.table.setColumnCount(5)
+        self.table.setHorizontalHeaderLabels(["Tâche", "Sous-tâche", "Date", "Commentaire", "Importance"])
+        self.task_layout.addWidget(self.table)
+
+        self.table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+
+        self.form_layout = QtWidgets.QFormLayout()
+        self.task_input = QtWidgets.QLineEdit(self.task_tab)
+        self.task_input.setObjectName("task_input")
+
+        self.subtask_input = QtWidgets.QLineEdit(self.task_tab)
+        self.subtask_input.setObjectName("subtask_input")
+
+        self.date_input = QtWidgets.QDateEdit(self.task_tab)
+        self.date_input.setCalendarPopup(True)
+        self.date_input.setObjectName("date_input")
+
+        self.comment_input = QtWidgets.QLineEdit(self.task_tab)
+        self.comment_input.setObjectName("comment_input")
+
+        self.importance_input = QtWidgets.QComboBox(self.task_tab)
+        self.importance_input.addItems(["Faible", "Moyenne", "Haute"])
+        self.importance_input.setObjectName("importance_input")
+
+        self.form_layout.addRow("Tâche :", self.task_input)
+        self.form_layout.addRow("Sous-tâche :", self.subtask_input)
+        self.form_layout.addRow("Date :", self.date_input)
+        self.form_layout.addRow("Commentaire :", self.comment_input)
+        self.form_layout.addRow("Importance :", self.importance_input)
+        self.task_layout.addLayout(self.form_layout)
+
+        self.button_layout = QtWidgets.QHBoxLayout()
+        self.add_task_button = QtWidgets.QPushButton("Ajouter une Tâche", self.task_tab)
+        self.delete_task_button = QtWidgets.QPushButton("Supprimer", self.task_tab)
+        self.complete_task_button = QtWidgets.QPushButton("Marquer comme terminé", self.task_tab)
+
+        self.add_task_button.setObjectName("add_task_button")
+        self.delete_task_button.setObjectName("delete_task_button")
+        self.complete_task_button.setObjectName("complete_task_button")
+
+        self.button_layout.addWidget(self.add_task_button)
+        self.button_layout.addWidget(self.delete_task_button)
+        self.button_layout.addWidget(self.complete_task_button)
+        self.task_layout.addLayout(self.button_layout)
+
+    def _setup_account_tab(self):
+        layout = QVBoxLayout(self.account_tab)
+
+        # Titre
+        titre_label = QLabel("Informations du Compte")
+        titre_label.setObjectName("titre_label")
+        titre_label.setAlignment(QtCore.Qt.AlignCenter)
+        layout.addWidget(titre_label)
+
+        # Email de l'utilisateur
+        self.email_label = QLabel("Email: ")
+        self.email_label.setObjectName("email_label")
+        layout.addWidget(self.email_label)
+
+        # Bouton de déconnexion
+        deconnexion_button = QPushButton("Se déconnecter")
+        deconnexion_button.setObjectName("deconnexion_button")
+        deconnexion_button.clicked.connect(self.deconnexion)
+        layout.addWidget(deconnexion_button)
+
+        layout.addStretch(1)
+
+    def set_current_user(self, email):
+        self.current_user = email
+        self.email_label.setText(f"Email: {email}")
+
+    def deconnexion(self):
+        from authentification import Ui_MainWindow as AuthMainWindow
+
+        # Fermer la fenêtre actuelle
+        self.main_window.close()
+
+        # Ouvrir la fenêtre d'authentification
+        self.main_window_auth = QtWidgets.QMainWindow()
+        self.main_window_ui = AuthMainWindow()
+        self.main_window_ui.setupUi(self.main_window_auth)
+        self.main_window_ui.main_window = self.main_window_auth
+        self.main_window_auth.show()
+
+    # Les autres méthodes restent identiques à l'implémentation précédente
+    def add_project(self):
+        project_name, ok = QtWidgets.QInputDialog.getText(None, "Nouveau Projet", "Nom du projet :")
+        if ok and project_name.strip():
+            if project_name in self.projects:
+                QMessageBox.warning(None, "Erreur", "Ce projet existe déjà.")
+            else:
+                self.projects[project_name] = []
+                self.project_list_widget.addItem(project_name)
+                QMessageBox.information(None, "Succès", f"Projet '{project_name}' ajouté.")
+
+    def project_clicked(self):
+        project_index = self.project_list_widget.currentRow()
+        if project_index >= 0:
+            project_name = self.project_list_widget.item(project_index).text()
+            self.current_project_label.setText(f"Projet sélectionné : {project_name}")
+            self.load_tasks()
+            self.tabs.setCurrentWidget(self.task_tab)
+
+    def load_tasks(self):
+        project_index = self.project_list_widget.currentRow()
+        if project_index >= 0:
+            project_name = self.project_list_widget.item(project_index).text()
+            self.table.setRowCount(0)
+            for task, subtask, date, comment, importance, completed in self.projects[project_name]:
+                row = self.table.rowCount()
+                self.table.insertRow(row)
+                task_item = QTableWidgetItem(task)
+                subtask_item = QTableWidgetItem(subtask)
+                date_item = QTableWidgetItem(date)
+                comment_item = QTableWidgetItem(comment)
+                importance_item = QTableWidgetItem(importance)
+
+                if completed:
+                    for item in [task_item, subtask_item, date_item, comment_item, importance_item]:
+                        item.setBackground(QtGui.QColor("lightgreen"))
+                        font = item.font()
+                        font.setStrikeOut(True)
+                        item.setFont(font)
+
+                if importance == "Haute":
+                    importance_item.setForeground(QtGui.QColor("red"))
+                    font = importance_item.font()
+                    font.setBold(True)
+                    importance_item.setFont(font)
+                elif importance == "Moyenne":
+                    importance_item.setForeground(QtGui.QColor("orange"))
+                else:
+                    importance_item.setForeground(QtGui.QColor("green"))
+
+                self.table.setItem(row, 0, task_item)
+                self.table.setItem(row, 1, subtask_item)
+                self.table.setItem(row, 2, date_item)
+                self.table.setItem(row, 3, comment_item)
+                self.table.setItem(row, 4, importance_item)
+
+    def add_task(self):
+        project_index = self.project_list_widget.currentRow()
+        if project_index < 0:
+            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner un projet.")
+            return
+
+        project_name = self.project_list_widget.item(project_index).text()
+        task = self.task_input.text().strip()
+        subtask = self.subtask_input.text().strip()
+        date = self.date_input.date().toString("dd/MM/yyyy")
+        comment = self.comment_input.text().strip()
+        importance = self.importance_input.currentText()
+
+        if not task:
+            QMessageBox.warning(None, "Erreur", "Veuillez entrer une tâche.")
+            return
+
+        self.projects[project_name].append((task, subtask, date, comment, importance, False))
+        self.load_tasks()
+
+        self.task_input.clear()
+        self.subtask_input.clear()
+        self.comment_input.clear()
+        self.importance_input.setCurrentIndex(0)
+
+    def delete_task(self):
+        project_index = self.project_list_widget.currentRow()
+        if project_index < 0:
+            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner un projet.")
+            return
+
+        project_name = self.project_list_widget.item(project_index).text()
+        rows = sorted(set(index.row() for index in self.table.selectedIndexes()), reverse=True)
+        if not rows:
+            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à supprimer.")
+            return
+
+        for row in rows:
+            del self.projects[project_name][row]
+        self.load_tasks()
+
+    def mark_completed(self):
+        project_index = self.project_list_widget.currentRow()
+        if project_index < 0:
+            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner un projet.")
+            return
+
+        project_name = self.project_list_widget.item(project_index).text()
+        rows = sorted(set(index.row() for index in self.table.selectedIndexes()), reverse=True)
+        if not rows:
+            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à marquer comme terminée.")
+            return
+
+        for row in rows:
+            task_data = self.projects[project_name][row]
+            self.projects[project_name][row] = (*task_data[:-1], True)  # Marque comme terminé
+        self.load_tasks()
 
     def retranslateUi(self, MainWindow):
-        # Traduction des textes de l'interface
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.bouton_quitter2.setText(_translate("MainWindow", "Quitter"))
-        self.bouton_project2.setText(_translate("MainWindow", "Project"))
-        self.bouton_profile2.setText(_translate("MainWindow", "Profile"))
-        self.bouton_message2.setText(_translate("MainWindow", "Messages"))
-        self.label_3.setText(_translate("MainWindow", "TASKFLOW"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Tab 1"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Tab 2"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Page"))
-        self.label_5.setText(_translate("MainWindow", "Profile page "))
-        self.label_6.setText(_translate("MainWindow", "Message page "))
+        MainWindow.setWindowTitle("Gestionnaire de Projets et Tâches")
+
+
+if __name__ == "__main__":
+    import sys
+
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
