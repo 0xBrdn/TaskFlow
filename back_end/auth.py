@@ -19,7 +19,8 @@ Variables:
     SCOPES (list): Liste des autorisations nécessaires pour interagir avec l'API Gmail.
     CLIENT_ID (str): ID client Google OAuth2.
 """
-
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 import mysql.connector
 from mysql.connector import Error
 import bcrypt
@@ -35,6 +36,7 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from email.mime.text import MIMEText
 
+
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 def connect_to_db():
@@ -46,10 +48,10 @@ def connect_to_db():
     """
     try:
         connection = mysql.connector.connect(
-            host='localhost',   
-            database='TaskFlow',  
-            user='root',      
-            password='(x5GuPz#3V9]e6'  
+            host='mysql-taskflowsae.alwaysdata.net',
+            database='taskflowsae_db',
+            user='379290_user',
+            password='&Y37tMHYrC9J&G7SC7R4mRS?6KBBHD8c!HQ6!4n5'
         )
         if connection.is_connected():
             print("Connexion à la base de données MySQL réussie")
@@ -94,7 +96,7 @@ def login_with_google(id_token_str):
 
         cursor = connection.cursor()
 
-        query = "SELECT * FROM user WHERE email = %s"
+        query = "SELECT * FROM users WHERE email = %s"
         cursor.execute(query, (email,))
         result = cursor.fetchone()
 
@@ -136,9 +138,9 @@ def create_user_google(username, email):
 
         cursor = connection.cursor()
 
-        query = """INSERT INTO user (username, password, email, is_google_user) 
+        query = """INSERT INTO users (username, password, email, is_google_user) 
                    VALUES (%s, %s, %s, %s)"""
-        cursor.execute(query, (username, '', email, 1))  
+        cursor.execute(query, (username, '', email, 1))
         connection.commit()
         print("Utilisateur Google créé avec succès.")
         send_confirmation_email(email, username)
@@ -170,7 +172,7 @@ def create_user(username, password, email):
 
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-        query = """INSERT INTO user (username, password, email) 
+        query = """INSERT INTO users (username, password, email) 
                    VALUES (%s, %s, %s)"""
         cursor.execute(query, (username, hashed_password, email))
         connection.commit()
@@ -203,7 +205,7 @@ def login_user(username, password):
 
         cursor = connection.cursor()
 
-        query = "SELECT password FROM user WHERE username = %s"
+        query = "SELECT password FROM users WHERE username = %s"
         cursor.execute(query, (username,))
         result = cursor.fetchone()
 
@@ -212,7 +214,7 @@ def login_user(username, password):
 
             if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
                 print("Connexion réussie.")
-                cursor.fetchall() 
+                cursor.fetchall()
                 return True
             else:
                 print("Mot de passe incorrect.")
@@ -226,7 +228,7 @@ def login_user(username, password):
         return False
     finally:
         if cursor:
-            cursor.close() 
+            cursor.close()
         if connection:
             close_db_connection(connection)
 
@@ -252,7 +254,7 @@ def change_password(username, old_password, new_password):
 
         cursor = connection.cursor()
 
-        query = "SELECT password FROM user WHERE username = %s"
+        query = "SELECT password FROM users WHERE username = %s"
         cursor.execute(query, (username,))
         result = cursor.fetchone()
 
@@ -267,7 +269,7 @@ def change_password(username, old_password, new_password):
 
                 cursor = connection.cursor()
 
-                update_query = "UPDATE user SET password = %s WHERE username = %s"
+                update_query = "UPDATE users SET password = %s WHERE username = %s"
                 cursor.execute(update_query, (hashed_new_password, username))
                 connection.commit()
                 print("Mot de passe changé avec succès.")
@@ -314,8 +316,8 @@ def send_confirmation_email(to_email, username):
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'api/credentials.json', SCOPES)
+            file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../api/credentials.json'))
+            flow = InstalledAppFlow.from_client_secrets_file(file_path, SCOPES)
             creds = flow.run_local_server(port=0)
         with open('token.json', 'w') as token:
             token.write(creds.to_json())

@@ -1,7 +1,16 @@
+import os
 from PyQt5 import QtCore, QtGui, QtWidgets
-from backend.db_api import DB_API
+from back_end.db_api import DB_API
 from pagePrincipale import Ui_MainWindow as MainWindowUI
+import webbrowser
 
+CLIENT_ID = "428963010703-44ievtu901l6r9g8dhs2jjmf11mphidg.apps.googleusercontent.com"
+REDIRECT_URI = "http://localhost:5000/oauth2callback"
+
+AUTH_URL = (
+    "https://accounts.google.com/o/oauth2/auth?response_type=code"
+    "&client_id={}&redirect_uri={}&scope=email%20profile"
+)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -146,6 +155,18 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addWidget(self.inputPassword)
 
         self.verticalLayout.addWidget(self.framePassword, 0, QtCore.Qt.AlignHCenter)
+
+        self.google_login_button = QtWidgets.QPushButton(self.frameMire)
+        self.google_login_button.setMinimumSize(QtCore.QSize(60, 60))
+        self.google_login_button.setMaximumSize(QtCore.QSize(60, 60))
+
+        google_icon = QtGui.QIcon("images/authentification/logo_google.png")
+        self.google_login_button.setIcon(google_icon)
+        self.google_login_button.setIconSize(QtCore.QSize(50, 50))
+
+        self.google_login_button.clicked.connect(self.login_with_google)
+
+        self.verticalLayout.addWidget(self.google_login_button, 0, QtCore.Qt.AlignHCenter)
 
         # Frame pour les message d'erreur
         self.frameErreur = QtWidgets.QFrame(self.frameMire)
@@ -361,6 +382,9 @@ class Ui_MainWindow(object):
             self.show_error_message("Échec de connexion", "Email ou mot de passe incorrect")
             print("echec")
             return False
+
+    def login_with_google(self):
+        webbrowser.open(AUTH_URL.format(CLIENT_ID, REDIRECT_URI))
 
     def handle_signup(self):
         """
