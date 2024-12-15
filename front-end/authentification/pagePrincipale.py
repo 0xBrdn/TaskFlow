@@ -184,15 +184,16 @@ class Ui_MainWindow(object):
             else:
                 self.projects[project_name] = []
                 self.project_list_widget.addItem(project_name)
-                QMessageBox.information(None, "Succès", f"Projet '{project_name}' ajouté.")
 
     def project_clicked(self):
-        project_index = self.project_list_widget.currentRow()
-        if project_index >= 0:
-            project_name = self.project_list_widget.item(project_index).text()
-            self.current_project_label.setText(f"Projet sélectionné : {project_name}")
-            self.load_tasks()
-            self.tabs.setCurrentWidget(self.task_tab)
+        try:
+            project_index = self.project_list_widget.currentRow()
+            if project_index >= 0:
+                project_name = self.project_list_widget.item(project_index).text()
+                self.current_project_label.setText(f"Projet sélectionné : {project_name}")
+                self.tabs.setCurrentWidget(self.task_tab)
+        except Exception as e:
+            print(e)
 
     def add_task(self):
         project_index = self.project_list_widget.currentRow()
