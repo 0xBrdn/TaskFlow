@@ -73,19 +73,26 @@ class Ui_MainWindow(object):
         self.current_project_label.setObjectName("current_project_label")
         self.task_layout.addWidget(self.current_project_label)
 
-        self.table = QtWidgets.QTableWidget(self.task_tab)
-        self.table.setColumnCount(5)
-        self.table.setHorizontalHeaderLabels(["Tâche", "Sous-tâche", "Date", "Commentaire", "Importance"])
-        self.task_layout.addWidget(self.table)
+        # Remplacer QTableWidget par QTreeWidget
+        self.tree = QtWidgets.QTreeWidget(self.task_tab)
+        self.tree.setColumnCount(4)
+        self.tree.setHeaderLabels(["Tâche", "Date", "Commentaire", "Importance"])
+        self.task_layout.addWidget(self.tree)
 
-        self.table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        # Rendre les colonnes extensibles
+        for i in range(4):
+            self.tree.header().setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
 
+        # Layout pour les entrées
         self.form_layout = QtWidgets.QFormLayout()
+
+        # Nouveaux input pour la hiérarchie des tâches
         self.task_input = QtWidgets.QLineEdit(self.task_tab)
         self.task_input.setObjectName("task_input")
 
         self.subtask_input = QtWidgets.QLineEdit(self.task_tab)
         self.subtask_input.setObjectName("subtask_input")
+        self.subtask_input.setPlaceholderText("Optionnel : Sous-tâche")
 
         self.date_input = QtWidgets.QDateEdit(self.task_tab)
         self.date_input.setCalendarPopup(True)
@@ -98,6 +105,7 @@ class Ui_MainWindow(object):
         self.importance_input.addItems(["Faible", "Moyenne", "Haute"])
         self.importance_input.setObjectName("importance_input")
 
+        # Configuration du formulaire
         self.form_layout.addRow("Tâche :", self.task_input)
         self.form_layout.addRow("Sous-tâche :", self.subtask_input)
         self.form_layout.addRow("Date :", self.date_input)
@@ -105,19 +113,29 @@ class Ui_MainWindow(object):
         self.form_layout.addRow("Importance :", self.importance_input)
         self.task_layout.addLayout(self.form_layout)
 
+        # Boutons
         self.button_layout = QtWidgets.QHBoxLayout()
         self.add_task_button = QtWidgets.QPushButton("Ajouter une Tâche", self.task_tab)
+        self.add_subtask_button = QtWidgets.QPushButton("Ajouter Sous-Tâche", self.task_tab)
         self.delete_task_button = QtWidgets.QPushButton("Supprimer", self.task_tab)
         self.complete_task_button = QtWidgets.QPushButton("Marquer comme terminé", self.task_tab)
 
         self.add_task_button.setObjectName("add_task_button")
+        self.add_subtask_button.setObjectName("add_subtask_button")
         self.delete_task_button.setObjectName("delete_task_button")
         self.complete_task_button.setObjectName("complete_task_button")
 
         self.button_layout.addWidget(self.add_task_button)
+        self.button_layout.addWidget(self.add_subtask_button)
         self.button_layout.addWidget(self.delete_task_button)
         self.button_layout.addWidget(self.complete_task_button)
         self.task_layout.addLayout(self.button_layout)
+
+        # Connecter les boutons
+        self.add_task_button.clicked.connect(self.add_task)
+        self.add_subtask_button.clicked.connect(self.add_subtask)
+        self.delete_task_button.clicked.connect(self.delete_task)
+        self.complete_task_button.clicked.connect(self.mark_completed)
 
     def _setup_account_tab(self):
         layout = QVBoxLayout(self.account_tab)
@@ -158,7 +176,6 @@ class Ui_MainWindow(object):
         self.main_window_ui.main_window = self.main_window_auth
         self.main_window_auth.show()
 
-    # Les autres méthodes restent identiques à l'implémentation précédente
     def add_project(self):
         project_name, ok = QtWidgets.QInputDialog.getText(None, "Nouveau Projet", "Nom du projet :")
         if ok and project_name.strip():
@@ -178,41 +195,9 @@ class Ui_MainWindow(object):
             self.tabs.setCurrentWidget(self.task_tab)
 
     def load_tasks(self):
-        project_index = self.project_list_widget.currentRow()
-        if project_index >= 0:
-            project_name = self.project_list_widget.item(project_index).text()
-            self.table.setRowCount(0)
-            for task, subtask, date, comment, importance, completed in self.projects[project_name]:
-                row = self.table.rowCount()
-                self.table.insertRow(row)
-                task_item = QTableWidgetItem(task)
-                subtask_item = QTableWidgetItem(subtask)
-                date_item = QTableWidgetItem(date)
-                comment_item = QTableWidgetItem(comment)
-                importance_item = QTableWidgetItem(importance)
-
-                if completed:
-                    for item in [task_item, subtask_item, date_item, comment_item, importance_item]:
-                        item.setBackground(QtGui.QColor("lightgreen"))
-                        font = item.font()
-                        font.setStrikeOut(True)
-                        item.setFont(font)
-
-                if importance == "Haute":
-                    importance_item.setForeground(QtGui.QColor("red"))
-                    font = importance_item.font()
-                    font.setBold(True)
-                    importance_item.setFont(font)
-                elif importance == "Moyenne":
-                    importance_item.setForeground(QtGui.QColor("orange"))
-                else:
-                    importance_item.setForeground(QtGui.QColor("green"))
-
-                self.table.setItem(row, 0, task_item)
-                self.table.setItem(row, 1, subtask_item)
-                self.table.setItem(row, 2, date_item)
-                self.table.setItem(row, 3, comment_item)
-                self.table.setItem(row, 4, importance_item)
+        # Cette méthode n'est plus nécessaire avec le QTreeWidget
+        # La structure des tâches est maintenue directement dans l'arbre
+        pass
 
     def add_task(self):
         project_index = self.project_list_widget.currentRow()
@@ -222,7 +207,6 @@ class Ui_MainWindow(object):
 
         project_name = self.project_list_widget.item(project_index).text()
         task = self.task_input.text().strip()
-        subtask = self.subtask_input.text().strip()
         date = self.date_input.date().toString("dd/MM/yyyy")
         comment = self.comment_input.text().strip()
         importance = self.importance_input.currentText()
@@ -231,46 +215,93 @@ class Ui_MainWindow(object):
             QMessageBox.warning(None, "Erreur", "Veuillez entrer une tâche.")
             return
 
-        self.projects[project_name].append((task, subtask, date, comment, importance, False))
-        self.load_tasks()
+        # Créer l'élément de tâche dans l'arbre
+        task_item = QtWidgets.QTreeWidgetItem(self.tree)
+        task_item.setText(0, task)
+        task_item.setText(1, date)
+        task_item.setText(2, comment)
+        task_item.setText(3, importance)
 
+        # Stocker les données supplémentaires comme des propriétés
+        task_item.setData(0, QtCore.Qt.UserRole, {"completed": False, "project": project_name})
+
+        # Gérer la couleur et l'importance
+        if importance == "Haute":
+            task_item.setForeground(3, QtGui.QColor("red"))
+        elif importance == "Moyenne":
+            task_item.setForeground(3, QtGui.QColor("orange"))
+        else:
+            task_item.setForeground(3, QtGui.QColor("green"))
+
+        # Nettoyer les champs
         self.task_input.clear()
+        self.comment_input.clear()
+        self.importance_input.setCurrentIndex(0)
+
+    def add_subtask(self):
+        # Vérifier qu'une tâche parente est sélectionnée
+        selected_items = self.tree.selectedItems()
+        if not selected_items:
+            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche parente.")
+            return
+
+        parent_item = selected_items[0]
+        subtask = self.subtask_input.text().strip()
+
+        if not subtask:
+            QMessageBox.warning(None, "Erreur", "Veuillez entrer une sous-tâche.")
+            return
+
+        # Créer la sous-tâche
+        subtask_item = QtWidgets.QTreeWidgetItem(parent_item)
+        subtask_item.setText(0, subtask)
+        subtask_item.setText(1, self.date_input.date().toString("dd/MM/yyyy"))
+        subtask_item.setText(2, self.comment_input.text().strip())
+        subtask_item.setText(3, self.importance_input.currentText())
+
+        # Stocker les données supplémentaires
+        subtask_item.setData(0, QtCore.Qt.UserRole,
+                             {"completed": False, "project": parent_item.data(0, QtCore.Qt.UserRole)["project"]})
+
+        # Nettoyer les champs
         self.subtask_input.clear()
         self.comment_input.clear()
         self.importance_input.setCurrentIndex(0)
 
     def delete_task(self):
-        project_index = self.project_list_widget.currentRow()
-        if project_index < 0:
-            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner un projet.")
-            return
-
-        project_name = self.project_list_widget.item(project_index).text()
-        rows = sorted(set(index.row() for index in self.table.selectedIndexes()), reverse=True)
-        if not rows:
+        selected_items = self.tree.selectedItems()
+        if not selected_items:
             QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à supprimer.")
             return
 
-        for row in rows:
-            del self.projects[project_name][row]
-        self.load_tasks()
+        for item in selected_items:
+            # Si c'est une sous-tâche, la supprimer de son parent
+            if item.parent():
+                parent = item.parent()
+                parent.removeChild(item)
+            else:
+                # Si c'est une tâche principale, la supprimer complètement
+                index = self.tree.indexOfTopLevelItem(item)
+                self.tree.takeTopLevelItem(index)
 
     def mark_completed(self):
-        project_index = self.project_list_widget.currentRow()
-        if project_index < 0:
-            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner un projet.")
-            return
-
-        project_name = self.project_list_widget.item(project_index).text()
-        rows = sorted(set(index.row() for index in self.table.selectedIndexes()), reverse=True)
-        if not rows:
+        selected_items = self.tree.selectedItems()
+        if not selected_items:
             QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à marquer comme terminée.")
             return
 
-        for row in rows:
-            task_data = self.projects[project_name][row]
-            self.projects[project_name][row] = (*task_data[:-1], True)  # Marque comme terminé
-        self.load_tasks()
+        for item in selected_items:
+            # Marquer l'élément comme terminé
+            current_data = item.data(0, QtCore.Qt.UserRole)
+            current_data["completed"] = True
+            item.setData(0, QtCore.Qt.UserRole, current_data)
+
+            # Changer l'apparence pour indiquer qu'il est terminé
+            for col in range(4):
+                item.setBackground(col, QtGui.QColor("lightgreen"))
+                font = item.font(col)
+                font.setStrikeOut(True)
+                item.setFont(col, font)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle("Gestionnaire de Projets et Tâches")
