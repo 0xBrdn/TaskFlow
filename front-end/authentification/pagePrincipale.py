@@ -194,11 +194,6 @@ class Ui_MainWindow(object):
             self.load_tasks()
             self.tabs.setCurrentWidget(self.task_tab)
 
-    def load_tasks(self):
-        # Cette méthode n'est plus nécessaire avec le QTreeWidget
-        # La structure des tâches est maintenue directement dans l'arbre
-        pass
-
     def add_task(self):
         project_index = self.project_list_widget.currentRow()
         if project_index < 0:
