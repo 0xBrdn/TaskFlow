@@ -53,3 +53,8 @@ lint.ignore = [
     "T201", # pas d'erreur sur les prints
     "PGH004" # pas d'erreur sur les noqa
 ]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: mark a test as an integration test."
+]
