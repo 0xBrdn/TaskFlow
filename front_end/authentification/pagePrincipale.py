@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QLabel, QVBoxLayout, QPushButton, QInputDialog
 from back_end.db_api import DB_API
 import datetime
+from typing import Optional
 
 
 class Ui_MainWindow(object):
@@ -325,6 +326,7 @@ class Ui_MainWindow(object):
                 else:
                     task_item.setForeground(3, QtGui.QColor("green"))
 
+                task_item.setData(0, QtCore.Qt.UserRole, task[0])
         except Exception as e:
             QMessageBox.critical(None, "Erreur", f"Impossible de charger les tâches : {str(e)}")
 
@@ -335,21 +337,52 @@ class Ui_MainWindow(object):
             return
 
         parent_item = selected_items[0]
-        subtask = self.subtask_input.text().strip()
+        subtask_title = self.subtask_input.text().strip()
+        subtask_date = self.date_input.date().toString("yyyy-MM-dd")
+        subtask_comment = self.comment_input.text().strip()
+        subtask_priority = self.importance_input.currentIndex()
 
-        if not subtask:
+        if not subtask_title:
             QMessageBox.warning(None, "Erreur", "Veuillez entrer une sous-tâche.")
             return
 
-        subtask_item = QtWidgets.QTreeWidgetItem(parent_item)
-        subtask_item.setText(0, subtask)
-        subtask_item.setText(1, self.date_input.date().toString("dd/MM/yyyy"))
-        subtask_item.setText(2, self.comment_input.text().strip())
-        subtask_item.setText(3, self.importance_input.currentText())
+        try:
+            task_id = parent_item.data(0,QtCore.Qt.UserRole)
 
-        self.subtask_input.clear()
-        self.comment_input.clear()
-        self.importance_input.setCurrentIndex(0)
+            if not task_id:
+                raise ValueError("ID de la tâche parente introuvable.")
+
+            subtask_info_id = DB_API.add_task_info(
+                status=0,
+                priority=subtask_priority,
+                title=subtask_title,
+                description=subtask_comment,
+                dead_line=subtask_date,
+                covered=0,
+                assign=None
+            )
+
+            DB_API.add_subtask(
+                task_id=task_id,
+                task_info_id=subtask_info_id
+            )
+
+            subtask_item = QtWidgets.QTreeWidgetItem(parent_item)
+            subtask_item.setText(0, subtask_title)
+            subtask_item.setText(1, subtask_date)
+            subtask_item.setText(2, subtask_comment)
+            subtask_item.setText(3,
+                                 "Basse" if subtask_priority == 1 else "Moyenne" if subtask_priority == 2 else "Haute")
+
+            self.subtask_input.clear()
+            self.comment_input.clear()
+            self.importance_input.setCurrentIndex(0)
+
+            QMessageBox.information(None, "Succès", "Sous-tâche ajoutée avec succès.")
+
+        except Exception as e:
+            QMessageBox.critical(None, "Erreur",
+                                 f"Une erreur s'est produite lors de l'ajout de la sous-tâche : {str(e)}")
 
     def delete_task(self):
         selected_items = self.tree.selectedItems()
@@ -393,6 +426,34 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle("Gestionnaire de Projets et Tâches")
+
+    def delete_user(username: str, user_id: Optional[int] = None) -> bool:
+        """
+        Permet de delete un utilisateur de la db et toutes ses dépendances.
+
+        Cette fonction renvoie un boolean. En cas d'échec,
+        elle renverra False et en cas de succes, elle renverra True.
+
+        :param username: Username de l'utilisateur
+        :param user_id: ID de l'utilisateur (optionnel)
+
+        Exemple:
+        >>> err = delete_user("toto")
+        >>> if err:
+        >>>     print("supprimé avec succes")
+        >>> err = delete_user(user_id=4)
+        >>> if err:
+        >>>     print("supprimé avec succes")
+        """
+        if not user_id:
+            user_id = DB_API.get_userID_by_username(username)
+            if isinstance(user_id, Exception):
+                return False
+        err = DB_API.delete_user(user_id)
+        if isinstance(err, Exception):
+            return False
+        return True
+        # Faire un bouton dans la page compte pour pouvoir supprimer son compte, vérification avec mot de passe
 
 
 if __name__ == "__main__":
