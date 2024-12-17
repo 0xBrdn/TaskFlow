@@ -13,6 +13,12 @@ class _Requests:
         "WHERE ug.userID = '{}';"
     )
 
+    get_project_in_users_groups = (
+        "SELECT ug.projectID, p.name, ug.permission, "
+        "ug.joined FROM users_groups ug JOIN projects "
+        "p ON p.projectID = ug.projectID WHERE userID = '{}';"
+    )
+
     get_tasks_by_project_id = (
         "SELECT t.taskID, ti.title, ti.description, ti.status, ti.priority, ti.covered, "
         "ti.assign, ti.dead_line FROM tasks t JOIN tasks_infos ti ON t.task_infoID = "
@@ -102,6 +108,10 @@ class _Requests:
     add_task_info = (
         "INSERT INTO tasks_infos (status, priority, title, description, "
         "dead_line, covered, assign) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}');"
+    )
+
+    set_invites_status = (
+        "UPDATE users_groups SET joined='{}' WHERE projectID='{}' AND userID='{}';"
     )
 
     add_task = "INSERT INTO tasks (projectID, task_infoID, userID) VALUES ('{}', '{}', '{}');"
