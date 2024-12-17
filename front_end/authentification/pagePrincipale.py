@@ -311,7 +311,7 @@ class Ui_MainWindow(object):
                     priority = "Basse"
                 task_item.setText(3, priority)
 
-                assigned_users = DB_API.get_users_in_tasks_group_by_group_id(task[0])
+                assigned_users = DB_API.get_users_in_tasks_group_by_group_id(task[6])
                 if assigned_users:
                     users_text = ", ".join([user[1] for user in assigned_users])
                     task_item.setText(4, users_text)
