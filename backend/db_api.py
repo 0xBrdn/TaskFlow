@@ -669,8 +669,60 @@ class DB_API:
         """
         return cursor.execute(_Requests.delete_user.format(user_id))
 
+    @staticmethod
+    @cm_cursor()
+    def get_project_in_users_groups_userid(user_id: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer tous les projets où l'user est invités (accepté ou non).
+
+        Cette fonction renvoie une liste de tuples comprenant les
+        projets sous la forme (projectID, name, permission, joined).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie None ou dans certains cas, un objet de type Exception.
+
+        :param user_id: L'userID
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> projects = DB_API.get_project_in_users_groups_userid(10)
+        >>> if projects and not isinstance(projects, Exception):
+        >>>     print(projects)
+
+        """
+        cursor.execute(_Requests.get_project_in_users_groups.format(user_id))
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def set_invites_status(
+        project_id: int, user_id: int, joined: bool, *, cursor: MySQLCursor
+    ) -> Optional[Exception]:
+        """
+        Permet d'accepter ou refuser une invitation vers un projet.
+
+        Cette fonction renvoie None ou une exception. En cas d'échec,
+        elle renverra une exc et en cas de succes, elle renverra None.
+
+        :param project_id: Le project_ID
+        :param user_id: ID de l'utilisateur
+        :param joined: Accepter ou pas l'invit
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> err = DB_API.set_invites_status(1, 1, False)
+        >>> if not isinstance(err, Exception):
+        >>>     print("delete avec succes")
+        """
+        return cursor.execute(_Requests.set_invites_status.format(joined, project_id, user_id))
+
 
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
-    # v = DB_API.get_project_id_by_project_name("tebgfbgrsbs")
     pass
+
+# TODO: ajouter les tests pour get_project_in_users_groups_userid, set_invites_status
