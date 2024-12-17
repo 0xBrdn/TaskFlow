@@ -261,12 +261,12 @@ class Ui_MainWindow(object):
                 description=task_comment,
                 dead_line=task_date,
                 covered=0,
-                assign=','.join(selected_users) if selected_users else None
+                assign=task_projectID if selected_users else None
             )
 
             user_id = DB_API.get_userID_by_email(self.current_user)
             DB_API.add_task(
-                project_id=project_id,
+                project_id=project_id[0],
                 task_info_id=task_info_id,
                 user_id=user_id[0]
             )
@@ -313,7 +313,7 @@ class Ui_MainWindow(object):
 
                 assigned_users = DB_API.get_users_in_tasks_group_by_group_id(task[0])
                 if assigned_users:
-                    users_text = ", ".join([user[1] for user in assigned_users])  # Affichage des noms des utilisateurs
+                    users_text = ", ".join([user[1] for user in assigned_users])
                     task_item.setText(4, users_text)
                 else:
                     task_item.setText(4, "Aucun utilisateur assigné")
