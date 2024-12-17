@@ -2,7 +2,7 @@ class _Requests:
     get_all_users = "SELECT userID, username, email, is_google_user FROM users;"
 
     get_email_hashpass = "SELECT password FROM users WHERE email = '{}';"
-
+  
     get_user_hashpass = "SELECT password FROM users WHERE userID = '{}';"
 
     get_project_id_by_project_name = "SELECT projectID FROM projects where projects.name = '{}';"
@@ -101,14 +101,13 @@ class _Requests:
     add_project = "INSERT INTO projects (name) VALUES ('{}');"
 
     add_user_to_group = (
-        "INSERT INTO users_groups (projectID, userID, permission, joined)"
-        " VALUES ('{}', '{}', '{}', '{}');"
+        "INSERT INTO users_groups (projectID, userID, "
+        "permission, joined) VALUES ('{}', '{}', '{}', '{}');"
     )
 
     add_task_info = (
         "INSERT INTO tasks_infos (status, priority, title, description, "
         "dead_line, covered, assign) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}');"
-    )
 
     set_invites_status = (
         "UPDATE users_groups SET joined='{}' WHERE projectID='{}' AND userID='{}';"
@@ -127,6 +126,12 @@ class _Requests:
     add_task_group = "INSERT INTO tasks_groups () VALUES ();"
 
     delete_user = "DELETE FROM users WHERE userID = '{}';"
+
+    delete_task = "DELETE FROM tasks WHERE taskID = '{}';"
+
+    delete_subtask = "DELETE FROM subtasks WHERE subtaskID = '{}';"
+
+    update_task_infos = "UPDATE tasks_infos SET {} WHERE task_infoID = '{}';"
 
 
 if __name__ == "__main__":

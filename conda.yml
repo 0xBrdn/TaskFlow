@@ -2,6 +2,9 @@
 channels:
   - conda-forge
   - defaults
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+  - https://repo.anaconda.com/pkgs/msys2
 dependencies:
   - aiohappyeyeballs=2.4.0=py312haa95532_0
   - aiohttp=3.10.5=py312h827c3e9_0
@@ -51,7 +54,6 @@ dependencies:
   - mypy=1.11.2=py312h827c3e9_0
   - mypy_extensions=1.0.0=py312haa95532_0
   - mysql-common=9.0.1=h2224204_1
-  - mysql-connector-python=9.0.0=py312h275cf98_1
   - mysql-libs=9.0.1=h809f9c2_1
   - nodeenv=1.7.0=py312haa95532_0
   - oauthlib=3.2.2=py312haa95532_0
@@ -110,4 +112,6 @@ dependencies:
   - yaml=0.2.5=he774522_0
   - yarl=1.11.0=py312h827c3e9_0
   - zstd=1.5.6=h0ea2cb4_0
+  - pip:
+      - mysql-connector-python==9.1.0
 prefix: C:\Users\windo\miniconda3\envs\TaskFlow
