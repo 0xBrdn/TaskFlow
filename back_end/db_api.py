@@ -1,136 +1,676 @@
+import datetime
 import logging
-from functools import partial
-from typing import Callable, Optional, List, Union, TypeAlias, Any
+from typing import Optional, Union
 
-import mysql.connector
-from mysql.connector import errorcode
-from mysql.connector.abstracts import MySQLConnectionAbstract
-from mysql.connector.pooling import PooledMySQLConnection
-from mysql.connector.types import RowType
+from mysql.connector.cursor import MySQLCursor
 
-from back_end.config import DB_HOST, DB_USER, DB_DATABASE, DB_PASSWORD
-
-ResultType: TypeAlias = Union[List[RowType], Optional[RowType], str, Exception]
+from back_end.db_helper import cm_cursor, ResultType, cm_conn
+from back_end.db_requests import _Requests
 
 _log = logging.getLogger(__name__)
 
 
-def cm_cursor() -> Callable:
-    """
-    Ce décorateur créer un curseur depuis une connexion vers une bdd.
+class DB_API:
+    """Classe permettant d'executer les commandes vers la DB SQL"""
 
-    Ce décorateur est utilsé pour chaque requête SQL vers la base de données.
-    Il crée automatiquement le curseur, puis le close une fois la fonction terminée.
-    Utilisé en tant que "context manager".
-    :return: Le résultat de la fonction enfante ou une Exception en cas d'erreur
-    """
+    @staticmethod
+    @cm_cursor()
+    def get_all_users(*, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer tous les utilisateurs de la DB.
 
-    def decorator(func: Callable) -> Callable:
-        def wrapper(*args, **kwargs) -> ResultType:
-            global conn
-            if not isinstance(conn, MySQLConnectionAbstract):
-                _conn = _create_conn()
-                assert _conn
-                assert _conn.is_connected(), "La db est injoinable"
-                conn = _conn
+        Cette fonction renvoie une liste de tuples comprenant les
+        users sous la forme (userID, username, email, is_google_user).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
 
-            cursor = kwargs.get("cursor", None)
-            if cursor:
-                kwargs.pop("cursor")
-            else:
-                cursor = conn.cursor()
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
 
-            try:
-                res = func(cursor=cursor, *args, **kwargs)
-            except Exception as e:
-                res = e
-            cursor.close()
-            return res
+        Exemple:
+        >>> users = DB_API.get_all_users()
+        >>> if not isinstance(users, Exception):
+        >>>     print(users)
 
-        return wrapper
+        """
+        cursor.execute(_Requests.get_all_users)
+        result = cursor.fetchall()
+        return result
 
-    return decorator
+    @staticmethod
+    @cm_cursor()
+    def get_project_id_by_project_name(project_name: str, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer le project id en fonction du project name de la DB.
 
+        Cette fonction renvoie un tuple comprenant le project id
+        sous la forme (project_id,).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
 
-def create_conn(
-    host: str, user: str, password: str, database: str
-) -> Optional[Union[MySQLConnectionAbstract, PooledMySQLConnection]]:
-    """
-    Cette fonction est utilisée pour créer la connexion vers la base de données.
+        :param project_name: Nom du projet
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
 
-    :param host: Ip ou le nom du server MYSQL
-    :param user: Utilisateur se connectant au server MYSQL
-    :param password: Password de l'utilisateur
-    :param database: La base de donnée cible
-    :return: La connexion sinon None en cas d'echec
-    """
-    global conn
-    try:
-        _log.debug(f"Création de la connexion vers la bdd {host=} {user=} {database=}")
-        connexion = mysql.connector.connect(
-            host=host, user=user, password=password, database=database
+        Exemple:
+        >>> project_id = DB_API.get_project_id_by_project_name()
+        >>> if not isinstance(project_id, Exception):
+        >>>     print(project_id)
+
+        """
+        cursor.execute(_Requests.get_project_id_by_project_name.format(project_name))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_email_hashpass(email: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer le mdp hash d'un user en fonction de l'email dans la DB.
+
+        Cette fonction renvoie un tuple comprenant uniquement le
+        mot de passe hash de la personne.
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param email: Email de l'utilisateur
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> hash_pass = DB_API.get_email_hashpass(1)
+        >>> if not isinstance(hash_pass, Exception):
+        >>>     print(hash_pass)
+        """
+        cursor.execute(_Requests.get_email_hashpass.format(email))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_user_hashpass(user_id: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer le mdp hash d'un user dans la DB.
+
+        Cette fonction renvoie un tuple comprenant uniquement le
+        mot de passe hash de la personne.
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param user_id: ID de l'utilisateur
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> hash_pass = DB_API.get_user_hashpass(1)
+        >>> if not isinstance(hash_pass, Exception):
+        >>>     print(hash_pass)
+        """
+        cursor.execute(_Requests.get_user_hashpass.format(user_id))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_projects_by_user_id(user_id: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer tous les projets d'un utilisateur en fonction de son userID.
+
+        Cette fonction renvoie une liste de tuples comprenant les
+        projets sous la forme (projectID, name).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param user_id: ID de l'utilisateur
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> projects = DB_API.get_projects_by_user_id(1)
+        >>> if not isinstance(projects, Exception):
+        >>>     print(projects)
+        """
+        cursor.execute(_Requests.get_projects_by_user_id.format(user_id))
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_tasks_by_project_id(project_id: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer toutes les taches d'un projet en fonction de son projectID.
+
+        Cette fonction renvoie une liste de tuples comprenant les
+        taches sous la forme (taskID, title, description, status,
+        priority, covered, assign, dead_line).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param project_id: projectID
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> tasks = DB_API.get_tasks_by_project_id(1)
+        >>> if not isinstance(tasks, Exception):
+        >>>     print(tasks)
+        """
+        cursor.execute(_Requests.get_tasks_by_project_id.format(project_id))
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_subtasks_by_task_id(task_id: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer toutes les sous taches d'un projet en fonction de son taskID.
+
+        Cette fonction renvoie une liste de tuples comprenant les
+        sous taches sous la forme (subtaskID, title, description, status,
+        priority, covered, assign, dead_line).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param task_id: taskID
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> subtasks = DB_API.get_subtasks_by_task_id(1)
+        >>> if not isinstance(subtasks, Exception):
+        >>>     print(subtasks)
+        """
+        cursor.execute(_Requests.get_subtasks_by_task_id.format(task_id))
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_user_logs_by_id(log_id: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer toutes les logs d'un user grace a son userID.
+
+        Cette fonction renvoie une liste de tuples comprenant les
+        logs sous la forme (logID, action, action_time, details).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param log_id: logID
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> logs = DB_API.get_user_logs_by_id(1)
+        >>> if not isinstance(logs, Exception):
+        >>>     print(logs)
+        """
+        cursor.execute(_Requests.get_user_logs_by_id.format(log_id))
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_users_in_project_by_project_id(project_id: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer toutes users dans un projet en fonction du projectID.
+
+        Cette fonction renvoie une liste de tuples comprenant les
+        projets de l'user sous la forme (userID, username, permission).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param project_id: projectID
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> users_in_project = DB_API.get_users_in_project_by_project_id(1)
+        >>> if not isinstance(users_in_project, Exception):
+        >>>     print(users_in_project)
+        """
+        cursor.execute(_Requests.get_users_in_project_by_project_id.format(project_id))
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_tasks_by_user_id(user_id: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer toutes les taches d'un utilisateur en fonction de son userID.
+
+        Cette fonction renvoie une liste de tuples comprenant les taches
+        sous la forme (taskID, title, description, status, priority, covered, assign, dead_line).
+        Cette fonction peut ne pas fonctionner, dans ce cas
+        elle renvoie un objet de type Exception.
+
+        :param user_id: ID de l'utilisateur
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> user_tasks = DB_API.get_tasks_by_user_id(1)
+        >>> if not isinstance(user_tasks, Exception):
+        >>>     print(user_tasks)
+        """
+        cursor.execute(_Requests.get_tasks_by_user_id.format(user_id))
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_users_in_tasks_group_by_group_id(group_id: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer tous les utilisateurs dans un groupe
+        de tâches en fonction de son groupID.
+
+        Cette fonction renvoie une liste de tuples comprenant les
+        utilisateurs sous la forme (userID, username, task_projectID).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param group_id: groupID
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> users_in_group = DB_API.get_users_in_tasks_group_by_group_id(1)
+        >>> if not isinstance(users_in_group, Exception):
+        >>>     print(users_in_group)
+        """
+        cursor.execute(_Requests.get_users_in_tasks_group_by_group_id.format(group_id))
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_all_status(*, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer les statuts de tous les users dans la DB.
+
+        Cette fonction renvoie une liste de tuples comprenant les
+        statuts sous la forme (userID, status), note : statut = (0 = deco; 1 = connect; 2 = idle).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle renvoie un objet
+        de type Exception.
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> status = DB_API.get_all_status()
+        >>> if not isinstance(status, Exception):
+        >>>     print(status)
+        """
+        cursor.execute(_Requests.get_all_status)
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def add_user(
+        username: str,
+        password: Optional[str],
+        email: str,
+        is_google_user: bool,
+        *,
+        cursor: MySQLCursor,
+    ) -> Union[Exception, Optional[int]]:
+        """
+        Permet d'ajouter un nouvel utilisateur à la DB.
+
+        Cette fonction renvoie un boolean. En cas d'échec,
+        elle renverra False et en cas de succes, elle renverra True.
+
+        :param username: Nom d'utilisateur
+        :param password: Mot de passe (hashé)
+        :param email: Adresse email de l'utilisateur
+        :param is_google_user: Si l'utilisateur se connecte avec google
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> user_id = DB_API.add_user("new_user", "hashed_password", "user@Exemple.com")
+        >>> if user_id and not isinstance(user_id, Exception):
+        >>>     print(user_id)
+        """
+        cursor.execute(_Requests.add_user.format(username, password, email, is_google_user))
+        return cursor.lastrowid
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def add_status(
+        user_id: int, status: int, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
+        """
+        Permet d'ajouter un statut à un utilisateur.
+
+        Cette fonction renvoie un boolean. En cas d'échec,
+        elle renverra False et en cas de succes, elle renverra True.
+
+        :param user_id: ID de l'utilisateur
+        :param status: Statut à ajouter (0 = deco; 1 = connect; 2 = idle)
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> status_id = DB_API.add_status(1, 0)
+        >>> if status_id and not isinstance(status_id, Exception):
+        >>>     print(status_id)
+        """
+        cursor.execute(_Requests.add_status.format(user_id, status))
+        return cursor.lastrowid
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def add_project(name: str, *, cursor: MySQLCursor) -> Union[Exception, Optional[int]]:
+        """
+        Permet d'ajouter un nouveau projet à la DB.
+
+        Cette fonction renvoie un boolean. En cas d'échec,
+        elle renverra False et en cas de succes, elle renverra True.
+
+        :param name: Nom du projet
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> project_id = DB_API.add_project("project_test")
+        >>> if project_id and not isinstance(project_id, Exception):
+        >>>     print(project_id)
+        """
+        cursor.execute(_Requests.add_project.format(name))
+        return cursor.lastrowid
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def add_user_to_group(
+        project_id: int, user_id: int, permission: int, joined: bool, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
+        """
+        Permet d'ajouter un utilisateur à un groupe de projet.
+
+        Cette fonction renvoie un boolean. En cas d'échec,
+        elle renverra False et en cas de succes, elle renverra True.
+
+        :param project_id: ID du projet
+        :param user_id: ID de l'utilisateur
+        :param permission: Permission de l'utilisateur dans le projet
+        (0 = read, 1 = write, 2 = admin)
+        :param joined: Date d'ajout à la groupe
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> user_group_id = DB_API.add_user_to_group(1, 1, 1, True)
+        >>> if user_group_id and not isinstance(user_group_id, Exception):
+        >>>     print(user_group_id)
+        """
+        cursor.execute(_Requests.add_user_to_group.format(project_id, user_id, permission, joined))
+        return cursor.lastrowid
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def add_task_info(
+        status: int,
+        priority: int,
+        title: str,
+        description: str,
+        dead_line: datetime.datetime,
+        covered: bool,
+        assign: int,
+        *,
+        cursor: MySQLCursor,
+    ) -> Union[Exception, Optional[int]]:
+        """
+        Permet d'ajouter des informations sur une tâche.
+
+        Cette fonction renvoie un boolean. En cas d'échec,
+        elle renverra False et en cas de succes, elle renverra True.
+
+        :param status: Statut de la tâche
+        :param priority: Priorité de la tâche (0 = basse; 1 = moyenne; 2= haute)
+        :param title: Titre de la tâche
+        :param description: Description de la tâche
+        :param dead_line: Date limite de la tâche (datetime.datetime,
+         le field dans la db est TIMESTAMP)
+        :param covered: Informations sur la couverture de la tâche (bool)
+        :param assign: task_projectID (lie la tache a un ou plusieurs
+         user a travers la table tasks_groups)
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> taskinfo_id = DB_API.add_task_info(1, 2, "titre tache",
+        "ceci est une description de la tache", datetime.datetime.now(), False, 1)
+        >>> if taskinfo_id and not isinstance(taskinfo_id, Exception):
+        >>>     print(taskinfo_id)
+        """
+        cursor.execute(
+            _Requests.add_task_info.format(
+                status, priority, title, description, dead_line, covered, assign
+            )
         )
-        _log.debug("Connexion effectuée avec succes")
 
-    except mysql.connector.Error as err:
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            _log.error(
-                "Accès refusé. Vérifiez votre nom d'utilisateur ou votre mot de passe."
-            )  # Ne doit pas apparaitre sauf si mal config coté server
-        elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            _log.error("La base de données spécifiée n'existe pas.")
-        elif err.errno == errorcode.CR_CONN_HOST_ERROR:
-            _log.error("Impossible de se connecter au serveur mysql (mauvaise ip ?).")
-        elif err.errno == errorcode.CR_CONNECTION_ERROR:
-            _log.error("Erreur de connexion à la base de données.")
-        elif err.errno == errorcode.CR_SERVER_LOST:
-            _log.error("La connexion au serveur MySQL a été perdue.")
-        else:
-            _log.error(f"Erreur MySQL: {err}")
-        connexion = None
-    conn = connexion
-    return conn
+        return cursor.lastrowid
 
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def add_task(
+        project_id: int, task_info_id: int, user_id: int, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
+        """
+        Permet d'ajouter une tâche à un projet.
 
-_create_conn = partial(
-    create_conn, host=DB_HOST, user=DB_USER, password=DB_PASSWORD, database=DB_DATABASE
-)  # Evite de réecrire a chaque fois l'host, l'user, le password et la database ...
-conn: Optional[Union[MySQLConnectionAbstract, PooledMySQLConnection]] = _create_conn()
+        Cette fonction renvoie un boolean. En cas d'échec,
+        elle renverra False et en cas de succes, elle renverra True.
 
+        :param project_id: ID du projet
+        :param task_info_id: ID des informations de la tâche
+        :param user_id: ID de l'utilisateur assigné
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
 
-def cm_conn() -> Callable:
-    """
-    Ce décorateur est utilisé pour les rollback ou les commits sur la DB.
+        Exemple:
+        >>> task_id = DB_API.add_task(1, 1, 1)
+        >>> if task_id and not isinstance(task_id, Exception):
+        >>>     print(task_id)
+        """
+        cursor.execute(_Requests.add_task.format(project_id, task_info_id, user_id))
+        return cursor.lastrowid
 
-    Utilisé seulement pour les ajouts dans la base de données,
-    les modifications et les suppressions, en tant que "context manager".
-    :return: True si commit, Exception si rollback
-    """
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def add_subtask(
+        task_id: int, task_info_id: int, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
+        """
+        Permet d'ajouter une sous-tâche à une tâche.
 
-    def decorator(func: Callable) -> Callable:
-        def wrapper(*args, **kwargs) -> Union[Any, Exception]:
-            global conn
-            if not isinstance(conn, MySQLConnectionAbstract):
-                _conn: Optional[Union[MySQLConnectionAbstract, PooledMySQLConnection]] = (
-                    _create_conn()
-                )
-                if _conn is None or not _conn.is_connected():
-                    return False
-                conn = _conn
+        Cette fonction renvoie un boolean. En cas d'échec,
+        elle renverra False et en cas de succes, elle renverra True.
 
-            res = func(*args, **kwargs)
-            if isinstance(res, Exception):
-                conn.rollback()
-                _log.debug("Rollback effectué")
-            else:
-                conn.commit()
-                _log.debug("Commit effectué")
-            return res
+        :param task_id: ID de la tâche parente
+        :param task_info_id: ID des informations de la sous-tâche
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
 
-        return wrapper
+        Exemple:
+        >>> subtask_id = DB_API.add_subtask(1, 1)
+        >>> if subtask_id and not isinstance(subtask_id, Exception):
+        >>>     print(subtask_id)
+        """
+        cursor.execute(_Requests.add_subtask.format(task_id, task_info_id))
+        return cursor.lastrowid
 
-    return decorator
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def add_user_to_task_group(
+        task_project_id: int, user_id: int, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
+        """
+        Permet d'ajouter un utilisateur à un groupe de tâches.
+
+        Cette fonction renvoie un boolean. En cas d'échec,
+        elle renverra False et en cas de succes, elle renverra True.
+
+        :param task_project_id: ID du projet de la tâche
+        :param user_id: ID de l'utilisateur à ajouter
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> users_tasks_groups_id = DB_API.add_user_to_task_group(1, 1)
+        >>> if users_tasks_groups_id and not isinstance(users_tasks_groups_id, Exception):
+        >>>     print(users_tasks_groups_id)
+        """
+        cursor.execute(_Requests.add_user_to_task_group.format(task_project_id, user_id))
+        return cursor.lastrowid
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def add_user_log(
+        user_id: int, action: str, details: str, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
+        """
+        Permet d'ajouter une log d'action pour un utilisateur.
+
+        Cette fonction renvoie un boolean. En cas d'échec,
+        elle renverra False et en cas de succes, elle renverra True.
+
+        :param user_id: ID de l'utilisateur
+        :param action: Action réalisée par l'utilisateur
+        :param details: Détails de l'action
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> user_log_id = DB_API.add_user_log(1, "affect", "user to task")
+        >>> if user_log_id and not isinstance(user_log_id, Exception):
+        >>>     print(user_log_id)
+        """
+        cursor.execute(_Requests.add_user_log.format(user_id, action, details))
+        return cursor.lastrowid
+
+    @staticmethod
+    @cm_cursor()
+    def get_userID_by_username(username: str, *, cursor: MySQLCursor) -> Optional[int]:
+        cursor.execute(_Requests.get_userID_by_username.format(username))
+        result = cursor.fetchone()
+        return result[0]
+
+    @staticmethod
+    @cm_cursor()
+    def get_all_projects(*, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_all_projects)
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_all_tasks(*, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_all_tasks)
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_user_email(user_id: int, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_user_email.format(user_id))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_emails_by_task_projectID(task_project_id: int, *, cursor: MySQLCursor) -> list:
+        cursor.execute(_Requests.get_emails_by_task_projectID.format(task_project_id))
+        result = cursor.fetchall()
+        return [row[0] for row in result]
+
+    @staticmethod
+    @cm_cursor()
+    def get_users_groups_by_project_name(name: str, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_users_groups_by_project_name.format(name))
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_tasks_by_title(title: str, *, cursor: MySQLCursor) -> ResultType:
+        query = _Requests.get_tasks_by_title.format(title)
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_email(email: str, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_email.format(email))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_user(username: str, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_user.format(username))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_userID_by_email(email: str, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_userID_by_email.format(email))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def add_task_group(*, cursor: MySQLCursor) -> Union[Exception, Optional[int]]:
+        cursor.execute(_Requests.add_task_group)
+        return cursor.lastrowid
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_user(user_id, *, cursor: MySQLCursor) -> Optional[Exception]:
+        """
+        Permet de delete un utilisateur de la db et toutes ses dépendances.
+
+        Cette fonction renvoie None ou une exception. En cas d'échec,
+        elle renverra une exc et en cas de succes, elle renverra None.
+
+        :param user_id: ID de l'utilisateur
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> err = DB_API.delete_user(1)
+        >>> if not isinstance(err, Exception):
+        >>>     print("delete avec succes")
+        """
+        return cursor.execute(_Requests.delete_user.format(user_id))
 
 
 if __name__ == "__main__":
-    _create_conn()
+    # print(DB_API.add_project('tebgfbgrsbs'))
+    # v = DB_API.get_project_id_by_project_name("tebgfbgrsbs")
+    pass
