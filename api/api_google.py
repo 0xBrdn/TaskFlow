@@ -37,8 +37,8 @@ Routes:
 """
 
 import sys, os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../backend')))
-from auth import login_with_google  
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+from back_end.auth import login_with_google
 from flask import Flask, request, jsonify, redirect, url_for
 import requests
 
@@ -60,7 +60,7 @@ def oauth2callback():
         str: Message de confirmation de la connexion réussie ou d'erreur en cas d'échec.
         tuple: En cas de problème lors de l'obtention du token, retourne un message d'erreur et un code HTTP 400.
     """
-    code = request.args.get('code') 
+    code = request.args.get('code')
 
     token_url = "https://oauth2.googleapis.com/token"
     data = {
@@ -75,11 +75,11 @@ def oauth2callback():
     if response.status_code == 200:
         tokens = response.json()
         id_token = tokens.get('id_token')
-        
+
         if id_token:
             success = login_with_google(id_token)
             if success:
-                return "Connexion réussie ! Vous pouvez fermer cette page."
+                return "L'utilisateur exite déjà ! Vous pouvez fermer cette page et vous connecter en rentrtant uniquement l'adresse mail de votre compte Google."
             else:
                 return "Échec de la connexion avec Google."
         else:
@@ -111,7 +111,7 @@ def google_login():
         return jsonify({"success": False, "message": "Token ID manquant."}), 400
 
     success = login_with_google(id_token)
-    
+
     if success:
         return jsonify({"success": True, "message": "Connexion réussie."}), 200
     else:
