@@ -77,7 +77,6 @@ class _Requests:
         "SELECT t.taskID, t.projectID, ti.description, ti.status, ti.priority, ti.covered, "
         "ti.assign, ti.dead_line FROM tasks t JOIN tasks_infos ti ON t.task_infoID = "
         "ti.task_infoID WHERE ti.title = '{}';"
-
     )
 
     get_email = "SELECT email FROM users WHERE email = '{}';"
@@ -95,8 +94,10 @@ class _Requests:
 
     add_project = "INSERT INTO projects (name) VALUES ('{}');"
 
-    add_user_to_group = "INSERT INTO users_groups (projectID, userID, permission, joined)" \
-                        " VALUES ('{}', '{}', '{}', '{}');"
+    add_user_to_group = (
+        "INSERT INTO users_groups (projectID, userID, permission, joined)"
+        " VALUES ('{}', '{}', '{}', '{}');"
+    )
 
     add_task_info = (
         "INSERT INTO tasks_infos (status, priority, title, description, "

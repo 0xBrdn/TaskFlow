@@ -4,8 +4,8 @@ from typing import Optional, Union
 
 from mysql.connector.cursor import MySQLCursor
 
-from back_end.db_helper import cm_cursor, ResultType, cm_conn
-from back_end.db_requests import _Requests
+from backend.db_helper import cm_cursor, ResultType, cm_conn
+from backend.db_requests import _Requests
 
 _log = logging.getLogger(__name__)
 
