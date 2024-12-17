@@ -1,6 +1,5 @@
-import os
 from PyQt5 import QtCore, QtGui, QtWidgets
-from back_end.db_api import DB_API
+from backend.db_api import DB_API
 from pagePrincipale import Ui_MainWindow as MainWindowUI
 import webbrowser
 
@@ -12,35 +11,40 @@ AUTH_URL = (
     "&client_id={}&redirect_uri={}&scope=email%20profile"
 )
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         """
-            Initialise et configure l'interface utilisateur pour la fenêtre de connexion/inscription.
+        Initialise et configure l'interface utilisateur pour la fenêtre de connexion/inscription.
 
-            Cette méthode met en place tous les éléments graphiques de la fenêtre d'authentification,
-            incluant les champs de saisie email et mot de passe, les boutons, et la gestion des états
-            de formulaire (connexion/inscription).
+        Cette méthode met en place tous les éléments graphiques de la fenêtre d'authentification,
+        incluant les champs de saisie email et mot de passe, les boutons, et la gestion des états
+        de formulaire (connexion/inscription).
 
-            Principales fonctionnalités:
-            - Configuration des widgets PyQt5
-            - Création des frames, labels, champs de saisie et boutons
-            - Mise en place des connexions pour la gestion des événements
-            - Chargement de la feuille de style
-            - Initialisation de l'état du formulaire
+        Principales fonctionnalités:
+        - Configuration des widgets PyQt5
+        - Création des frames, labels, champs de saisie et boutons
+        - Mise en place des connexions pour la gestion des événements
+        - Chargement de la feuille de style
+        - Initialisation de l'état du formulaire
 
-            :param MainWindow: La fenêtre principale de l'application à configurer
-            :type MainWindow: QtWidgets.QMainWindow
+        :param MainWindow: La fenêtre principale de l'application à configurer
+        :type MainWindow: QtWidgets.QMainWindow
 
-            Exemple d'utilisation:
-            main_window = QtWidgets.QMainWindow()
-            ui = Ui_MainWindow()
-            ui.setupUi(main_window)
-            main_window.show()
-            """
+        Exemple d'utilisation:
+        main_window = QtWidgets.QMainWindow()
+        ui = Ui_MainWindow()
+        ui.setupUi(main_window)
+        main_window.show()
+        """
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1035, 774)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("images/authentification/logo_alternatif.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap("images/authentification/logo_alternatif.png"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
         MainWindow.setWindowIcon(icon)
 
         # Charger le fichier QSS
@@ -242,7 +246,8 @@ class Ui_MainWindow(object):
         self.labelErreur.setWordWrap(True)
         self.verticalLayoutErreur.addWidget(self.labelErreur)
 
-        # Organise le frame des erreurs pour qu'ils se place entre le champ mot de passe et le bouton Valider.
+        # Organise le frame des erreurs pour qu'ils se place entre le champ
+        # mot de passe et le bouton Valider.
         self.verticalLayout.insertWidget(4, self.frameErreur, 0, QtCore.Qt.AlignHCenter)
 
         # Frame pour le bouton Valider.
@@ -280,12 +285,16 @@ class Ui_MainWindow(object):
         self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.frameCreerCompte)
         self.verticalLayout_6.setObjectName("verticalLayout_6")
 
-        self.boutonCreerCompte = QtWidgets.QLabel("<a href='#'>Créer un compte</a>", self.frameCreerCompte)
+        self.boutonCreerCompte = QtWidgets.QLabel(
+            "<a href='#'>Créer un compte</a>", self.frameCreerCompte
+        )
         self.boutonCreerCompte.setMinimumSize(QtCore.QSize(25, 25))
         self.boutonCreerCompte.setMaximumSize(QtCore.QSize(80, 25))
         self.boutonCreerCompte.setObjectName("boutonCreerCompte")
         self.boutonCreerCompte.setAlignment(QtCore.Qt.AlignCenter)
-        self.boutonCreerCompte.linkActivated.connect(self.show_signup_form)  # Connecte le lien à la fonction qui permett le changement de forme
+        self.boutonCreerCompte.linkActivated.connect(
+            self.show_signup_form
+        )  # Connecte le lien à la fonction qui permett le changement de forme
         self.verticalLayout_6.addWidget(self.boutonCreerCompte)
         self.verticalLayout.addWidget(self.frameCreerCompte, 0, QtCore.Qt.AlignHCenter)
 
@@ -361,11 +370,10 @@ class Ui_MainWindow(object):
             self.boutonValider.clicked.disconnect()
             self.inputMail.returnPressed.disconnect()
             self.inputPassword.returnPressed.disconnect()
-        except:
+        except Exception:
             pass
 
         if self.is_login_form:
-
             self.google_login_button.setVisible(True)
             self.frameUser.setVisible(False)
             self.inputUser.setVisible(False)
@@ -373,7 +381,7 @@ class Ui_MainWindow(object):
 
             # Formulaire d'authentification
             self.main_window.setWindowTitle(_translate("MainWindow", "TaskFlow - Login"))
-            self.titreUser.setText(_translate("MainWindow", "Nom d\'Utilisateur"))
+            self.titreUser.setText(_translate("MainWindow", "Nom d'Utilisateur"))
             self.label.setText(_translate("MainWindow", "S'identifier"))
             self.boutonValider.setText(_translate("MainWindow", "Valider"))
             self.boutonCreerCompte.setText("<a href='#'>Créer un compte</a>")
@@ -385,7 +393,6 @@ class Ui_MainWindow(object):
             self.inputMail.returnPressed.connect(self.handle_login)
             self.inputPassword.returnPressed.connect(self.handle_login)
         else:
-
             self.google_login_button.setVisible(False)
             self.frameUser.setVisible(True)
             self.inputUser.setVisible(True)
@@ -475,23 +482,31 @@ class Ui_MainWindow(object):
 
         # Vérification des éléments remplis
         if not self.validate_email(email):
-            self.show_error_message("Erreur d'inscription", "Veuillez entrer une adresse email valide")
+            self.show_error_message(
+                "Erreur d'inscription", "Veuillez entrer une adresse email valide"
+            )
             return False
 
         if len(password) < 8:
-            self.show_error_message("Erreur d'inscription", "Le mot de passe doit contenir au moins 8 caractères")
+            self.show_error_message(
+                "Erreur d'inscription", "Le mot de passe doit contenir au moins 8 caractères"
+            )
             return False
 
         # Vérifie si l'adresse mail est existante
         existing_email = DB_API.get_email(email)
         if existing_email and not isinstance(existing_email, Exception):
-            self.show_error_message("Erreur d'inscription", "Cette adresse email est déjà utilisée")
+            self.show_error_message(
+                "Erreur d'inscription", "Cette adresse email est déjà utilisée"
+            )
             return False
 
         # Vérifie si l'username est existant
         existing_username = DB_API.get_user(username)
         if existing_username and not isinstance(existing_username, Exception):
-            self.show_error_message("Erreur d'inscription", "Ce nom d'utilisateur est déjà utilisée")
+            self.show_error_message(
+                "Erreur d'inscription", "Ce nom d'utilisateur est déjà utilisée"
+            )
             return False
 
         is_google_user = 1 if email.endswith("@gmail.com") else 0
@@ -500,16 +515,20 @@ class Ui_MainWindow(object):
         try:
             success = DB_API.add_user(username, password, email, is_google_user)
             if success:
-                self.show_success_message("Inscription réussie", "Votre compte a été créé avec succès!")
+                self.show_success_message(
+                    "Inscription réussie", "Votre compte a été créé avec succès!"
+                )
                 # Switch back to login form
                 self.is_login_form = True
                 self.update_form_state()
                 return True
             else:
-                self.show_error_message("Erreur d'inscription", "Erreur lors de la création du compte")
+                self.show_error_message(
+                    "Erreur d'inscription", "Erreur lors de la création du compte"
+                )
                 return False
         except Exception as e:
-            self.show_error_message("Erreur d'inscription", f"Une erreur est survenue: {str(e)}")
+            self.show_error_message("Erreur d'inscription", f"Une erreur est survenue: {e!s}")
             return False
 
     def validate_email(self, email):
@@ -530,10 +549,11 @@ class Ui_MainWindow(object):
         """
 
         import re
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+
+        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.match(pattern, email) is not None
 
-    def show_error_message(self, title, message):
+    def show_error_message(self, title, message):  # noqa
         """
         Affiche un message d'erreur dans le label prévu à cet effet.
 
@@ -548,7 +568,6 @@ class Ui_MainWindow(object):
         Exemple d'utilisation:
         self.show_error_message("Erreur", "Email ou mot de passe incorrect")
         """
-
         self.labelErreur.setText(message)
         # Délais de supression de message. Ici 3 secondes.
         QtCore.QTimer.singleShot(3000, self.clear_error_message)
@@ -565,7 +584,7 @@ class Ui_MainWindow(object):
 
         self.labelErreur.clear()
 
-    def show_success_message(self, title, message):
+    def show_success_message(self, title, message):  # noqa
         """
         Affiche un message de succès dans le label prévu à cet effet.
 
@@ -621,7 +640,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("TaskFlow - Login", "TaskFlow - Login"))
-        self.titreUser.setText(_translate("MainWindow", "Nom d\'Utilisateur"))
+        self.titreUser.setText(_translate("MainWindow", "Nom d'Utilisateur"))
         self.label.setText(_translate("MainWindow", "S'identifier"))
         self.titreMail.setText(_translate("MainWindow", "E-Mail"))
         self.titrePassword.setText(_translate("MainWindow", "Mot de passe"))

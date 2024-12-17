@@ -276,7 +276,7 @@ class Ui_MainWindow(object):
             )
 
             for user in selected_users:
-                user_id = DB_API.get_userID_by_username(user)
+                user_id = DB_API.get_user_id_by_username(user)
                 DB_API.add_user_to_task_group(task_projectID, user_id)
 
             QMessageBox.information(None, "Succès", "Tâche ajoutée avec succès.")
