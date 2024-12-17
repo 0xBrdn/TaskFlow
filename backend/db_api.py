@@ -90,7 +90,6 @@ class DB_API:
 
     @staticmethod
     @cm_cursor()
-
     def get_user_hashpass(user_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer le mdp hash d'un user dans la DB.
@@ -707,13 +706,6 @@ class DB_API:
         return result
 
     @staticmethod
-    @cm_conn()
-    @cm_cursor()
-    def add_task_group(*, cursor: MySQLCursor) -> Union[Exception, Optional[int]]:
-        cursor.execute(_Requests.add_task_group)
-        return cursor.lastrowid
-      
-    @staticmethod
     @cm_cursor()
     def get_emails_by_task_project_id(
         task_project_id: int, *, cursor: MySQLCursor
@@ -811,6 +803,7 @@ class DB_API:
         result = cursor.fetchall()
         return result
 
+    @staticmethod
     @cm_conn()
     @cm_cursor()
     def update_task_infos(
@@ -866,13 +859,19 @@ class DB_API:
     ) -> Optional[Exception]:
         """
         Permet d'accepter ou refuser une invitation vers un projet.
-
         Cette fonction renvoie None ou une exception. En cas d'échec,
         elle renverra une exc et en cas de succes, elle renverra None.
-
         :param project_id: Le project_ID
         :param user_id: ID de l'utilisateur
         :param joined: Accepter ou pas l'invit
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        Exemple:
+        >>> err = DB_API.set_invites_status(1, 1, False)
+        >>> if not isinstance(err, Exception):
+        >>>     print("delete avec succes")
+        """
+        return cursor.execute(_Requests.set_invites_status.format(joined, project_id, user_id))
 
     @staticmethod
     @cm_conn()

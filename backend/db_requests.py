@@ -2,7 +2,7 @@ class _Requests:
     get_all_users = "SELECT userID, username, email, is_google_user FROM users;"
 
     get_email_hashpass = "SELECT password FROM users WHERE email = '{}';"
-  
+
     get_user_hashpass = "SELECT password FROM users WHERE userID = '{}';"
 
     get_project_id_by_project_name = "SELECT projectID FROM projects where projects.name = '{}';"
@@ -108,6 +108,7 @@ class _Requests:
     add_task_info = (
         "INSERT INTO tasks_infos (status, priority, title, description, "
         "dead_line, covered, assign) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}');"
+    )
 
     set_invites_status = (
         "UPDATE users_groups SET joined='{}' WHERE projectID='{}' AND userID='{}';"
