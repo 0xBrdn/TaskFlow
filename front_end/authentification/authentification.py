@@ -1,465 +1,628 @@
+import os
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox, QLabel, QVBoxLayout, QPushButton, QInputDialog
 from back_end.db_api import DB_API
-import datetime
-from typing import Optional
+from pagePrincipale import Ui_MainWindow as MainWindowUI
+import webbrowser
 
+CLIENT_ID = "428963010703-44ievtu901l6r9g8dhs2jjmf11mphidg.apps.googleusercontent.com"
+REDIRECT_URI = "http://localhost:5000/oauth2callback"
+
+AUTH_URL = (
+    "https://accounts.google.com/o/oauth2/auth?response_type=code"
+    "&client_id={}&redirect_uri={}&scope=email%20profile"
+)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        """
+            Initialise et configure l'interface utilisateur pour la fenêtre de connexion/inscription.
+
+            Cette méthode met en place tous les éléments graphiques de la fenêtre d'authentification,
+            incluant les champs de saisie email et mot de passe, les boutons, et la gestion des états
+            de formulaire (connexion/inscription).
+
+            Principales fonctionnalités:
+            - Configuration des widgets PyQt5
+            - Création des frames, labels, champs de saisie et boutons
+            - Mise en place des connexions pour la gestion des événements
+            - Chargement de la feuille de style
+            - Initialisation de l'état du formulaire
+
+            :param MainWindow: La fenêtre principale de l'application à configurer
+            :type MainWindow: QtWidgets.QMainWindow
+
+            Exemple d'utilisation:
+            main_window = QtWidgets.QMainWindow()
+            ui = Ui_MainWindow()
+            ui.setupUi(main_window)
+            main_window.show()
+            """
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1200, 800)
+        MainWindow.resize(1035, 774)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("images/authentification/logo_alternatif.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
 
-        # Chargement du fichier de style
-        try:
-            with open('style.qss', 'r') as f:
-                style = f.read()
-                MainWindow.setStyleSheet(style)
-        except FileNotFoundError:
-            print("style.qss introuvable. Utilisation du style par défaut.")
+        # Charger le fichier QSS
+        with open("authentification.qss", "r") as file:
+            stylesheet = file.read()
+            MainWindow.setStyleSheet(stylesheet)
 
+        # Instanciation de la page dans sa globalité
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout.setObjectName("gridLayout")
 
-        self.layout = QtWidgets.QVBoxLayout(self.centralwidget)
-        self.layout.setObjectName("layout")
+        # Frame de la mire d'authentification
+        self.frameMire = QtWidgets.QFrame(self.centralwidget)
+        self.frameMire.setMinimumSize(QtCore.QSize(350, 500))
+        self.frameMire.setMaximumSize(QtCore.QSize(350, 500))
+        self.frameMire.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameMire.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameMire.setObjectName("frameMire")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.frameMire)
+        self.verticalLayout.setObjectName("verticalLayout")
 
-        # Onglets pour séparer les projets, les tâches et le compte
-        self.tabs = QtWidgets.QTabWidget(self.centralwidget)
-        self.project_tab = QtWidgets.QWidget()
-        self.task_tab = QtWidgets.QWidget()
-        self.account_tab = QtWidgets.QWidget()
-        self.tabs.addTab(self.project_tab, "Projets")
-        self.tabs.addTab(self.task_tab, "Tâches")
-        self.tabs.addTab(self.account_tab, "Compte")
-        self.layout.addWidget(self.tabs)
+        # Frame du titre
+        self.frameTitre = QtWidgets.QFrame(self.frameMire)
+        self.frameTitre.setMinimumSize(QtCore.QSize(100, 60))
+        self.frameTitre.setMaximumSize(QtCore.QSize(300, 60))
+        self.frameTitre.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameTitre.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameTitre.setObjectName("frameTitre")
+        self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.frameTitre)
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
 
-        # Configurations des onglets existants (projets et tâches)
-        self._setup_project_tab()
-        self._setup_task_tab()
-        self._setup_account_tab()
+        # Label du titre
+        self.label = QtWidgets.QLabel(self.frameTitre)
+        self.label.setMinimumSize(QtCore.QSize(100, 60))
+        self.label.setMaximumSize(QtCore.QSize(1500, 60))
+        font = QtGui.QFont()
+        font.setFamily("Tahoma")
+        font.setPointSize(17)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label.setFont(font)
+        self.label.setObjectName("titre")
+        self.verticalLayout_5.addWidget(self.label)
+        self.verticalLayout.addWidget(self.frameTitre, 0, QtCore.Qt.AlignHCenter)
 
+        # Frame du nom d'utilisateur
+        self.frameUser = QtWidgets.QFrame(self.frameMire)
+        self.frameUser.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameUser.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameUser.setObjectName("frameUser")
+        self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.frameUser)
+        self.verticalLayout_7.setObjectName("verticalLayout_7")
+
+        # Titre du nom d'utilisateur
+        self.titreUser = QtWidgets.QLabel(self.frameUser)
+        font = QtGui.QFont()
+        font.setFamily("Tahoma")
+        font.setPointSize(13)
+        font.setBold(True)
+        font.setWeight(75)
+        self.titreUser.setFont(font)
+        self.titreUser.setObjectName("titreUser")
+        self.titreUser.setMinimumSize(QtCore.QSize(160, 30))
+        self.titreUser.setMaximumSize(QtCore.QSize(160, 30))
+        self.verticalLayout_7.addWidget(self.titreUser)
+
+        # champ du nom d'utilisateur
+        self.inputUser = QtWidgets.QLineEdit(self.frameUser)
+        self.inputUser.setMinimumSize(QtCore.QSize(300, 30))
+        self.inputUser.setMaximumSize(QtCore.QSize(300, 30))
+        font = QtGui.QFont()
+        font.setFamily("Tahoma")
+        font.setPointSize(10)
+        self.inputUser.setFont(font)
+        self.inputUser.setObjectName("inputUser")
+        self.verticalLayout_7.addWidget(self.inputUser)
+
+        self.verticalLayout.addWidget(self.frameUser, 0, QtCore.Qt.AlignHCenter)
+
+        # Frame pour le champs Email
+        self.frameLogin = QtWidgets.QFrame(self.frameMire)
+        self.frameLogin.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameLogin.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameLogin.setObjectName("frameLogin")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.frameLogin)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.frameLogin.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+
+        # Titre de l'Email
+        self.titreMail = QtWidgets.QLabel(self.frameLogin)
+        self.titreMail.setMinimumSize(QtCore.QSize(60, 30))
+        self.titreMail.setMaximumSize(QtCore.QSize(60, 30))
+        font = QtGui.QFont()
+        font.setFamily("Tahoma")
+        font.setPointSize(13)
+        font.setBold(True)
+        font.setWeight(75)
+        self.titreMail.setFont(font)
+        self.verticalLayout_2.addWidget(self.titreMail)
+        self.titreMail.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+
+        # Champ de l'Email
+        self.inputMail = QtWidgets.QLineEdit(self.frameLogin)
+        self.inputMail.setMinimumSize(QtCore.QSize(300, 30))
+        self.inputMail.setMaximumSize(QtCore.QSize(300, 30))
+        font = QtGui.QFont()
+        font.setFamily("Tahoma")
+        font.setPointSize(10)
+        self.inputMail.setFont(font)
+        self.inputMail.setObjectName("inputMail")
+        self.verticalLayout_2.addWidget(self.inputMail)
+        self.inputMail.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+
+        self.verticalLayout.addWidget(self.frameLogin, 0, QtCore.Qt.AlignHCenter)
+
+        # Frame pour le champ mot de passe
+        self.framePassword = QtWidgets.QFrame(self.frameMire)
+        self.framePassword.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.framePassword.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.framePassword.setObjectName("framePassword")
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.framePassword)
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.framePassword.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+
+        # Titre et champ du mot de passe
+        self.titrePassword = QtWidgets.QLabel(self.framePassword)
+        self.titrePassword.setMaximumSize(QtCore.QSize(120, 30))
+        font = QtGui.QFont()
+        font.setFamily("Tahoma")
+        font.setPointSize(13)
+        font.setBold(True)
+        font.setWeight(75)
+        self.titrePassword.setFont(font)
+        self.verticalLayout_3.addWidget(self.titrePassword)
+        self.titrePassword.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+
+        self.inputPassword = QtWidgets.QLineEdit(self.framePassword)
+        self.inputPassword.setMinimumSize(QtCore.QSize(300, 30))
+        self.inputPassword.setMaximumSize(QtCore.QSize(300, 30))
+        font = QtGui.QFont()
+        font.setFamily("Tahoma")
+        font.setPointSize(10)
+        self.inputPassword.setFont(font)
+        self.inputPassword.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.inputPassword.setObjectName("inputPassword")
+        self.verticalLayout_3.addWidget(self.inputPassword)
+        self.inputPassword.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+
+        self.verticalLayout.addWidget(self.framePassword, 0, QtCore.Qt.AlignHCenter)
+
+        for frame in [self.frameUser, self.frameLogin, self.framePassword]:
+            frame.setMinimumSize(QtCore.QSize(350, 80))
+            frame.setMaximumSize(QtCore.QSize(350, 80))
+
+        # Frame pour le bouton Google
+        self.frameGoogle = QtWidgets.QFrame(self.frameMire)
+        self.frameGoogle.setMinimumSize(QtCore.QSize(50, 50))
+        self.frameGoogle.setMaximumSize(QtCore.QSize(50, 50))
+        self.frameGoogle.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameGoogle.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameGoogle.setObjectName("frameGoogle")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.frameGoogle)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+
+        # Bouton google
+        self.google_login_button = QtWidgets.QPushButton(self.frameGoogle)
+        google_icon = QtGui.QIcon("images/authentification/logo_google.png")
+        self.google_login_button.setIconSize(QtCore.QSize(50, 50))
+        self.google_login_button.setIcon(google_icon)
+        self.google_login_button.setMinimumSize(QtCore.QSize(50, 50))
+        self.google_login_button.setMaximumSize(QtCore.QSize(50, 50))
+        self.verticalLayout.addWidget(self.google_login_button, 0, QtCore.Qt.AlignHCenter)
+
+        self.google_login_button.clicked.connect(self.login_with_google)
+
+        # Frame pour les message d'erreur
+        self.frameErreur = QtWidgets.QFrame(self.frameMire)
+        self.frameErreur.setMinimumSize(QtCore.QSize(350, 50))
+        self.frameErreur.setMaximumSize(QtCore.QSize(350, 50))
+        self.frameErreur.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameErreur.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameErreur.setObjectName("frameErreur")
+
+        self.verticalLayoutErreur = QtWidgets.QVBoxLayout(self.frameErreur)
+        self.verticalLayoutErreur.setObjectName("verticalLayoutErreur")
+        self.verticalLayout.insertWidget(4, self.frameErreur, 0, QtCore.Qt.AlignHCenter)
+
+        # Label pour les erreurs
+        self.labelErreur = QtWidgets.QLabel(self.frameErreur)
+        self.labelErreur.setObjectName("labelErreur")
+        font = QtGui.QFont()
+        font.setFamily("Tahoma")
+        font.setPointSize(10)
+        self.labelErreur.setFont(font)
+        self.labelErreur.setStyleSheet("color: red;")
+        self.labelErreur.setAlignment(QtCore.Qt.AlignCenter)
+        self.labelErreur.setWordWrap(True)
+        self.verticalLayoutErreur.addWidget(self.labelErreur)
+
+        # Organise le frame des erreurs pour qu'ils se place entre le champ mot de passe et le bouton Valider.
+        self.verticalLayout.insertWidget(4, self.frameErreur, 0, QtCore.Qt.AlignHCenter)
+
+        # Frame pour le bouton Valider.
+        self.frameBouton = QtWidgets.QFrame(self.frameMire)
+        self.frameBouton.setMinimumSize(QtCore.QSize(150, 80))
+        self.frameBouton.setMaximumSize(QtCore.QSize(150, 80))
+        self.frameBouton.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameBouton.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameBouton.setObjectName("frameBouton")
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.frameBouton)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+
+        # Bouton Valider
+        self.boutonValider = QtWidgets.QPushButton(self.frameBouton)
+        self.boutonValider.setMaximumSize(QtCore.QSize(150, 50))
+        font = QtGui.QFont()
+        font.setFamily("Tahoma")
+        font.setPointSize(13)
+        font.setBold(True)
+        font.setWeight(75)
+        self.boutonValider.setFont(font)
+        self.boutonValider.setObjectName("boutonValider")
+        self.verticalLayout_4.addWidget(self.boutonValider)
+        self.boutonValider.clicked.connect(self.handle_login)
+
+        self.verticalLayout.addWidget(self.frameBouton, 0, QtCore.Qt.AlignHCenter)
+
+        # "Créer un compte" label (lien)
+        self.frameCreerCompte = QtWidgets.QFrame(self.frameMire)
+        self.frameCreerCompte.setMinimumSize(QtCore.QSize(100, 50))
+        self.frameCreerCompte.setMaximumSize(QtCore.QSize(100, 50))
+        self.frameCreerCompte.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameCreerCompte.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameCreerCompte.setObjectName("frameCreerCompte")
+        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.frameCreerCompte)
+        self.verticalLayout_6.setObjectName("verticalLayout_6")
+
+        self.boutonCreerCompte = QtWidgets.QLabel("<a href='#'>Créer un compte</a>", self.frameCreerCompte)
+        self.boutonCreerCompte.setMinimumSize(QtCore.QSize(25, 25))
+        self.boutonCreerCompte.setMaximumSize(QtCore.QSize(80, 25))
+        self.boutonCreerCompte.setObjectName("boutonCreerCompte")
+        self.boutonCreerCompte.setAlignment(QtCore.Qt.AlignCenter)
+        self.boutonCreerCompte.linkActivated.connect(self.show_signup_form)  # Connecte le lien à la fonction qui permett le changement de forme
+        self.verticalLayout_6.addWidget(self.boutonCreerCompte)
+        self.verticalLayout.addWidget(self.frameCreerCompte, 0, QtCore.Qt.AlignHCenter)
+
+        self.gridLayout.addWidget(self.frameMire, 2, 0, 1, 1)
+
+        self.frame = QtWidgets.QFrame(self.centralwidget)
+        self.frame.setMinimumSize(QtCore.QSize(300, 140))
+        self.frame.setMaximumSize(QtCore.QSize(300, 160))
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.frame)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.gridLayout.addWidget(self.frame, 0, 0, 1, 1, QtCore.Qt.AlignHCenter)
+        self.frame_2 = QtWidgets.QFrame(self.centralwidget)
+        self.frame_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_2.setObjectName("frame_2")
+        self.gridLayout.addWidget(self.frame_2, 3, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
 
-        # Connexions
-        self.add_project_button.clicked.connect(self.add_project)
-        self.project_list_widget.currentRowChanged.connect(self.project_clicked)
-        self.add_task_button.clicked.connect(self.add_task)
-        self.add_subtask_button.clicked.connect(self.add_subtask)
-        self.delete_task_button.clicked.connect(self.delete_task)
-        self.complete_task_button.clicked.connect(self.mark_completed)
-        self.tree.itemSelectionChanged.connect(self.update_subtask_availability)
+        # Variable qui vérifie la forme actuelle
+        self.is_login_form = True
 
-        # Données internes
-        self.projects = {}
-        self.users = ["zack", "maxime", "swann"]
-        self.current_user = None
-        self.current_project = None
+        # Stocke la reference MainWindow
+        self.main_window = MainWindow
 
-    def _setup_project_tab(self):
-        self.project_layout = QtWidgets.QVBoxLayout(self.project_tab)
-        self.project_label = QtWidgets.QLabel("Liste des Projets")
-        self.project_label.setObjectName("project_label")
-        self.project_label.setStyleSheet("font-size: 16px;")
-        self.project_layout.addWidget(self.project_label)
+        # Initialise l'était du formulaire et les connections.
+        self.update_form_state()
 
-        self.project_list_widget = QtWidgets.QListWidget()
-        self.project_list_widget.setStyleSheet("font-size: 14px;")
-        self.project_layout.addWidget(self.project_list_widget)
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        self.add_project_button = QtWidgets.QPushButton("Ajouter un Projet")
-        self.add_project_button.setObjectName("add_project_button")
-        self.project_layout.addWidget(self.add_project_button)
+    def show_signup_form(self):
+        """
+        Permute entre les formulaires de connexion et d'inscription.
+        Cette méthode met à jour l'état de l'interface utilisateur en basculant
+        entre les deux formulaires disponibles: connexion et inscription.
 
-    def _setup_task_tab(self):
-        self.task_layout = QtWidgets.QVBoxLayout(self.task_tab)
+        Fonctionnalités principales:
+        - Basculer entre l'état de connexion et d'inscription.
+        - Mettre à jour l'affichage des champs, titres, et boutons associés.
 
-        self.title_label = QtWidgets.QLabel(self.task_tab)
-        self.title_label.setText("Gestionnaire de Tâches")
-        self.title_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.title_label.setObjectName("title_label")
-        self.title_label.setStyleSheet("font-size: 18px;")
-        self.task_layout.addWidget(self.title_label)
+        Exemple d'utilisation:
+        self.show_signup_form()
+        """
+        self.is_login_form = not self.is_login_form
+        self.update_form_state()
 
-        self.current_project_label = QtWidgets.QLabel(self.task_tab)
-        self.current_project_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.current_project_label.setObjectName("current_project_label")
-        self.current_project_label.setStyleSheet("font-size: 16px;")
-        self.task_layout.addWidget(self.current_project_label)
+    def update_form_state(self):
+        """
+        Met à jour l'état et l'apparence des formulaires selon le contexte.
 
-        self.tree = QtWidgets.QTreeWidget(self.task_tab)
-        self.tree.setColumnCount(5)
-        self.tree.setHeaderLabels(["Tâche", "Date", "Commentaire", "Importance", "Utilisateurs assignés"])
-        self.tree.setStyleSheet("font-size: 14px;")
-        self.task_layout.addWidget(self.tree)
+        Cette méthode est appelée pour ajuster dynamiquement les éléments de l'interface,
+        en fonction de l'état actuel du formulaire (connexion ou inscription). Elle adapte
+        notamment les labels, les placeholders, les textes des boutons, et les connexions
+        des événements.
 
-        for i in range(4):
-            self.tree.header().setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
+        Fonctionnalités principales:
+        - Mise à jour des textes affichés (titres, boutons, placeholders).
+        - Déconnexion des anciens événements et création de nouveaux.
+        - Gestion des connexions pour valider l'action courante (connexion/inscription).
 
-        self.form_layout = QtWidgets.QFormLayout()
+        Exemple d'utilisation:
+            self.is_login_form = False
+            self.update_form_state()
+        """
 
-        self.task_input = QtWidgets.QLineEdit(self.task_tab)
-        self.task_input.setObjectName("task_input")
+        _translate = QtCore.QCoreApplication.translate
 
-        self.subtask_input = QtWidgets.QLineEdit(self.task_tab)
-        self.subtask_input.setObjectName("subtask_input")
-        self.subtask_input.setPlaceholderText("veuillez séléctionner une taches")
-        self.subtask_input.setEnabled(False)
-
-        self.date_input = QtWidgets.QDateEdit(self.task_tab)
-        self.date_input.setCalendarPopup(True)
-        self.date_input.setObjectName("date_input")
-        self.date_input.setDate(QtCore.QDate(2025, 1, 1))
-
-        self.comment_input = QtWidgets.QLineEdit(self.task_tab)
-        self.comment_input.setObjectName("comment_input")
-
-        self.importance_input = QtWidgets.QComboBox(self.task_tab)
-        self.importance_input.addItems(["Faible", "Moyenne", "Haute"])
-        self.importance_input.setObjectName("importance_input")
-
-        self.assign_input = QtWidgets.QListWidget(self.task_tab)
-        self.assign_input.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
-        self.assign_input.setObjectName("assign_input")
-        self.form_layout.addRow("Assigner un ou plusieurs utilisateurs :", self.assign_input)
-
-        self.form_layout.addRow("Tâche :", self.task_input)
-        self.form_layout.addRow("Sous-tâche :", self.subtask_input)
-        self.form_layout.addRow("Date :", self.date_input)
-        self.form_layout.addRow("Commentaire :", self.comment_input)
-        self.form_layout.addRow("Importance :", self.importance_input)
-        self.task_layout.addLayout(self.form_layout)
-
-        self.button_layout = QtWidgets.QHBoxLayout()
-        self.add_task_button = QtWidgets.QPushButton("Ajouter une Tâche", self.task_tab)
-        self.add_subtask_button = QtWidgets.QPushButton("Ajouter Sous-Tâche", self.task_tab)
-        self.add_subtask_button.setEnabled(False)
-        self.delete_task_button = QtWidgets.QPushButton("Supprimer", self.task_tab)
-        self.complete_task_button = QtWidgets.QPushButton("Marquer comme terminé", self.task_tab)
-
-        self.add_task_button.setObjectName("add_task_button")
-        self.add_subtask_button.setObjectName("add_subtask_button")
-        self.delete_task_button.setObjectName("delete_task_button")
-        self.complete_task_button.setObjectName("complete_task_button")
-
-        self.button_layout.addWidget(self.add_task_button)
-        self.button_layout.addWidget(self.add_subtask_button)
-        self.button_layout.addWidget(self.delete_task_button)
-        self.button_layout.addWidget(self.complete_task_button)
-        self.task_layout.addLayout(self.button_layout)
-
-    def _setup_account_tab(self):
-        layout = QVBoxLayout(self.account_tab)
-        titre_label = QLabel("Informations du Compte")
-        titre_label.setObjectName("titre_label")
-        titre_label.setAlignment(QtCore.Qt.AlignCenter)
-        layout.addWidget(titre_label)
-
-        self.email_label = QLabel("Email: ")
-        self.email_label.setObjectName("email_label")
-        layout.addWidget(self.email_label)
-
-        deconnexion_button = QPushButton("Se déconnecter")
-        deconnexion_button.setObjectName("deconnexion_button")
-        deconnexion_button.clicked.connect(self.deconnexion)
-        layout.addWidget(deconnexion_button)
-
-        layout.addStretch(1)
-
-    def set_current_user(self, email):
-        self.current_user = email
-        self.email_label.setText(f"Email: {email}")
-        self.load_projects()
-
-    def deconnexion(self):
-        from authentification import Ui_MainWindow as AuthMainWindow
-
-        QMessageBox.information(None, "Déconnexion", "Vous êtes maintenant déconnecté.")
-
-        QtWidgets.QApplication.closeAllWindows()
-
-        self.auth_window = QtWidgets.QMainWindow()
-        self.auth_ui = AuthMainWindow()
-        self.auth_ui.setupUi(self.auth_window)
-        self.auth_window.show()
-
-    def add_project(self):
-        project_name, ok = QtWidgets.QInputDialog.getText(None, "Nouveau Projet", "Nom du projet :")
-        if not ok or not project_name.strip():
-            return
-
+        # Déconnecte les connections existantes
         try:
-            project_id = DB_API.add_project(project_name)
-            permission = 2
-            joined = 1
-            userID = DB_API.get_userID_by_email(self.current_user)
-            DB_API.add_user_to_group(project_id, userID[0], permission, joined)
-            self.load_projects()
-        except Exception as e:
-            QMessageBox.warning(None, "Erreur", f"Impossible d'ajouter le projet : {str(e)}")
+            self.boutonValider.clicked.disconnect()
+            self.inputMail.returnPressed.disconnect()
+            self.inputPassword.returnPressed.disconnect()
+        except:
+            pass
 
-    def load_projects(self):
-        self.project_list_widget.clear()
-        try:
-            userID = DB_API.get_userID_by_email(self.current_user)
+        if self.is_login_form:
 
-            projects = DB_API.get_projects_by_user_id(userID[0])
+            self.google_login_button.setVisible(True)
+            self.frameUser.setVisible(False)
+            self.inputUser.setVisible(False)
+            self.titreUser.setVisible(False)
 
-            for project in projects:
-                self.project_list_widget.addItem(f"{project[1]}")
+            # Formulaire d'authentification
+            self.main_window.setWindowTitle(_translate("MainWindow", "TaskFlow - Login"))
+            self.titreUser.setText(_translate("MainWindow", "Nom d\'Utilisateur"))
+            self.label.setText(_translate("MainWindow", "S'identifier"))
+            self.boutonValider.setText(_translate("MainWindow", "Valider"))
+            self.boutonCreerCompte.setText("<a href='#'>Créer un compte</a>")
+            self.inputPassword.setPlaceholderText("")
+            self.inputMail.setPlaceholderText("")
 
-        except Exception as e:
-            QMessageBox.warning(None, "Erreur", f"Impossible de charger les projets : {str(e)}")
-
-    def project_clicked(self):
-        project_index = self.project_list_widget.currentRow()
-        if project_index >= 0:
-            project_name_with_details = self.project_list_widget.item(project_index).text()
-            project_name = project_name_with_details.split(" (")[0]
-            self.current_project = project_name
-            self.current_project_label.setText(f"Projet sélectionné : {project_name}")
-            self.tabs.setCurrentWidget(self.task_tab)
-            self.load_tasks_for_project(project_name)
-            self.load_users_for_project(project_name)
-
-    def load_users_for_project(self, project_name):
-        self.assign_input.clear()
-
-        try:
-            project_id = DB_API.get_project_id_by_project_name(project_name)
-            users_in_project = DB_API.get_users_in_project_by_project_id(project_id[0])
-
-            for user in users_in_project:
-                self.assign_input.addItem(user[1])  # Ajoute les utilisateurs à la liste
-        except Exception as e:
-            QMessageBox.warning(None, "Erreur", f"Impossible de charger les utilisateurs du projet : {str(e)}")
-
-    def add_task(self):
-        if not self.current_project:
-            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner un projet.")
-            return
-
-        task_title = self.task_input.text().strip()
-        task_date = self.date_input.date().toString("yyyy-MM-dd")
-        task_comment = self.comment_input.text().strip()
-        task_priority = self.importance_input.currentIndex()
-
-        selected_users = [item.text() for item in self.assign_input.selectedItems()]
-
-        if not task_title:
-            QMessageBox.warning(None, "Erreur", "Veuillez entrer une tâche.")
-            return
-
-        try:
-            task_projectID = DB_API.add_task_group()
-            project_id = DB_API.get_project_id_by_project_name(self.current_project)
-
-            task_info_id = DB_API.add_task_info(
-                status=0,
-                priority=task_priority,
-                title=task_title,
-                description=task_comment,
-                dead_line=task_date,
-                covered=0,
-                assign=task_projectID if selected_users else None
-            )
-
-            user_id = DB_API.get_userID_by_email(self.current_user)
-            DB_API.add_task(
-                project_id=project_id[0],
-                task_info_id=task_info_id,
-                user_id=user_id[0]
-            )
-
-            for user in selected_users:
-                user_id = DB_API.get_userID_by_username(user)
-                DB_API.add_user_to_task_group(task_projectID, user_id)
-
-            QMessageBox.information(None, "Succès", "Tâche ajoutée avec succès.")
-            self.load_tasks_for_project(self.current_project)
-
-            self.task_input.clear()
-            self.comment_input.clear()
-            self.importance_input.setCurrentIndex(0)
-            self.assign_input.clearSelection()
-
-        except Exception as e:
-            QMessageBox.critical(None, "Erreur", f"Une erreur s'est produite lors de l'ajout de la tâche : {str(e)}")
-
-    def load_tasks_for_project(self, project_name):
-        self.tree.clear()
-
-        try:
-            project_id = DB_API.get_project_id_by_project_name(project_name)
-            tasks = DB_API.get_tasks_by_project_id(project_id[0])
-
-            for task in tasks:
-                task_item = QtWidgets.QTreeWidgetItem(self.tree)
-                task_item.setText(0, task[1])
-                deadline = task[7]
-                formatted_date = deadline.strftime("%d/%m/%Y") if isinstance(deadline, datetime.datetime) else str(
-                    deadline)
-                task_item.setText(1, formatted_date)
-                task_item.setText(2, task[2])
-                priority = task[4]
-                priority_text = "Haute" if priority == 3 else "Moyenne" if priority == 2 else "Basse"
-                task_item.setText(3, priority_text)
-
-                assigned_users = DB_API.get_users_in_tasks_group_by_group_id(task[6])
-                users_text = ", ".join(
-                    [user[1] for user in assigned_users]) if assigned_users else "Aucun utilisateur assigné"
-                task_item.setText(4, users_text)
-
-                color_map = {"Haute": "red", "Moyenne": "orange", "Basse": "green"}
-                task_item.setForeground(3, QtGui.QColor(color_map.get(priority_text, "black")))
-
-                task_item.setData(0, QtCore.Qt.UserRole, task[0])
-
-                subtasks = DB_API.get_subtasks_by_task_id(task[0])
-                for subtask in subtasks:
-                    subtask_item = QtWidgets.QTreeWidgetItem(task_item)
-                    subtask_item.setText(0, subtask[1])
-                    subtask_item.setText(1, subtask[7].strftime("%d/%m/%Y"))
-                    subtask_item.setText(2, subtask[2])
-                    subtask_item.setText(3, "Haute" if subtask[4] == 3 else "Moyenne" if subtask[4] == 2 else "Basse")
-
-                self.tree.setIndentation(20)
-
-        except Exception as e:
-            QMessageBox.critical(None, "Erreur", f"Impossible de charger les tâches : {str(e)}")
-
-    def add_subtask(self):
-        selected_items = self.tree.selectedItems()
-        if not selected_items:
-            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche parente.")
-            return
-
-        parent_item = selected_items[0]
-        subtask_title = self.subtask_input.text().strip()
-        subtask_date = self.date_input.date().toString("yyyy-MM-dd")
-        subtask_comment = self.comment_input.text().strip()
-        subtask_priority = self.importance_input.currentIndex()
-
-        if not subtask_title:
-            QMessageBox.warning(None, "Erreur", "Veuillez entrer une sous-tâche.")
-            return
-
-        try:
-            task_id = parent_item.data(0,QtCore.Qt.UserRole)
-
-            if not task_id:
-                raise ValueError("ID de la tâche parente introuvable.")
-
-            subtask_info_id = DB_API.add_task_info(
-                status=0,
-                priority=subtask_priority,
-                title=subtask_title,
-                description=subtask_comment,
-                dead_line=subtask_date,
-                covered=0,
-                assign=None
-            )
-
-            DB_API.add_subtask(
-                task_id=task_id,
-                task_info_id=subtask_info_id
-            )
-
-            subtask_item = QtWidgets.QTreeWidgetItem(parent_item)
-            subtask_item.setText(0, subtask_title)
-            subtask_item.setText(1, subtask_date)
-            subtask_item.setText(2, subtask_comment)
-            subtask_item.setText(3,
-                                 "Basse" if subtask_priority == 1 else "Moyenne" if subtask_priority == 2 else "Haute")
-
-            self.subtask_input.clear()
-            self.comment_input.clear()
-            self.importance_input.setCurrentIndex(0)
-
-            QMessageBox.information(None, "Succès", "Sous-tâche ajoutée avec succès.")
-
-        except Exception as e:
-            QMessageBox.critical(None, "Erreur",
-                                 f"Une erreur s'est produite lors de l'ajout de la sous-tâche : {str(e)}")
-
-    def delete_task(self):
-        selected_items = self.tree.selectedItems()
-        if not selected_items:
-            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à supprimer.")
-            return
-
-        for item in selected_items:
-            if item.parent():
-                parent = item.parent()
-                parent.removeChild(item)
-            else:
-                index = self.tree.indexOfTopLevelItem(item)
-                self.tree.takeTopLevelItem(index)
-
-                self.projects[self.current_project]["tasks"] = [
-                    t for t in self.projects[self.current_project]["tasks"] if t["task"] != item.text(0)
-                ]
-
-    def mark_completed(self):
-        selected_items = self.tree.selectedItems()
-        if not selected_items:
-            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à marquer comme terminée.")
-            return
-
-        for item in selected_items:
-            for col in range(4):
-                item.setBackground(col, QtGui.QColor("lightgreen"))
-                font = item.font(col)
-                font.setStrikeOut(True)
-                item.setFont(col, font)
-
-    def update_subtask_availability(self):
-        selected_items = self.tree.selectedItems()
-        if selected_items:
-            self.add_subtask_button.setEnabled(True)
-            self.subtask_input.setEnabled(True)
+            # Met en place les connection du formulaire d'authentification.
+            self.boutonValider.clicked.connect(self.handle_login)
+            self.inputMail.returnPressed.connect(self.handle_login)
+            self.inputPassword.returnPressed.connect(self.handle_login)
         else:
-            self.add_subtask_button.setEnabled(False)
-            self.subtask_input.setEnabled(False)
+
+            self.google_login_button.setVisible(False)
+            self.frameUser.setVisible(True)
+            self.inputUser.setVisible(True)
+            self.titreUser.setVisible(True)
+
+            # Formulaire de création de compte
+            self.main_window.setWindowTitle(_translate("MainWindow", "TaskFlow - Inscription"))
+            self.label.setText(_translate("MainWindow", "Créer un compte"))
+            self.boutonValider.setText(_translate("MainWindow", "S'inscrire"))
+            self.boutonCreerCompte.setText("<a href='#'>Retour</a>")
+            self.inputPassword.setPlaceholderText("Minimum 8 caractères")
+            self.inputMail.setPlaceholderText("exemple@email.com")
+            self.inputUser.setPlaceholderText("exemple")
+
+            # Met en place les connection du formulaire d'authentification.
+            self.boutonValider.clicked.connect(self.handle_signup)
+            self.inputMail.returnPressed.connect(self.handle_signup)
+            self.inputPassword.returnPressed.connect(self.handle_signup)
+
+    def handle_login(self):
+        """
+        Gère la soumission du formulaire de connexion.
+
+        Cette méthode valide les champs de saisie, récupère les informations d'authentification
+        depuis la base de données, et affiche un message de succès ou d'erreur en conséquence.
+        En cas de succès, elle redirige vers la fenêtre principale.
+
+        Fonctionnalités principales:
+        - Validation des champs email et mot de passe.
+        - Comparaison des données avec celles stockées en base de données.
+        - Affichage des messages d'erreur ou de succès.
+        - Navigation vers la fenêtre principale en cas de connexion réussie.
+
+        Exemple d'utilisation:
+        self.handle_login()
+        """
+
+        # Nettoie les potentiels messages d'erreur existants
+        self.clear_error_message()
+
+        email = self.inputMail.text()
+        password = self.inputPassword.text()
+        print("Authentification...")
+
+        hashpass = DB_API.get_email_hashpass(email)
+        if isinstance(hashpass, Exception) or not hashpass:
+            self.show_error_message("Échec de connexion", "Email ou mot de passe incorrect")
+            print("échec")
+            return False
+
+        elif hashpass[0] == password:
+            self.show_success_message("Connexion réussie", "Bienvenue!")
+            print("succès")
+
+            self.open_main_window()
+            return True
+
+        else:
+            self.show_error_message("Échec de connexion", "Email ou mot de passe incorrect")
+            print("échec")
+            return False
+
+    def login_with_google(self):
+        webbrowser.open(AUTH_URL.format(CLIENT_ID, REDIRECT_URI))
+
+    def handle_signup(self):
+        """
+        Gère la soumission du formulaire d'inscription.
+
+        Cette méthode valide les champs de saisie (email et mot de passe), vérifie la disponibilité
+        de l'email, et crée un nouvel utilisateur si toutes les conditions sont remplies.
+        Elle retourne ensuite à l'écran de connexion.
+
+        Fonctionnalités principales:
+        - Validation du format de l'email.
+        - Vérification que l'email n'existe pas déjà en base de données.
+        - Création d'un nouvel utilisateur dans la base de données.
+        - Affichage des messages d'erreur ou de succès.
+
+        Exemple d'utilisation:
+            self.handle_signup()
+        """
+        self.clear_error_message()
+        username = self.inputUser.text()
+        email = self.inputMail.text()
+        password = self.inputPassword.text()
+
+        # Vérification des éléments remplis
+        if not self.validate_email(email):
+            self.show_error_message("Erreur d'inscription", "Veuillez entrer une adresse email valide")
+            return False
+
+        if len(password) < 8:
+            self.show_error_message("Erreur d'inscription", "Le mot de passe doit contenir au moins 8 caractères")
+            return False
+
+        # Vérifie si l'adresse mail est existante
+        existing_email = DB_API.get_email(email)
+        if existing_email and not isinstance(existing_email, Exception):
+            self.show_error_message("Erreur d'inscription", "Cette adresse email est déjà utilisée")
+            return False
+
+        # Vérifie si l'username est existant
+        existing_username = DB_API.get_user(username)
+        if existing_username and not isinstance(existing_username, Exception):
+            self.show_error_message("Erreur d'inscription", "Ce nom d'utilisateur est déjà utilisée")
+            return False
+
+        is_google_user = 1 if email.endswith("@gmail.com") else 0
+
+        # Créé le nouvel utilisateur
+        try:
+            success = DB_API.add_user(username, password, email, is_google_user)
+            if success:
+                self.show_success_message("Inscription réussie", "Votre compte a été créé avec succès!")
+                # Switch back to login form
+                self.is_login_form = True
+                self.update_form_state()
+                return True
+            else:
+                self.show_error_message("Erreur d'inscription", "Erreur lors de la création du compte")
+                return False
+        except Exception as e:
+            self.show_error_message("Erreur d'inscription", f"Une erreur est survenue: {str(e)}")
+            return False
+
+    def validate_email(self, email):
+        """
+        Valide le format de l'email saisi par l'utilisateur.
+
+        Cette méthode utilise une expression régulière pour vérifier si l'email
+        respecte le format standard.
+
+        :param email: Adresse email à valider
+        :type email: str
+        :return: `True` si le format est valide, sinon `False`
+        :rtype: bool
+
+        Exemple d'utilisation:
+        if not self.validate_email(email):
+            print("Email invalide")
+        """
+
+        import re
+        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        return re.match(pattern, email) is not None
+
+    def show_error_message(self, title, message):
+        """
+        Affiche un message d'erreur dans le label prévu à cet effet.
+
+        Cette méthode met à jour le contenu du label `labelErreur` avec un message d'erreur.
+        Le message est automatiquement effacé après un délai de 3 secondes.
+
+        :param title: Titre du message d'erreur (non affiché ici, prévu pour une extension future)
+        :type title: str
+        :param message: Contenu du message d'erreur
+        :type message: str
+
+        Exemple d'utilisation:
+        self.show_error_message("Erreur", "Email ou mot de passe incorrect")
+        """
+
+        self.labelErreur.setText(message)
+        # Délais de supression de message. Ici 3 secondes.
+        QtCore.QTimer.singleShot(3000, self.clear_error_message)
+
+    def clear_error_message(self):
+        """
+        Efface le message d'erreur affiché dans `labelErreur`.
+
+        Cette méthode remet le contenu du label à une chaîne vide.
+
+        Exemple d'utilisation:
+        self.clear_error_message()
+        """
+
+        self.labelErreur.clear()
+
+    def show_success_message(self, title, message):
+        """
+        Affiche un message de succès dans le label prévu à cet effet.
+
+        Cette méthode modifie temporairement le style du label `labelErreur` pour afficher
+        un message de succès en blanc, puis le réinitialise après un délai de 3 secondes.
+
+        :param title: Titre du message de succès (non affiché ici, prévu pour une extension future)
+        :type title: str
+        :param message: Contenu du message de succès
+        :type message: str
+
+        Exemple d'utilisation:
+        self.show_success_message("Succès", "Votre compte a été créé avec succès")
+        """
+
+        self.labelErreur.setStyleSheet("color: white;")
+        self.labelErreur.setText(message)
+        # Nettoie les messages de succès au bout de 3 secondes
+        QtCore.QTimer.singleShot(3000, self.clear_error_message)
+        # Réinitialise la couleur du label.
+        QtCore.QTimer.singleShot(3000, lambda: self.labelErreur.setStyleSheet("color: red;"))
+
+    def open_main_window(self):
+        """
+        Redirige vers la fenêtre principale après une connexion réussie.
+
+        Cette méthode ferme la fenêtre d'authentification et instancie la fenêtre principale
+        de l'application.
+
+        Fonctionnalités principales:
+        - Fermeture de la fenêtre actuelle.
+        - Création et affichage de la fenêtre principale.
+
+        Exemple d'utilisation:
+        self.open_main_window()
+        """
+
+        # Fermer la fenêtre de connexion actuelle
+        self.main_window.close()
+
+        # Créer et afficher la fenêtre principale
+        self.main_window_instance = QtWidgets.QMainWindow()
+        self.main_window_ui = MainWindowUI()
+        self.main_window_ui.setupUi(self.main_window_instance)
+
+        # Passer l'email de l'utilisateur connecté
+        self.main_window_ui.set_current_user(self.inputMail.text())
+
+        # Stocker une référence à la fenêtre principale
+        self.main_window_ui.main_window = self.main_window_instance
+        self.main_window_instance.show()
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle("Gestionnaire de Projets et Tâches")
-
-    def delete_user(username: str, user_id: Optional[int] = None) -> bool:
-        """
-        Permet de delete un utilisateur de la db et toutes ses dépendances.
-
-        Cette fonction renvoie un boolean. En cas d'échec,
-        elle renverra False et en cas de succes, elle renverra True.
-
-        :param username: Username de l'utilisateur
-        :param user_id: ID de l'utilisateur (optionnel)
-
-        Exemple:
-        >>> err = delete_user("toto")
-        >>> if err:
-        >>>     print("supprimé avec succes")
-        >>> err = delete_user(user_id=4)
-        >>> if err:
-        >>>     print("supprimé avec succes")
-        """
-        if not user_id:
-            user_id = DB_API.get_userID_by_username(username)
-            if isinstance(user_id, Exception):
-                return False
-        err = DB_API.delete_user(user_id)
-        if isinstance(err, Exception):
-            return False
-        return True
-        # Faire un bouton dans la page compte pour pouvoir supprimer son compte, vérification avec mot de passe
-
-
-if __name__ == "__main__":
-    import sys
-
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("TaskFlow - Login", "TaskFlow - Login"))
+        self.titreUser.setText(_translate("MainWindow", "Nom d\'Utilisateur"))
+        self.label.setText(_translate("MainWindow", "S'identifier"))
+        self.titreMail.setText(_translate("MainWindow", "E-Mail"))
+        self.titrePassword.setText(_translate("MainWindow", "Mot de passe"))
+        self.boutonValider.setText(_translate("MainWindow", "Valider"))
