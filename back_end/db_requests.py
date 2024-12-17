@@ -1,80 +1,123 @@
 class _Requests:
-    get_email_hashpass = "SELECT password FROM users WHERE email = '{}';"
-
     get_all_users = "SELECT userID, username, email, is_google_user FROM users;"
 
-    get_user_hashpass = "SELECT password FROM users WHERE userID = {};"
+    get_email_hashpass = "SELECT password FROM users WHERE email = '{}';"
+
+    get_user_hashpass = "SELECT password FROM users WHERE userID = '{}';"
+
+    get_project_id_by_project_name = "SELECT projectID FROM projects where projects.name = '{}';"
 
     get_projects_by_user_id = (
         "SELECT p.projectID, p.name FROM projects p "
         "JOIN users_groups ug ON p.projectID = ug.projectID "
-        "WHERE ug.userID = {};"
+        "WHERE ug.userID = '{}';"
     )
 
     get_tasks_by_project_id = (
         "SELECT t.taskID, ti.title, ti.description, ti.status, ti.priority, ti.covered, "
         "ti.assign, ti.dead_line FROM tasks t JOIN tasks_infos ti ON t.task_infoID = "
-        "ti.task_infoID WHERE t.projectID = {};"
+        "ti.task_infoID WHERE t.projectID = '{}';"
     )
 
     get_subtasks_by_task_id = (
         "SELECT st.subtaskID, ti.title, ti.description, ti.status, ti.priority, ti.covered, "
         "ti.assign, ti.dead_line FROM subtasks st "
-        "JOIN tasks_infos ti ON st.task_infoID = ti.task_infoID WHERE st.taskID = {};"
+        "JOIN tasks_infos ti ON st.task_infoID = ti.task_infoID WHERE st.taskID = '{}';"
     )
 
     get_user_logs_by_id = (
-        "SELECT logID, action, action_time, details FROM users_logs WHERE userID = {};"
+        "SELECT logID, action, action_time, details FROM users_logs WHERE userID = '{}';"
     )
 
     get_users_in_project_by_project_id = (
         "SELECT u.userID, u.username, ug.permission FROM users u "
         "JOIN users_groups ug ON u.userID = ug.userID "
-        "WHERE ug.projectID = {};"
+        "WHERE ug.projectID = '{}';"
     )
 
     get_tasks_by_user_id = (
         "SELECT t.taskID, ti.title, ti.description, ti.status, ti.priority, ti.covered, "
         "ti.assign, ti.dead_line FROM tasks t "
         "JOIN tasks_infos ti ON t.task_infoID = ti.task_infoID "
-        "WHERE t.userID = {};"
+        "WHERE t.userID = '{}';"
     )
 
     get_users_in_tasks_group_by_group_id = (
         "SELECT u.userID, u.username, utg.task_projectID FROM users u "
         "JOIN users_tasks_groups utg ON u.userID = utg.userID "
-        "WHERE utg.task_projectID = {};"
+        "WHERE utg.task_projectID = '{}';"
     )
+
+    get_userID_by_username = "SELECT userID FROM users where username = '{}';"
 
     get_all_status = "SELECT userID, status FROM status;"
 
-    add_user = (
-        "INSERT INTO users (username, password, email, is_google_user) VALUES ({}, {}, {}, {});"
+    get_all_projects = "SELECT projectID, name FROM projects;"
+
+    get_all_tasks = (
+        "SELECT t.taskID, ti.title, ti.description, ti.status, ti.priority, ti.covered, "
+        "ti.assign, ti.dead_line FROM tasks t JOIN tasks_infos ti ON t.task_infoID = "
+        "ti.task_infoID;"
     )
 
-    add_status = "INSERT INTO status (userID, status) VALUES ({}, {});"
+    get_user_email = "SELECT email FROM users WHERE userID = '{}';"
 
-    add_project = "INSERT INTO projects (name) VALUES ({});"
+    get_emails_by_task_projectID = (
+        "SELECT u.email FROM users_tasks_groups utg JOIN users u ON utg.userID = u.userID "
+        "WHERE utg.task_projectID = '{}';"
+    )
+
+    get_users_groups_by_project_name = (
+        "SELECT ug.* FROM users_groups ug "
+        "JOIN projects p ON ug.projectID = p.projectID "
+        "WHERE p.name = '{}';"
+    )
+
+    get_tasks_by_title = (
+        "SELECT t.taskID, t.projectID, ti.description, ti.status, ti.priority, ti.covered, "
+        "ti.assign, ti.dead_line FROM tasks t JOIN tasks_infos ti ON t.task_infoID = "
+        "ti.task_infoID WHERE ti.title = '{}';"
+
+    )
+
+    get_email = "SELECT email FROM users WHERE email = '{}';"
+
+    get_user = "SELECT username FROM users WHERE username = '{}';"
+
+    get_userID_by_email = "SELECT userID FROM users WHERE email = '{}';"
+
+    add_user = (
+        "INSERT INTO users (username, password, email, is_google_user) "
+        "VALUES ('{}', '{}', '{}', '{}');"
+    )
+
+    add_status = "INSERT INTO status (userID, status) VALUES ('{}', '{}');"
+
+    add_project = "INSERT INTO projects (name) VALUES ('{}');"
 
     add_user_to_group = (
         "INSERT INTO users_groups (projectID, userID, "
-        "permission, joined) VALUES ({}, {}, {}, {});"
+        "permission, joined) VALUES ('{}', '{}', '{}', '{}');"
     )
 
     add_task_info = (
         "INSERT INTO tasks_infos (status, priority, title, description, "
-        "dead_line, covered, assign) VALUES ({}, {}, {}, {}, {}, {}, {});"
+        "dead_line, covered, assign) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}');"
     )
 
-    add_task = "INSERT INTO tasks (projectID, task_infoID, userID) VALUES ({}, {}, {});"
+    add_task = "INSERT INTO tasks (projectID, task_infoID, userID) VALUES ('{}', '{}', '{}');"
 
-    add_subtask = "INSERT INTO subtasks (taskID, task_infoID) VALUES ({}, {});"
+    add_subtask = "INSERT INTO subtasks (taskID, task_infoID) VALUES ('{}', '{}');"
 
     add_user_to_task_group = (
-        "INSERT INTO users_tasks_groups (task_projectID, userID) VALUES ({}, {});"
+        "INSERT INTO users_tasks_groups (task_projectID, userID) VALUES ('{}', '{}');"
     )
 
-    add_user_log = "INSERT INTO users_logs (userID, action, details) VALUES ({}, {}, {});"
+    add_user_log = "INSERT INTO users_logs (userID, action, details) VALUES ('{}', '{}', '{}');"
+
+    add_task_group = "INSERT INTO tasks_groups () VALUES ();"
+
+    delete_user = "DELETE FROM users WHERE userID = '{}';"
 
 
 if __name__ == "__main__":
