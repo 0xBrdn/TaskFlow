@@ -9,6 +9,15 @@ QLabel {
     color: #2C3E50; /* Gris bleuté foncé pour le texte */
 }
 
+/* Style pour les inputs et combos */
+QLineEdit, QComboBox, QDateEdit {
+    background-color: white;
+    border: 1px solid #3498DB;
+    border-radius: 5px;
+    padding: 6px;
+    color: #2C3E50;
+}
+
 /* Style pour les boutons */
 QPushButton {
     color: white;
@@ -23,15 +32,6 @@ QPushButton:hover {
 
 QPushButton:pressed {
     background-color: #21618C; /* Bleu encore plus foncé au clic */
-}
-
-/* Style pour les inputs et combos */
-QLineEdit, QComboBox, QDateEdit {
-    background-color: white;
-    border: 1px solid #3498DB;
-    border-radius: 5px;
-    padding: 6px;
-    color: #2C3E50;
 }
 
 /* Style pour les tableaux */

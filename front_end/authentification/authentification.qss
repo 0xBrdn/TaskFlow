@@ -37,7 +37,7 @@ QLabel {
 }
 
 /* Style pour inputMail et inputPassword */
-#inputMail, #inputPassword {
+#inputMail, #inputPassword, #inputUser {
     background-color: rgb(92, 92, 92);
     color: rgb(255, 255, 255);
     selection-color: rgb(92, 92, 92);
