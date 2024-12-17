@@ -368,19 +368,19 @@ class Ui_MainWindow(object):
         hashpass = DB_API.get_email_hashpass(email)
         if isinstance(hashpass, Exception) or not hashpass:
             self.show_error_message("Échec de connexion", "Email ou mot de passe incorrect")
-            print("echec")
+            print("échec")
             return False
 
         elif hashpass[0] == password:
             self.show_success_message("Connexion réussie", "Bienvenue!")
-            print("succes")
+            print("succès")
 
             self.open_main_window()
             return True
 
         else:
             self.show_error_message("Échec de connexion", "Email ou mot de passe incorrect")
-            print("echec")
+            print("échec")
             return False
 
     def login_with_google(self):
@@ -404,7 +404,7 @@ class Ui_MainWindow(object):
             self.handle_signup()
         """
         self.clear_error_message()
-
+        username = self.inputUsername.text()
         email = self.inputMail.text()
         password = self.inputPassword.text()
 
@@ -418,14 +418,22 @@ class Ui_MainWindow(object):
             return False
 
         # Vérifie si l'adresse mail est existante
-        existing_user = DB_API.get_email_hashpass(email)
-        if existing_user and not isinstance(existing_user, Exception):
+        existing_email = DB_API.get_email(email)
+        if existing_email and not isinstance(existing_email, Exception):
             self.show_error_message("Erreur d'inscription", "Cette adresse email est déjà utilisée")
             return False
 
+        # Vérifie si l'username est existant
+        existing_username = DB_API.get_user(username)
+        if existing_username and not isinstance(existing_username, Exception):
+            self.show_error_message("Erreur d'inscription", "Ce nom d'utilisateur est déjà utilisée")
+            return False
+
+        is_google_user = 1 if email.endswith("@gmail.com") else 0
+
         # Créé le nouvel utilisateur
         try:
-            success = DB_API.add_user(email, password)
+            success = DB_API.add_user(username, password, email, is_google_user)
             if success:
                 self.show_success_message("Inscription réussie", "Votre compte a été créé avec succès!")
                 # Switch back to login form
