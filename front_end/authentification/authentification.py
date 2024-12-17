@@ -398,6 +398,7 @@ class Ui_MainWindow(object):
             self.boutonCreerCompte.setText("<a href='#'>Retour</a>")
             self.inputPassword.setPlaceholderText("Minimum 8 caractères")
             self.inputMail.setPlaceholderText("exemple@email.com")
+            self.inputUser.setPlaceholderText("exemple")
 
             # Met en place les connection du formulaire d'authentification.
             self.boutonValider.clicked.connect(self.handle_signup)

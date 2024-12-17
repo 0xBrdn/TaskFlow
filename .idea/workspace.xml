@@ -7,16 +7,7 @@
     <list default="true" id="5338d278-2e09-40d0-8047-f0efcab8280b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front_end/authentification/authentification.py" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/authentification/authentification.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front_end/authentification/authentification.qss" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/authentification/authentification.qss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front_end/authentification/authentification.ui" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/authentification/authentification.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front_end/authentification/authentificationLogic.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/front_end/authentification/pagePrincipale.qss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/front_end/authentification/style.qss" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/authentification/style.qss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front_end/authentification/temp.py" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/authentification/temp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front_end/authentification/test.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/front_end/authentification/todo liste.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/front_end/authentification/try.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

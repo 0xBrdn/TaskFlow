@@ -88,36 +88,38 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.addWidget(self.label)
         self.verticalLayout.addWidget(self.frameTitre, 0, QtCore.Qt.AlignHCenter)
 
-        # Frame et champ de nom d'utilisateur
+        # Frame du nom d'utilisateur
         self.frameUser = QtWidgets.QFrame(self.frameMire)
         self.frameUser.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frameUser.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frameUser.setObjectName("frameUser")
-
         self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.frameUser)
         self.verticalLayout_7.setObjectName("verticalLayout_7")
 
+        # Titre du nom d'utilisateur
         self.titreUser = QtWidgets.QLabel(self.frameUser)
-
         font = QtGui.QFont()
         font.setFamily("Tahoma")
         font.setPointSize(13)
         font.setBold(True)
         font.setWeight(75)
-
         self.titreUser.setFont(font)
         self.titreUser.setObjectName("titreUser")
-
+        self.titreUser.setMinimumSize(QtCore.QSize(160, 30))
+        self.titreUser.setMaximumSize(QtCore.QSize(160, 30))
         self.verticalLayout_7.addWidget(self.titreUser)
 
+        # champ du nom d'utilisateur
         self.inputUser = QtWidgets.QLineEdit(self.frameUser)
+        self.inputUser.setMinimumSize(QtCore.QSize(300, 30))
+        self.inputUser.setMaximumSize(QtCore.QSize(300, 30))
         font = QtGui.QFont()
         font.setFamily("Tahoma")
         font.setPointSize(10)
         self.inputUser.setFont(font)
         self.inputUser.setObjectName("inputUser")
-
         self.verticalLayout_7.addWidget(self.inputUser)
+
         self.verticalLayout.addWidget(self.frameUser, 0, QtCore.Qt.AlignHCenter)
 
         # Frame pour le champs Email
@@ -127,9 +129,9 @@ class Ui_MainWindow(object):
         self.frameLogin.setObjectName("frameLogin")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.frameLogin)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.frameLogin.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
-
-        # Titre et champ de l'Email
+        # Titre de l'Email
         self.titreMail = QtWidgets.QLabel(self.frameLogin)
         self.titreMail.setMinimumSize(QtCore.QSize(60, 30))
         self.titreMail.setMaximumSize(QtCore.QSize(60, 30))
@@ -140,7 +142,9 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.titreMail.setFont(font)
         self.verticalLayout_2.addWidget(self.titreMail)
+        self.titreMail.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
+        # Champ de l'Email
         self.inputMail = QtWidgets.QLineEdit(self.frameLogin)
         self.inputMail.setMinimumSize(QtCore.QSize(300, 30))
         self.inputMail.setMaximumSize(QtCore.QSize(300, 30))
@@ -150,6 +154,7 @@ class Ui_MainWindow(object):
         self.inputMail.setFont(font)
         self.inputMail.setObjectName("inputMail")
         self.verticalLayout_2.addWidget(self.inputMail)
+        self.inputMail.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
         self.verticalLayout.addWidget(self.frameLogin, 0, QtCore.Qt.AlignHCenter)
 
@@ -160,8 +165,9 @@ class Ui_MainWindow(object):
         self.framePassword.setObjectName("framePassword")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.framePassword)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.framePassword.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
-        # # Titre et champ du mot de passe
+        # Titre et champ du mot de passe
         self.titrePassword = QtWidgets.QLabel(self.framePassword)
         self.titrePassword.setMaximumSize(QtCore.QSize(120, 30))
         font = QtGui.QFont()
@@ -171,6 +177,7 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.titrePassword.setFont(font)
         self.verticalLayout_3.addWidget(self.titrePassword)
+        self.titrePassword.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
         self.inputPassword = QtWidgets.QLineEdit(self.framePassword)
         self.inputPassword.setMinimumSize(QtCore.QSize(300, 30))
@@ -182,23 +189,34 @@ class Ui_MainWindow(object):
         self.inputPassword.setEchoMode(QtWidgets.QLineEdit.Password)
         self.inputPassword.setObjectName("inputPassword")
         self.verticalLayout_3.addWidget(self.inputPassword)
+        self.inputPassword.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
         self.verticalLayout.addWidget(self.framePassword, 0, QtCore.Qt.AlignHCenter)
 
-        for frame in [self.frameLogin, self.framePassword]:
+        for frame in [self.frameUser, self.frameLogin, self.framePassword]:
             frame.setMinimumSize(QtCore.QSize(350, 80))
             frame.setMaximumSize(QtCore.QSize(350, 80))
 
-        self.verticalLayout.setSpacing(10)
+        # Frame pour le bouton Google
+        self.frameGoogle = QtWidgets.QFrame(self.frameMire)
+        self.frameGoogle.setMinimumSize(QtCore.QSize(50, 50))
+        self.frameGoogle.setMaximumSize(QtCore.QSize(50, 50))
+        self.frameGoogle.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameGoogle.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frameGoogle.setObjectName("frameGoogle")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.frameGoogle)
+        self.horizontalLayout.setObjectName("horizontalLayout")
 
-        self.google_login_button = QtWidgets.QPushButton(self.frameMire)
-
+        # Bouton google
+        self.google_login_button = QtWidgets.QPushButton(self.frameGoogle)
         google_icon = QtGui.QIcon("images/authentification/logo_google.png")
+        self.google_login_button.setIconSize(QtCore.QSize(50, 50))
         self.google_login_button.setIcon(google_icon)
+        self.google_login_button.setMinimumSize(QtCore.QSize(50, 50))
+        self.google_login_button.setMaximumSize(QtCore.QSize(50, 50))
+        self.verticalLayout.addWidget(self.google_login_button, 0, QtCore.Qt.AlignHCenter)
 
         self.google_login_button.clicked.connect(self.login_with_google)
-
-        self.verticalLayout.addWidget(self.google_login_button, 0, QtCore.Qt.AlignHCenter)
 
         # Frame pour les message d'erreur
         self.frameErreur = QtWidgets.QFrame(self.frameMire)
@@ -225,7 +243,7 @@ class Ui_MainWindow(object):
         self.verticalLayoutErreur.addWidget(self.labelErreur)
 
         # Organise le frame des erreurs pour qu'ils se place entre le champ mot de passe et le bouton Valider.
-        self.verticalLayout.insertWidget(3, self.frameErreur, 0, QtCore.Qt.AlignHCenter)
+        self.verticalLayout.insertWidget(4, self.frameErreur, 0, QtCore.Qt.AlignHCenter)
 
         # Frame pour le bouton Valider.
         self.frameBouton = QtWidgets.QFrame(self.frameMire)
@@ -353,17 +371,6 @@ class Ui_MainWindow(object):
             self.inputUser.setVisible(False)
             self.titreUser.setVisible(False)
 
-            self.google_login_button.setIconSize(QtCore.QSize(50, 50))
-            self.google_login_button.setMinimumSize(QtCore.QSize(60, 60))
-            self.google_login_button.setMaximumSize(QtCore.QSize(60, 60))
-
-            self.frameUser.setMinimumSize(QtCore.QSize(0, 0))
-            self.frameUser.setMaximumSize(QtCore.QSize(0, 0))
-            self.inputUser.setMinimumSize(QtCore.QSize(0, 0))
-            self.inputUser.setMaximumSize(QtCore.QSize(0, 0))
-            self.titreUser.setMinimumSize(QtCore.QSize(0, 0))
-            self.titreUser.setMaximumSize(QtCore.QSize(0, 0))
-
             # Formulaire d'authentification
             self.main_window.setWindowTitle(_translate("MainWindow", "TaskFlow - Login"))
             self.titreUser.setText(_translate("MainWindow", "Nom d\'Utilisateur"))
@@ -383,17 +390,6 @@ class Ui_MainWindow(object):
             self.frameUser.setVisible(True)
             self.inputUser.setVisible(True)
             self.titreUser.setVisible(True)
-
-            self.google_login_button.setIconSize(QtCore.QSize(0, 0))
-            self.google_login_button.setMinimumSize(QtCore.QSize(0, 0))
-            self.google_login_button.setMaximumSize(QtCore.QSize(0, 0))
-
-            self.titreUser.setMinimumSize(QtCore.QSize(160, 30))
-            self.titreUser.setMaximumSize(QtCore.QSize(160, 30))
-            self.inputUser.setMinimumSize(QtCore.QSize(300, 30))
-            self.inputUser.setMaximumSize(QtCore.QSize(300, 30))
-            self.frameUser.setMinimumSize(QtCore.QSize(350, 80))
-            self.frameUser.setMaximumSize(QtCore.QSize(350, 80))
 
             # Formulaire de création de compte
             self.main_window.setWindowTitle(_translate("MainWindow", "TaskFlow - Inscription"))
