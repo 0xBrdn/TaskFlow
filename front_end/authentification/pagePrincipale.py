@@ -194,7 +194,6 @@ class Ui_MainWindow(object):
             joined = 1
             userID = DB_API.get_userID_by_email(self.current_user)
             DB_API.add_user_to_group(project_id, userID[0], permission, joined)
-
             self.load_projects()
         except Exception as e:
             QMessageBox.warning(None, "Erreur", f"Impossible d'ajouter le projet : {str(e)}")
@@ -384,6 +383,53 @@ class Ui_MainWindow(object):
             QMessageBox.critical(None, "Erreur",
                                  f"Une erreur s'est produite lors de l'ajout de la sous-tâche : {str(e)}")
 
+
+    def load_tasks_for_project(self, project_name):
+        self.tree.clear()
+
+        try:
+            project_id = DB_API.get_project_id_by_project_name(project_name)
+            tasks = DB_API.get_tasks_by_project_id(project_id[0])
+
+            for task in tasks:
+                # Afficher la tâche principale
+                task_item = QtWidgets.QTreeWidgetItem(self.tree)
+                task_item.setText(0, task[1])  # Titre de la tâche
+                deadline = task[7]
+                formatted_date = deadline.strftime("%d/%m/%Y") if isinstance(deadline, datetime.datetime) else str(
+                    deadline)
+                task_item.setText(1, formatted_date)
+                task_item.setText(2, task[2])  # Description
+                priority = task[4]
+                priority_text = "Haute" if priority == 3 else "Moyenne" if priority == 2 else "Basse"
+                task_item.setText(3, priority_text)
+
+                assigned_users = DB_API.get_users_in_tasks_group_by_group_id(task[6])
+                users_text = ", ".join(
+                    [user[1] for user in assigned_users]) if assigned_users else "Aucun utilisateur assigné"
+                task_item.setText(4, users_text)
+
+                # Changer la couleur du texte en fonction de la priorité
+                color_map = {"Haute": "red", "Moyenne": "orange", "Basse": "green"}
+                task_item.setForeground(3, QtGui.QColor(color_map.get(priority_text, "black")))
+
+                # Associer l'ID de la tâche à l'élément
+                task_item.setData(0, QtCore.Qt.UserRole, task[0])
+
+                # Récupérer les sous-tâches et les afficher sous la tâche parente
+                subtasks = DB_API.get_subtasks_by_task_id(task[0])
+                for subtask in subtasks:
+                    subtask_item = QtWidgets.QTreeWidgetItem(task_item)
+                    subtask_item.setText(0, subtask[1])  # Titre de la sous-tâche
+                    subtask_item.setText(1, subtask[7].strftime("%d/%m/%Y"))  # Deadline sous-tâche
+                    subtask_item.setText(2, subtask[2])  # Description de la sous-tâche
+                    subtask_item.setText(3, "Haute" if subtask[4] == 3 else "Moyenne" if subtask[4] == 2 else "Basse")
+
+                # Formater l'affichage des sous-tâches (réduire l'indentation sous la tâche parente)
+                self.tree.setIndentation(20)
+
+        except Exception as e:
+            QMessageBox.critical(None, "Erreur", f"Impossible de charger les tâches : {str(e)}")
     def delete_task(self):
         selected_items = self.tree.selectedItems()
         if not selected_items:
