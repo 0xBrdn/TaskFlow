@@ -95,10 +95,8 @@ class _Requests:
 
     add_project = "INSERT INTO projects (name) VALUES ('{}');"
 
-    add_user_to_group = (
-        "INSERT INTO users_groups (projectID, userID, "
-        "permission, joined) VALUES ('{}', '{}', '{}', '{}');"
-    )
+    add_user_to_group = "INSERT INTO users_groups (projectID, userID, permission, joined)" \
+                        " VALUES ('{}', '{}', '{}', '{}');"
 
     add_task_info = (
         "INSERT INTO tasks_infos (status, priority, title, description, "
