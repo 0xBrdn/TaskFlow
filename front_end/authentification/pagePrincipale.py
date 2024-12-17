@@ -463,15 +463,15 @@ class Ui_MainWindow(object):
         :param user_id: ID de l'utilisateur (optionnel)
 
         Exemple:
-        >>> err = delete_user("toto")
+        >>> err = self.delete_user("toto")
         >>> if err:
         >>>     print("supprimé avec succes")
-        >>> err = delete_user(user_id=4)
+        >>> err = self.delete_user(user_id=4)
         >>> if err:
         >>>     print("supprimé avec succes")
         """
         if not user_id:
-            user_id = DB_API.get_userID_by_username(username)
+            user_id = DB_API.get_user_id_by_username(username)
             if isinstance(user_id, Exception):
                 return False
         err = DB_API.delete_user(user_id)
