@@ -1,6 +1,6 @@
 import logging
 from functools import partial
-from typing import Callable, Optional, List, Union, TypeAlias
+from typing import Callable, Optional, List, Union, TypeAlias, Any
 
 import mysql.connector
 from mysql.connector import errorcode
@@ -8,7 +8,7 @@ from mysql.connector.abstracts import MySQLConnectionAbstract
 from mysql.connector.pooling import PooledMySQLConnection
 from mysql.connector.types import RowType
 
-from .config import DB_HOST, DB_USER, DB_DATABASE, DB_PASSWORD
+from back_end.config import DB_HOST, DB_USER, DB_DATABASE, DB_PASSWORD
 
 ResultType: TypeAlias = Union[List[RowType], Optional[RowType], str, Exception]
 
@@ -39,6 +39,7 @@ def cm_cursor() -> Callable:
                 kwargs.pop("cursor")
             else:
                 cursor = conn.cursor()
+
             try:
                 res = func(cursor=cursor, *args, **kwargs)
             except Exception as e:
@@ -88,7 +89,7 @@ def create_conn(
             _log.error(f"Erreur MySQL: {err}")
         connexion = None
     conn = connexion
-    return connexion
+    return conn
 
 
 _create_conn = partial(
@@ -107,7 +108,7 @@ def cm_conn() -> Callable:
     """
 
     def decorator(func: Callable) -> Callable:
-        def wrapper(*args, **kwargs) -> Union[bool, Exception]:
+        def wrapper(*args, **kwargs) -> Union[Any, Exception]:
             global conn
             if not isinstance(conn, MySQLConnectionAbstract):
                 _conn: Optional[Union[MySQLConnectionAbstract, PooledMySQLConnection]] = (
@@ -121,12 +122,15 @@ def cm_conn() -> Callable:
             if isinstance(res, Exception):
                 conn.rollback()
                 _log.debug("Rollback effectué")
-                return res
             else:
                 conn.commit()
                 _log.debug("Commit effectué")
-                return True
+            return res
 
         return wrapper
 
     return decorator
+
+
+if __name__ == "__main__":
+    _create_conn()
