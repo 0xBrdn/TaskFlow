@@ -533,6 +533,35 @@ class Ui_MainWindow(object):
             return False
         return True
 
+    def send_invitation(self, user_id: int, permission: int, project_id: int):
+        """
+        Inviter un user dans son projet
+        """
+        user_group_id = DB_API.add_user_to_group(
+            project_id=project_id, user_id=user_id, permission=permission, joined=False
+        )
+        if not user_group_id or isinstance(user_group_id, Exception):
+            return None
+        return user_group_id
+
+    def get_invitation(self, user_id: int):
+        """
+        Cette fonction récupere les projets où l'utilisateur est invité
+        """
+        projects = DB_API.get_project_in_users_groups_userid(user_id=user_id)
+        if not projects or isinstance(projects, Exception):
+            return None
+        return projects
+
+    def set_invite(self, project_id: int, user_id: int, joined: bool):
+        """
+        Permet d'accepter ou refuser une invitation a un projet
+        """
+        err = DB_API.set_invites_status(project_id=project_id, user_id=user_id, joined=joined)
+        if isinstance(err, Exception):
+            return
+        return
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
