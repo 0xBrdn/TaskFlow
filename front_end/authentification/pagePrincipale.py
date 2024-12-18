@@ -53,12 +53,6 @@ class Ui_MainWindow(object):
         self.add_user_button.clicked.connect(self.add_selected_user)
         self.remove_user_button.clicked.connect(self.remove_selected_user_from_list)
 
-        # Données internes
-        self.projects = {}
-        self.users = ["zack", "maxime", "swann"]
-        self.current_user = None
-        self.current_project = None
-
         self.retranslateUi(MainWindow)
 
     def _setup_project_tab(self):
