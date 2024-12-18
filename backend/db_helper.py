@@ -34,17 +34,20 @@ def cm_cursor() -> Callable:
                 assert _conn.is_connected(), "La db est injoinable"
                 conn = _conn
 
+            # Créer un curseur tamponné
             cursor = kwargs.get("cursor", None)
             if cursor:
                 kwargs.pop("cursor")
             else:
-                cursor = conn.cursor()
+                # Notez l'argument buffered=True
+                cursor = conn.cursor(buffered=True)
 
             try:
                 res = func(cursor=cursor, *args, **kwargs)
             except Exception as e:
                 res = e
-            cursor.close()
+            finally:
+                cursor.close()
             return res
 
         return wrapper
