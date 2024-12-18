@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox, QLabel, QVBoxLayout, QPushButton
+from PyQt5.QtWidgets import QMessageBox, QLabel, QVBoxLayout, QPushButton, QInputDialog, QGroupBox, QHBoxLayout
 from backend.db_api import DB_API
 import datetime
 from typing import Optional
@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
         self.layout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.layout.setObjectName("layout")
 
-        # Onglets pour séparer les projets, les tâches et le compte
+        # Onglets : Projets, Tâches, Compte
         self.tabs = QtWidgets.QTabWidget(self.centralwidget)
         self.project_tab = QtWidgets.QWidget()
         self.task_tab = QtWidgets.QWidget()
@@ -34,7 +34,7 @@ class Ui_MainWindow(object):
         self.tabs.addTab(self.account_tab, "Compte")
         self.layout.addWidget(self.tabs)
 
-        # Configurations des onglets existants (projets et tâches)
+        # Setup des onglets
         self._setup_project_tab()
         self._setup_task_tab()
         self._setup_account_tab()
@@ -49,12 +49,17 @@ class Ui_MainWindow(object):
         self.delete_task_button.clicked.connect(self.delete_task)
         self.complete_task_button.clicked.connect(self.mark_completed)
         self.tree.itemSelectionChanged.connect(self.update_subtask_availability)
+        self.delete_account_button.clicked.connect(self.delete_account)
+        self.add_user_button.clicked.connect(self.add_selected_user)
+        self.remove_user_button.clicked.connect(self.remove_selected_user_from_list)
 
         # Données internes
         self.projects = {}
         self.users = ["zack", "maxime", "swann"]
         self.current_user = None
         self.current_project = None
+
+        self.retranslateUi(MainWindow)
 
     def _setup_project_tab(self):
         self.project_layout = QtWidgets.QVBoxLayout(self.project_tab)
@@ -89,9 +94,7 @@ class Ui_MainWindow(object):
 
         self.tree = QtWidgets.QTreeWidget(self.task_tab)
         self.tree.setColumnCount(5)
-        self.tree.setHeaderLabels(
-            ["Tâche", "Date", "Commentaire", "Importance", "Utilisateurs assignés"]
-        )
+        self.tree.setHeaderLabels(["Tâche", "Date", "Commentaire", "Importance", "Utilisateurs assignés"])
         self.tree.setStyleSheet("font-size: 14px;")
         self.task_layout.addWidget(self.tree)
 
@@ -105,7 +108,7 @@ class Ui_MainWindow(object):
 
         self.subtask_input = QtWidgets.QLineEdit(self.task_tab)
         self.subtask_input.setObjectName("subtask_input")
-        self.subtask_input.setPlaceholderText("veuillez séléctionner une taches")
+        self.subtask_input.setPlaceholderText("veuillez sélectionner une tâche")
         self.subtask_input.setEnabled(False)
 
         self.date_input = QtWidgets.QDateEdit(self.task_tab)
@@ -120,11 +123,46 @@ class Ui_MainWindow(object):
         self.importance_input.addItems(["Faible", "Moyenne", "Haute"])
         self.importance_input.setObjectName("importance_input")
 
-        self.assign_input = QtWidgets.QListWidget(self.task_tab)
-        self.assign_input.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
-        self.assign_input.setObjectName("assign_input")
-        self.form_layout.addRow("Assigner un ou plusieurs utilisateurs :", self.assign_input)
+        # Ajout du QGroupBox pour assigner des utilisateurs
+        assign_group = QGroupBox("Assigner des utilisateurs")
+        assign_group.setStyleSheet("""
+        QGroupBox {
+            border: 2px solid #8f8f91;
+            border-radius: 10px;
+            margin-top: 1em;
+            background-color: #e0f0ff;
+        }
+        QGroupBox:title {
+            subcontrol-origin: margin;
+            subcontrol-position: top center;
+            padding: 0 3px;
+            background-color: transparent;
+        }
+        """)
+        assign_layout = QHBoxLayout(assign_group)
 
+        self.assign_user_dropdown = QtWidgets.QComboBox(self.task_tab)
+        self.assign_user_dropdown.setObjectName("assign_user_dropdown")
+        self.assign_user_dropdown.setFixedWidth(150)
+
+        self.add_user_button = QtWidgets.QPushButton("+", self.task_tab)
+        self.add_user_button.setFixedWidth(30)
+        self.add_user_button.setStyleSheet("background-color: green; color: white; border-radius: 5px;")
+
+        self.remove_user_button = QtWidgets.QPushButton("-", self.task_tab)
+        self.remove_user_button.setFixedWidth(30)
+        self.remove_user_button.setStyleSheet("background-color: red; color: white; border-radius: 5px;")
+
+        self.assigned_users_list = QtWidgets.QListWidget(self.task_tab)
+        self.assigned_users_list.setFixedHeight(60)
+        self.assigned_users_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+
+        assign_layout.addWidget(self.assign_user_dropdown)
+        assign_layout.addWidget(self.add_user_button)
+        assign_layout.addWidget(self.remove_user_button)
+        assign_layout.addWidget(self.assigned_users_list)
+
+        self.form_layout.addRow("Assigner un ou plusieurs utilisateurs :", assign_group)
         self.form_layout.addRow("Tâche :", self.task_input)
         self.form_layout.addRow("Sous-tâche :", self.subtask_input)
         self.form_layout.addRow("Date :", self.date_input)
@@ -152,32 +190,66 @@ class Ui_MainWindow(object):
 
     def _setup_account_tab(self):
         layout = QVBoxLayout(self.account_tab)
-        titre_label = QLabel("Informations du Compte")
-        titre_label.setObjectName("titre_label")
-        titre_label.setAlignment(QtCore.Qt.AlignCenter)
-        layout.addWidget(titre_label)
+
+        account_group = QGroupBox("Informations du Compte")
+        account_group.setStyleSheet("font-size: 16px;")
+        account_layout = QVBoxLayout(account_group)
+
+        logo_label = QLabel()
+        try:
+            pixmap = QtGui.QPixmap("images/logo_alternatif.png")
+            pixmap = pixmap.scaledToWidth(150, QtCore.Qt.SmoothTransformation)
+            logo_label.setPixmap(pixmap)
+            logo_label.setAlignment(QtCore.Qt.AlignCenter)
+        except Exception as e:
+            print(f"Impossible de charger le logo : {e}")
+        account_layout.addWidget(logo_label)
 
         self.email_label = QLabel("Email: ")
         self.email_label.setObjectName("email_label")
-        layout.addWidget(self.email_label)
+        self.email_label.setStyleSheet("font-size: 14px;")
+        account_layout.addWidget(self.email_label)
+
+        self.username_label = QLabel("Nom d'utilisateur : Inconnu")
+        self.username_label.setStyleSheet("font-size: 14px;")
+        account_layout.addWidget(self.username_label)
+
+        self.role_label = QLabel("Rôle : Inconnu")
+        self.role_label.setStyleSheet("font-size: 14px;")
+        account_layout.addWidget(self.role_label)
 
         deconnexion_button = QPushButton("Se déconnecter")
         deconnexion_button.setObjectName("deconnexion_button")
+        deconnexion_button.setStyleSheet("background-color: red; color: white; font-weight: bold; font-size:14px;")
         deconnexion_button.clicked.connect(self.deconnexion)
-        layout.addWidget(deconnexion_button)
+        account_layout.addWidget(deconnexion_button)
 
-        layout.addStretch(1)
+        self.delete_account_button = QPushButton("Supprimer mon compte")
+        self.delete_account_button.setStyleSheet("background-color: #a40000; color: white; font-weight: bold; font-size:14px;")
+        account_layout.addWidget(self.delete_account_button)
+
+        account_layout.addStretch(1)
+        layout.addWidget(account_group)
 
     def set_current_user(self, email):
         self.current_user = email
         self.email_label.setText(f"Email: {email}")
+        # Récupération du username et du rôle depuis la DB
+        try:
+            # Vérifiez que la méthode get_user_info existe dans db_api.
+            user_info = DB_API.get_user_info(email)
+            self.username_label.setText(f"Nom d'utilisateur : {user_info.get('username', 'Inconnu')}")
+            self.role_label.setText(f"Rôle : {user_info.get('role', 'Inconnu')}")
+        except:
+            self.username_label.setText("Nom d'utilisateur : Inconnu")
+            self.role_label.setText("Rôle : Inconnu")
+
         self.load_projects()
 
     def deconnexion(self):
         from authentification import Ui_MainWindow as AuthMainWindow
 
         QMessageBox.information(None, "Déconnexion", "Vous êtes maintenant déconnecté.")
-
         QtWidgets.QApplication.closeAllWindows()
 
         self.auth_window = QtWidgets.QMainWindow()
@@ -185,13 +257,31 @@ class Ui_MainWindow(object):
         self.auth_ui.setupUi(self.auth_window)
         self.auth_window.show()
 
+    def delete_account(self):
+        reponse = QMessageBox.question(None, "Supprimer le compte",
+                                       "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.",
+                                       QMessageBox.Yes | QMessageBox.No)
+        if reponse == QMessageBox.Yes:
+            user_id = DB_API.get_userID_by_email(self.current_user)
+            if isinstance(user_id, Exception) or user_id is None:
+                QMessageBox.critical(None, "Erreur", "Impossible de récupérer l'ID de l'utilisateur.")
+                return
+            err = self.delete_user("", user_id=user_id[0])
+            if err:
+                QMessageBox.information(None, "Succès", "Compte supprimé avec succès.")
+                QtWidgets.QApplication.closeAllWindows()
+                from authentification import Ui_MainWindow as AuthMainWindow
+                self.auth_window = QtWidgets.QMainWindow()
+                self.auth_ui = AuthMainWindow()
+                self.auth_ui.setupUi(self.auth_window)
+                self.auth_window.show()
+            else:
+                QMessageBox.warning(None, "Erreur", "Impossible de supprimer le compte.")
+
     def add_project(self):
-        project_name, ok = QtWidgets.QInputDialog.getText(
-            None, "Nouveau Projet", "Nom du projet :"
-        )
+        project_name, ok = QInputDialog.getText(None, "Nouveau Projet", "Nom du projet :")
         if not ok or not project_name.strip():
             return
-
         try:
             project_id = DB_API.add_project(project_name)
             permission = 2
@@ -200,20 +290,17 @@ class Ui_MainWindow(object):
             DB_API.add_user_to_group(project_id, userID[0], permission, joined)
             self.load_projects()
         except Exception as e:
-            QMessageBox.warning(None, "Erreur", f"Impossible d'ajouter le projet : {e!s}")
+            QMessageBox.warning(None, "Erreur", f"Impossible d'ajouter le projet : {str(e)}")
 
     def load_projects(self):
         self.project_list_widget.clear()
         try:
             userID = DB_API.get_userID_by_email(self.current_user)
-
             projects = DB_API.get_projects_by_user_id(userID[0])
-
             for project in projects:
                 self.project_list_widget.addItem(f"{project[1]}")
-
         except Exception as e:
-            QMessageBox.warning(None, "Erreur", f"Impossible de charger les projets : {e!s}")
+            QMessageBox.warning(None, "Erreur", f"Impossible de charger les projets : {str(e)}")
 
     def project_clicked(self):
         project_index = self.project_list_widget.currentRow()
@@ -227,18 +314,33 @@ class Ui_MainWindow(object):
             self.load_users_for_project(project_name)
 
     def load_users_for_project(self, project_name):
-        self.assign_input.clear()
+        self.assign_user_dropdown.clear()
+        self.assigned_users_list.clear()
 
         try:
             project_id = DB_API.get_project_id_by_project_name(project_name)
             users_in_project = DB_API.get_users_in_project_by_project_id(project_id[0])
-
             for user in users_in_project:
-                self.assign_input.addItem(user[1])  # Ajoute les utilisateurs à la liste
+                self.assign_user_dropdown.addItem(user[1])
         except Exception as e:
-            QMessageBox.warning(
-                None, "Erreur", f"Impossible de charger les utilisateurs du projet : {e!s}"
-            )
+            QMessageBox.warning(None, "Erreur", f"Impossible de charger les utilisateurs du projet : {str(e)}")
+
+    def add_selected_user(self):
+        selected_user = self.assign_user_dropdown.currentText().strip()
+        if selected_user and not self.is_user_already_assigned(selected_user):
+            self.assigned_users_list.addItem(selected_user)
+
+    def remove_selected_user_from_list(self):
+        items = self.assigned_users_list.selectedItems()
+        if items:
+            for item in items:
+                self.assigned_users_list.takeItem(self.assigned_users_list.row(item))
+
+    def is_user_already_assigned(self, username: str) -> bool:
+        for i in range(self.assigned_users_list.count()):
+            if self.assigned_users_list.item(i).text() == username:
+                return True
+        return False
 
     def add_task(self):
         if not self.current_project:
@@ -250,7 +352,7 @@ class Ui_MainWindow(object):
         task_comment = self.comment_input.text().strip()
         task_priority = self.importance_input.currentIndex()
 
-        selected_users = [item.text() for item in self.assign_input.selectedItems()]
+        selected_users = [self.assigned_users_list.item(i).text() for i in range(self.assigned_users_list.count())]
 
         if not task_title:
             QMessageBox.warning(None, "Erreur", "Veuillez entrer une tâche.")
@@ -267,17 +369,20 @@ class Ui_MainWindow(object):
                 description=task_comment,
                 dead_line=task_date,
                 covered=0,
-                assign=task_projectID if selected_users else None,
+                assign=task_projectID if selected_users else None
             )
 
             user_id = DB_API.get_userID_by_email(self.current_user)
             DB_API.add_task(
-                project_id=project_id[0], task_info_id=task_info_id, user_id=user_id[0]
+                project_id=project_id[0],
+                task_info_id=task_info_id,
+                user_id=user_id[0]
             )
 
+            # Vérifier que c'est bien get_user_id_by_username dans db_api:
             for user in selected_users:
-                user_id = DB_API.get_user_id_by_username(user)
-                DB_API.add_user_to_task_group(task_projectID, user_id)
+                uid = DB_API.get_user_id_by_username(user)
+                DB_API.add_user_to_task_group(task_projectID, uid)
 
             QMessageBox.information(None, "Succès", "Tâche ajoutée avec succès.")
             self.load_tasks_for_project(self.current_project)
@@ -285,43 +390,29 @@ class Ui_MainWindow(object):
             self.task_input.clear()
             self.comment_input.clear()
             self.importance_input.setCurrentIndex(0)
-            self.assign_input.clearSelection()
+            self.assigned_users_list.clear()
 
         except Exception as e:
-            QMessageBox.critical(
-                None, "Erreur", f"Une erreur s'est produite lors de l'ajout de la tâche : {e!s}"
-            )
+            QMessageBox.critical(None, "Erreur", f"Une erreur s'est produite lors de l'ajout de la tâche : {str(e)}")
 
     def load_tasks_for_project(self, project_name):
         self.tree.clear()
-
         try:
             project_id = DB_API.get_project_id_by_project_name(project_name)
             tasks = DB_API.get_tasks_by_project_id(project_id[0])
-
             for task in tasks:
                 task_item = QtWidgets.QTreeWidgetItem(self.tree)
                 task_item.setText(0, task[1])
                 deadline = task[7]
-                formatted_date = (
-                    deadline.strftime("%d/%m/%Y")
-                    if isinstance(deadline, datetime.datetime)
-                    else str(deadline)
-                )
+                formatted_date = deadline.strftime("%d/%m/%Y") if isinstance(deadline, datetime.datetime) else str(deadline)
                 task_item.setText(1, formatted_date)
                 task_item.setText(2, task[2])
                 priority = task[4]
-                priority_text = (
-                    "Haute" if priority == 3 else "Moyenne" if priority == 2 else "Basse"
-                )
+                priority_text = "Haute" if priority == 3 else "Moyenne" if priority == 2 else "Basse"
                 task_item.setText(3, priority_text)
 
                 assigned_users = DB_API.get_users_in_tasks_group_by_group_id(task[6])
-                users_text = (
-                    ", ".join([user[1] for user in assigned_users])
-                    if assigned_users
-                    else "Aucun utilisateur assigné"
-                )
+                users_text = ", ".join([user[1] for user in assigned_users]) if assigned_users else "Aucun utilisateur assigné"
                 task_item.setText(4, users_text)
 
                 color_map = {"Haute": "red", "Moyenne": "orange", "Basse": "green"}
@@ -335,15 +426,12 @@ class Ui_MainWindow(object):
                     subtask_item.setText(0, subtask[1])
                     subtask_item.setText(1, subtask[7].strftime("%d/%m/%Y"))
                     subtask_item.setText(2, subtask[2])
-                    subtask_item.setText(
-                        3,
-                        "Haute" if subtask[4] == 3 else "Moyenne" if subtask[4] == 2 else "Basse",
-                    )
+                    subtask_item.setText(3, "Haute" if subtask[4] == 3 else "Moyenne" if subtask[4] == 2 else "Basse")
 
                 self.tree.setIndentation(20)
 
         except Exception as e:
-            QMessageBox.critical(None, "Erreur", f"Impossible de charger les tâches : {e!s}")
+            QMessageBox.critical(None, "Erreur", f"Impossible de charger les tâches : {str(e)}")
 
     def add_subtask(self):
         selected_items = self.tree.selectedItems()
@@ -363,7 +451,6 @@ class Ui_MainWindow(object):
 
         try:
             task_id = parent_item.data(0, QtCore.Qt.UserRole)
-
             if not task_id:
                 raise ValueError("ID de la tâche parente introuvable.")
 
@@ -374,7 +461,7 @@ class Ui_MainWindow(object):
                 description=subtask_comment,
                 dead_line=subtask_date,
                 covered=0,
-                assign=None,
+                assign=None
             )
 
             DB_API.add_subtask(task_id=task_id, task_info_id=subtask_info_id)
@@ -383,14 +470,8 @@ class Ui_MainWindow(object):
             subtask_item.setText(0, subtask_title)
             subtask_item.setText(1, subtask_date)
             subtask_item.setText(2, subtask_comment)
-            subtask_item.setText(
-                3,
-                "Basse"
-                if subtask_priority == 1
-                else "Moyenne"
-                if subtask_priority == 2
-                else "Haute",
-            )
+            subtask_item.setText(3,
+                                 "Basse" if subtask_priority == 1 else "Moyenne" if subtask_priority == 2 else "Haute")
 
             self.subtask_input.clear()
             self.comment_input.clear()
@@ -399,11 +480,8 @@ class Ui_MainWindow(object):
             QMessageBox.information(None, "Succès", "Sous-tâche ajoutée avec succès.")
 
         except Exception as e:
-            QMessageBox.critical(
-                None,
-                "Erreur",
-                f"Une erreur s'est produite lors de l'ajout de la sous-tâche : {e!s}",
-            )
+            QMessageBox.critical(None, "Erreur",
+                                 f"Une erreur s'est produite lors de l'ajout de la sous-tâche : {str(e)}")
 
     def delete_task(self):
         selected_items = self.tree.selectedItems()
@@ -418,19 +496,12 @@ class Ui_MainWindow(object):
             else:
                 index = self.tree.indexOfTopLevelItem(item)
                 self.tree.takeTopLevelItem(index)
-
-                self.projects[self.current_project]["tasks"] = [
-                    t
-                    for t in self.projects[self.current_project]["tasks"]
-                    if t["task"] != item.text(0)
-                ]
+                # plus de maj dans self.projects
 
     def mark_completed(self):
         selected_items = self.tree.selectedItems()
         if not selected_items:
-            QMessageBox.warning(
-                None, "Erreur", "Veuillez sélectionner une tâche à marquer comme terminée."
-            )
+            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à marquer comme terminée.")
             return
 
         for item in selected_items:
@@ -453,23 +524,6 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle("Gestionnaire de Projets et Tâches")
 
     def delete_user(self, username: str, user_id: Optional[int] = None) -> bool:
-        """
-        Permet de delete un utilisateur de la db et toutes ses dépendances.
-
-        Cette fonction renvoie un boolean. En cas d'échec,
-        elle renverra False et en cas de succes, elle renverra True.
-
-        :param username: Username de l'utilisateur
-        :param user_id: ID de l'utilisateur (optionnel)
-
-        Exemple:
-        >>> err = self.delete_user("toto")
-        >>> if err:
-        >>>     print("supprimé avec succes")
-        >>> err = self.delete_user(user_id=4)
-        >>> if err:
-        >>>     print("supprimé avec succes")
-        """
         if not user_id:
             user_id = DB_API.get_user_id_by_username(username)
             if isinstance(user_id, Exception):
@@ -478,42 +532,9 @@ class Ui_MainWindow(object):
         if isinstance(err, Exception):
             return False
         return True
-        # Faire un bouton dans la page compte pour pouvoir supprimer son compte,
-        # vérification avec mot de passe
-
-    def send_invitation(self, user_id: int, permission: int, project_id: int):
-        """
-        Inviter un user dans son projet
-        """
-        user_group_id = DB_API.add_user_to_group(
-            project_id=project_id, user_id=user_id, permission=permission, joined=False
-        )
-        if not user_group_id or isinstance(user_group_id, Exception):
-            return None
-        return user_group_id
-
-    def get_invitation(self, user_id: int):
-        """
-        Cette fonction récupere les projets où l'utilisateur est invité
-        """
-        projects = DB_API.get_project_in_users_groups_userid(user_id=user_id)
-        if not projects or isinstance(projects, Exception):
-            return None
-        return projects
-
-    def set_invite(self, project_id: int, user_id: int, joined: bool):
-        """
-        Permet d'accepter ou refuser une invitation a un projet
-        """
-        err = DB_API.set_invites_status(project_id=project_id, user_id=user_id, joined=joined)
-        if isinstance(err, Exception):
-            return
-        return
-
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
