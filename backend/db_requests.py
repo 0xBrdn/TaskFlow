@@ -1,6 +1,8 @@
 class _Requests:
     get_all_users = "SELECT userID, username, email, is_google_user FROM users;"
 
+    get_email_hashpass = "SELECT password FROM users WHERE email = '{}';"
+
     get_user_hashpass = "SELECT password FROM users WHERE userID = '{}';"
 
     get_project_id_by_project_name = "SELECT projectID FROM projects where projects.name = '{}';"
@@ -9,6 +11,12 @@ class _Requests:
         "SELECT p.projectID, p.name FROM projects p "
         "JOIN users_groups ug ON p.projectID = ug.projectID "
         "WHERE ug.userID = '{}';"
+    )
+
+    get_project_in_users_groups = (
+        "SELECT ug.projectID, p.name, ug.permission, "
+        "ug.joined FROM users_groups ug JOIN projects "
+        "p ON p.projectID = ug.projectID WHERE userID = '{}';"
     )
 
     get_tasks_by_project_id = (
@@ -65,6 +73,24 @@ class _Requests:
         "WHERE utg.task_projectID = '{}';"
     )
 
+    get_users_groups_by_project_name = (
+        "SELECT ug.* FROM users_groups ug "
+        "JOIN projects p ON ug.projectID = p.projectID "
+        "WHERE p.name = '{}';"
+    )
+
+    get_tasks_by_title = (
+        "SELECT t.taskID, t.projectID, ti.description, ti.status, ti.priority, ti.covered, "
+        "ti.assign, ti.dead_line FROM tasks t JOIN tasks_infos ti ON t.task_infoID = "
+        "ti.task_infoID WHERE ti.title = '{}';"
+    )
+
+    get_email = "SELECT email FROM users WHERE email = '{}';"
+
+    get_user = "SELECT username FROM users WHERE username = '{}';"
+
+    get_userID_by_email = "SELECT userID FROM users WHERE email = '{}';"
+
     add_user = (
         "INSERT INTO users (username, password, email, is_google_user) "
         "VALUES ('{}', '{}', '{}', '{}');"
@@ -82,6 +108,10 @@ class _Requests:
     add_task_info = (
         "INSERT INTO tasks_infos (status, priority, title, description, "
         "dead_line, covered, assign) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}');"
+    )
+
+    set_invites_status = (
+        "UPDATE users_groups SET joined='{}' WHERE projectID='{}' AND userID='{}';"
     )
 
     add_task = "INSERT INTO tasks (projectID, task_infoID, userID) VALUES ('{}', '{}', '{}');"

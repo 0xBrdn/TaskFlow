@@ -47,7 +47,6 @@ class DB_API:
         Cette fonction renvoie un tuple comprenant le project id
         sous la forme (project_id,).
         Cette fonction peut ne pas fonctionner, dans ce cas elle
-        renvoie None ou dans certains cas, un objet de type Exception.
 
         :param project_name: Nom du projet
         :param cursor: Curseur d'une connexion vers une DB
@@ -61,6 +60,31 @@ class DB_API:
 
         """
         cursor.execute(_Requests.get_project_id_by_project_name.format(project_name))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_email_hashpass(email: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer le mdp hash d'un user en fonction de l'email dans la DB.
+
+        Cette fonction renvoie un tuple comprenant uniquement le
+        mot de passe hash de la personne.
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie un objet de type Exception.
+
+        :param email: Email de l'utilisateur
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> hash_pass = DB_API.get_email_hashpass(1)
+        >>> if not isinstance(hash_pass, Exception):
+        >>>     print(hash_pass)
+        """
+        cursor.execute(_Requests.get_email_hashpass.format(email))
         result = cursor.fetchone()
         return result
 
@@ -640,6 +664,49 @@ class DB_API:
 
     @staticmethod
     @cm_cursor()
+    def get_emails_by_task_projectID(task_project_id: int, *, cursor: MySQLCursor) -> list:
+        cursor.execute(_Requests.get_emails_by_task_projectID.format(task_project_id))
+        result = cursor.fetchall()
+        return [row[0] for row in result]
+
+    @staticmethod
+    @cm_cursor()
+    def get_users_groups_by_project_name(name: str, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_users_groups_by_project_name.format(name))
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_tasks_by_title(title: str, *, cursor: MySQLCursor) -> ResultType:
+        query = _Requests.get_tasks_by_title.format(title)
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_email(email: str, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_email.format(email))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_user(username: str, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_user.format(username))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_userID_by_email(email: str, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_userID_by_email.format(email))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
     def get_emails_by_task_project_id(
         task_project_id: int, *, cursor: MySQLCursor
     ) -> Union[Exception, Optional[list]]:
@@ -692,6 +759,9 @@ class DB_API:
         """
         Permet de delete un utilisateur de la db et toutes ses dépendances.
 
+        Cette fonction renvoie None ou une exception. En cas d'échec,
+        elle renverra une exc et en cas de succes, elle renverra None.
+
         Cette fonction renvoie None ou None, une exception de façon rare. En cas d'échec,
         elle renverra une None et en cas de succes, elle renverra None.
         Elle renverra une Exception que dans certains cas.
@@ -702,10 +772,36 @@ class DB_API:
 
         Exemple:
         >>> err = DB_API.delete_user(1)
-        >>> if and not isinstance(err, Exception):
+        >>> if not isinstance(err, Exception):
         >>>     print("delete avec succes")
         """
         return cursor.execute(_Requests.delete_user.format(user_id))
+
+    @staticmethod
+    @cm_cursor()
+    def get_project_in_users_groups_userid(user_id: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récuperer tous les projets où l'user est invités (accepté ou non).
+
+        Cette fonction renvoie une liste de tuples comprenant les
+        projets sous la forme (projectID, name, permission, joined).
+        Cette fonction peut ne pas fonctionner, dans ce cas elle
+        renvoie None ou dans certains cas, un objet de type Exception.
+
+        :param user_id: L'userID
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: resultat de la commande ou exception
+
+        Exemple:
+        >>> projects = DB_API.get_project_in_users_groups_userid(10)
+        >>> if projects and not isinstance(projects, Exception):
+        >>>     print(projects)
+
+        """
+        cursor.execute(_Requests.get_project_in_users_groups.format(user_id))
+        result = cursor.fetchall()
+        return result
 
     @staticmethod
     @cm_conn()
@@ -758,6 +854,28 @@ class DB_API:
     @staticmethod
     @cm_conn()
     @cm_cursor()
+    def set_invites_status(
+        project_id: int, user_id: int, joined: bool, *, cursor: MySQLCursor
+    ) -> Optional[Exception]:
+        """
+        Permet d'accepter ou refuser une invitation vers un projet.
+        Cette fonction renvoie None ou une exception. En cas d'échec,
+        elle renverra une exc et en cas de succes, elle renverra None.
+        :param project_id: Le project_ID
+        :param user_id: ID de l'utilisateur
+        :param joined: Accepter ou pas l'invit
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        Exemple:
+        >>> err = DB_API.set_invites_status(1, 1, False)
+        >>> if not isinstance(err, Exception):
+        >>>     print("delete avec succes")
+        """
+        return cursor.execute(_Requests.set_invites_status.format(joined, project_id, user_id))
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
     def delete_subtask(subtask_id, *, cursor: MySQLCursor) -> Optional[Exception]:
         """
         Permet de delete une subtask de la db et toutes ses dépendances.
@@ -784,3 +902,5 @@ if __name__ == "__main__":
     t = DB_API.get_all_tasks()
     print(type(t), t)
     pass
+
+# TODO: ajouter les tests pour get_project_in_users_groups_userid, set_invites_status
