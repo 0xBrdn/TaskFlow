@@ -14,7 +14,7 @@
   <p align="center">
     Une application collaborative de gestion de projets et de tâches.
     <br />
-    <a href=https://github.com/zzendor/SAE502-TaskFlow/docs><strong>Explorez les docs »</strong></a>
+    <a href=https://github.com/zzendor/SAE502-TaskFlow/tree/main/docs><strong>Explorez les docs »</strong></a>
     <br />
     <br />
   </p>
