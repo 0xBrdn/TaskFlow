@@ -6,6 +6,7 @@ import pyotp
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from zxcvbn import zxcvbn
 
 # =====================
 # Config email pour TOTP
@@ -437,7 +438,7 @@ class Ui_MainWindow(object):
         email = self.inputMail.text().strip()
         password = self.inputPassword.text()
 
-        # CHANGEMENT: On refuse la création pour @gmail.com ou .fr
+        # Vérifier que l'email ne termine pas par @gmail.com
         if email.lower().endswith("@gmail.com"):
             self.show_error_message(
                 "Erreur d'inscription Impossible de créer un compte "
@@ -445,19 +446,33 @@ class Ui_MainWindow(object):
             )
             return False
 
+        # Validation de l'adresse email
         if not self.validate_email(email):
             self.show_error_message(
                 "Erreur d'inscription Veuillez entrer une adresse email valide"
             )
             return False
 
+        # Vérification de la force du mot de passe avec zxcvbn
+        password_strength = zxcvbn(password)
+        if password_strength['score'] < 3:  # Score requis : 3 ou plus
+            feedback = password_strength['feedback']
+            warning = feedback.get('warning', "")
+            suggestions = " ".join(feedback.get('suggestions', []))
+            self.show_error_message(
+                "Mot de passe faible",
+                f"Votre mot de passe est trop faible. {warning} {suggestions}"
+            )
+            return False
+
+        # Vérifier que le mot de passe a au moins 8 caractères
         if len(password) < 8:
             self.show_error_message(
                 "Erreur d'inscription Le mot de passe doit contenir au moins 8 caractères"
             )
             return False
 
-        # Vérifie si l'email existe déjà
+        # Vérification si l'email existe déjà
         existing_email = DB_API.get_email(email)
         if existing_email and not isinstance(existing_email, Exception):
             self.show_error_message(
@@ -465,13 +480,14 @@ class Ui_MainWindow(object):
             )
             return False
 
-        # Vérifie si le username existe déjà
+        # Vérification si le nom d'utilisateur existe déjà
         existing_username = DB_API.get_user(username)
         if existing_username and not isinstance(existing_username, Exception):
             self.show_error_message("Erreur d'inscription Ce nom d'utilisateur est déjà utilisé")
             return False
 
-        is_google_user = 0  # forcé à 0
+        # Création du compte utilisateur
+        is_google_user = 0  # forcé à 0 pour les comptes non Google
         try:
             success = DB_API.add_user(username, password, email, is_google_user)
             if success and not isinstance(success, Exception):

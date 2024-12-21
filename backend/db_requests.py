@@ -255,6 +255,19 @@ class _Requests:
 
     delete_users_groups = "DELETE FROM users_groups WHERE projectID = '{}';"
 
+    delete_tasks_groups = (
+        "DELETE tg FROM tasks_groups tg INNER JOIN tasks t ON t.assign = tg.task_projectID WHERE "
+        "t.projectID = '{}';"
+    )
+
+    delete_tasks_infos = (
+        "DELETE ti FROM tasks_infos ti INNER JOIN tasks t ON t.task_infoID = ti.task_infoID WHERE t.projectID = '{}';"
+    )
+
+    delete_tasks = (
+        "DELETE FROM tasks where projectID = '{}';"
+    )
+    
 
 if __name__ == "__main__":
     # Exemple fictif :

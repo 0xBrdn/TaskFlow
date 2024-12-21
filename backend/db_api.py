@@ -14,7 +14,7 @@ from backend.db_requests import _Requests
 _log = logging.getLogger(__name__)
 
 # Instanciation globale du PasswordHasher
-ph = PasswordHasher(time_cost=2, memory_cost=65536, parallelism=1, hash_len=32, salt_len=16)
+ph = PasswordHasher()
 
 
 class DB_API:
@@ -66,21 +66,40 @@ class DB_API:
         - Sinon, on stocke un placeholder (ex: "").
         Retourne l'ID (userID) inséré, ou un objet Exception en cas d'erreur.
         """
-        # Hachage conditionnel du password
         if not is_google_user:
             try:
-                password = ph.hash(password)  # Argon2 hashing
+                # Hachage Argon2 du mot de passe
+                password = ph.hash(password)
             except Exception as e:
                 return e
         else:
-            password = ""  # Compte Google => placeholder
+            # Compte Google => mot de passe vide ou placeholder
+            password = ""
 
-        # Insertion paramétrée dans la DB
+        # Insertion en DB
         try:
             # Ici, _Requests.add_user doit être une requête du type:
             # "INSERT INTO users (username, password, email, is_google_user) VALUES (%s, %s, %s, %s);" # noqa
             cursor.execute(_Requests.add_user, (username, password, email, is_google_user))
             return cursor.lastrowid
+        except Exception as e:
+            return e
+
+    @staticmethod
+    @cm_cursor()
+    def get_email_hashpass(email: str, *, cursor: MySQLCursor) -> Union[tuple, Exception, None]:
+        """
+        Retourne (hashed_password,) pour un utilisateur donné par son email,
+        ou None si non trouvé, ou Exception si erreur DB.
+        (Fonction legacy, vous pouvez la garder si du code l'utilise.)
+        """
+        try:
+            cursor.execute(_Requests.get_email_hashpass, (email,))
+            row = cursor.fetchone()
+            if row:
+                return (row[0],)  # pour rester compatible
+            else:
+                return None
         except Exception as e:
             return e
 
@@ -867,23 +886,11 @@ class DB_API:
     @cm_cursor()
     def delete_user(user_id, *, cursor: MySQLCursor) -> Optional[Exception]:
         """
-        Permet de delete un utilisateur de la db et toutes ses dépendances.
+        Supprime un utilisateur de la base de données.
 
-        Cette fonction renvoie None ou une exception. En cas d'échec,
-        elle renverra une exc et en cas de succes, elle renverra None.
-
-        Cette fonction renvoie None ou None, une exception de façon rare. En cas d'échec,
-        elle renverra une None et en cas de succes, elle renverra None.
-        Elle renverra une Exception que dans certains cas.
-
-        :param user_id: ID de l'utilisateur
-        :param cursor: Curseur d'une connexion vers une DB
-        (optionnel, géré automatiquement par le décorateur cm_cursor())
-
-        Exemple:
-        >>> err = DB_API.delete_user(1)
-        >>> if not isinstance(err, Exception):
-        >>>     print("delete avec succes")
+        :param user_id: ID de l'utilisateur à supprimer.
+        :param cursor: Curseur pour exécuter la requête SQL.
+        :return: None si la suppression réussit, ou une Exception si elle échoue.
         """
         return cursor.execute(_Requests.delete_user, (user_id,))
 
@@ -982,6 +989,34 @@ class DB_API:
     @staticmethod
     @cm_conn()
     @cm_cursor()
+    def delete_subtask(subtask_id, *, cursor: MySQLCursor) -> Optional[Exception]:
+        """
+        Permet de delete une subtask de la db et toutes ses dépendances.
+
+        Cette fonction renvoie None ou None, une exception de façon rare. En cas d'échec,
+        elle renverra une exc et en cas de succes, elle renverra None.
+
+        :param subtask_id: ID de la tache
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> err = DB_API.delete_subtask(1)
+        >>> if and not isinstance(err, Exception):
+        >>>     print("delete avec succes")
+        """
+        return cursor.execute(_Requests.delete_task.format(subtask_id))
+
+    @staticmethod
+    @cm_cursor()
+    def get_user_permission(project_id: int, user_id: int, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_user_permission.format(project_id, user_id))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
     def set_totp_secret(email: str, secret: str, *, cursor: MySQLCursor) -> bool:
         """
         Stocke la clé TOTP 'secret' dans la table 'users' pour l'email donné.
@@ -991,6 +1026,42 @@ class DB_API:
         return True
 
 
+    def delete_project(project_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
+        return cursor.execute(_Requests.delete_project.format(project_id))
+
+    @staticmethod
+    @cm_cursor()
+    def get_task_info_by_task_id(taskID: str, *, cursor: MySQLCursor) -> ResultType:
+        query = _Requests.get_tasks_by_title.format(taskID)
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_user_group(project_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
+        return cursor.execute(_Requests.delete_users_groups.format(project_id))
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_tasks_groups(project_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
+        return cursor.execute(_Requests.delete_tasks_groups.format(project_id))
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_tasks_infos(project_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
+        return cursor.execute(_Requests.delete_tasks_infos.format(project_id))
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_tasks(project_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
+        return cursor.execute(_Requests.delete_tasks.format(project_id))
+        
+    
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
     # t = (DB_API.add_user(username="vlad", password="trql",
