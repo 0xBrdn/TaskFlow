@@ -24,7 +24,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="securisation" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -67,7 +67,7 @@
     &quot;Python.try.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;securisation&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/defaultuser0/miniconda3/condabin/conda.bat&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
@@ -248,15 +248,7 @@
       <option name="project" value="LOCAL" />
       <updated>1734793301358</updated>
     </task>
-    <task id="LOCAL-00005" summary="ajout 2FA google lors de la connexion au compte">
-      <option name="closed" value="true" />
-      <created>1734814300369</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1734814300369</updated>
-    </task>
-    <option name="localTasksCounter" value="6" />
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -277,8 +269,7 @@
     <MESSAGE value="ajout delete du compte, ajout/supp user depuis le GUI" />
     <MESSAGE value="Modifie la fonction cm_cursor() dans db_helper.py pour créer un curseur tamponné avec cursor = conn.cursor(buffered=True)." />
     <MESSAGE value="ajout argon2 pour hash mdp , modification création de compte pour stop les compte avec gmail.com" />
-    <MESSAGE value="ajout 2FA google lors de la connexion au compte" />
-    <option name="LAST_COMMIT_MESSAGE" value="ajout 2FA google lors de la connexion au compte" />
+    <option name="LAST_COMMIT_MESSAGE" value="ajout argon2 pour hash mdp , modification création de compte pour stop les compte avec gmail.com" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -114,6 +114,7 @@ dependencies:
   - zstd=1.5.6=h0ea2cb4_0
   - argon2-cffi
   - typing-extensions
+  - zxcvbn
   - pip:
       - mysql-connector-python==9.1.0
 prefix: C:\Users\windo\miniconda3\envs\TaskFlow
