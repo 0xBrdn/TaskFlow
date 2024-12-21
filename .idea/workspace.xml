@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="5338d278-2e09-40d0-8047-f0efcab8280b" name="Changes" comment="Modifie la fonction cm_cursor() dans db_helper.py pour créer un curseur tamponné avec cursor = conn.cursor(buffered=True).">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/db_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db_api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/conda.yml" beforeDir="false" afterPath="$PROJECT_DIR$/conda.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/front_end/authentification/authentification.py" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/authentification/authentification.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
