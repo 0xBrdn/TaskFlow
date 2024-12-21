@@ -239,6 +239,19 @@ class _Requests:
         WHERE email = %s;
     """
 
+    get_user_permission = "SELECT permission FROM users_groups WHERE projectID = '{}' AND userID = '{}';"
+
+    delete_project = "DELETE FROM projects WHERE projectID = '{}';"
+
+    get_task_info_by_task_id = (
+        "SELECT ti.title, ti.description, ti.status, ti.priority, ti.covered,"
+        "ti.assign, ti.dead_line "
+        "FROM tasks t "
+        "JOIN tasks_infos ti ON t.task_infoID = ti.task_infoID "
+        "WHERE t.taskID = 11;"
+    )
+
+    delete_users_groups = "DELETE FROM users_groups WHERE projectID = '{}';"
 
 if __name__ == "__main__":
     # Exemple fictif :
