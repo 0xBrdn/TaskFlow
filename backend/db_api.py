@@ -881,26 +881,14 @@ class DB_API:
     @cm_cursor()
     def delete_user(user_id, *, cursor: MySQLCursor) -> Optional[Exception]:
         """
-        Permet de delete un utilisateur de la db et toutes ses dépendances.
+        Supprime un utilisateur de la base de données.
 
-        Cette fonction renvoie None ou une exception. En cas d'échec,
-        elle renverra une exc et en cas de succes, elle renverra None.
-
-        Cette fonction renvoie None ou None, une exception de façon rare. En cas d'échec,
-        elle renverra une None et en cas de succes, elle renverra None.
-        Elle renverra une Exception que dans certains cas.
-
-        :param user_id: ID de l'utilisateur
-        :param cursor: Curseur d'une connexion vers une DB
-        (optionnel, géré automatiquement par le décorateur cm_cursor())
-
-        Exemple:
-        >>> err = DB_API.delete_user(1)
-        >>> if not isinstance(err, Exception):
-        >>>     print("delete avec succes")
+        :param user_id: ID de l'utilisateur à supprimer.
+        :param cursor: Curseur pour exécuter la requête SQL.
+        :return: None si la suppression réussit, ou une Exception si elle échoue.
         """
-        return cursor.execute(_Requests.delete_user, (user_id,))
-
+        cursor.execute(_Requests.delete_user, (user_id,))
+        return None
 
     @staticmethod
     @cm_cursor()

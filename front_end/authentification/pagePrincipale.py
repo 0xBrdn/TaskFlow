@@ -258,17 +258,27 @@ class Ui_MainWindow(object):
         self.auth_window.show()
 
     def delete_account(self):
-        reponse = QMessageBox.question(None, "Supprimer le compte",
-                                       "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.",
-                                       QMessageBox.Yes | QMessageBox.No)
+        # Demander confirmation avant de supprimer le compte
+        reponse = QMessageBox.question(
+            None,
+            "Supprimer le compte",
+            "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.",
+            QMessageBox.Yes | QMessageBox.No
+        )
+
         if reponse == QMessageBox.Yes:
+            # Récupérer l'ID de l'utilisateur à partir de l'email
             user_id = DB_API.get_userID_by_email(self.current_user)
-            if isinstance(user_id, Exception) or user_id is None:
+            if isinstance(user_id, Exception) or not user_id:
                 QMessageBox.critical(None, "Erreur", "Impossible de récupérer l'ID de l'utilisateur.")
                 return
-            err = self.delete_user("", user_id=user_id[0])
-            if err:
+
+            # Supprimer l'utilisateur et ses dépendances
+            err = DB_API.delete_user(user_id[0])  # Appelle directement la fonction existante dans db_api.py
+            if err is None:  # Si aucune erreur, suppression réussie
                 QMessageBox.information(None, "Succès", "Compte supprimé avec succès.")
+
+                # Fermer toutes les fenêtres et revenir à la fenêtre d'authentification
                 QtWidgets.QApplication.closeAllWindows()
                 from authentification import Ui_MainWindow as AuthMainWindow
                 self.auth_window = QtWidgets.QMainWindow()
@@ -276,7 +286,8 @@ class Ui_MainWindow(object):
                 self.auth_ui.setupUi(self.auth_window)
                 self.auth_window.show()
             else:
-                QMessageBox.warning(None, "Erreur", "Impossible de supprimer le compte.")
+                # Gérer les erreurs de suppression
+                QMessageBox.warning(None, "Erreur", f"Impossible de supprimer le compte : {err}")
 
     def add_project(self):
         project_name, ok = QInputDialog.getText(None, "Nouveau Projet", "Nom du projet :")
@@ -524,14 +535,33 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle("Gestionnaire de Projets et Tâches")
 
     def delete_user(self, username: str, user_id: Optional[int] = None) -> bool:
-        if not user_id:
-            user_id = DB_API.get_user_id_by_username(username)
-            if isinstance(user_id, Exception):
+        """
+        Supprime un utilisateur de la base de données en utilisant son username ou son user_id.
+
+        :param username: Le nom d'utilisateur (utilisé si user_id n'est pas fourni).
+        :param user_id: L'ID de l'utilisateur (prioritaire sur username si fourni).
+        :return: True si la suppression a réussi, False sinon.
+        """
+        try:
+            # Si l'user_id n'est pas fourni, récupérez-le avec le username
+            if not user_id:
+                user_id = DB_API.get_user_id_by_username(username)
+                if user_id is None or isinstance(user_id, Exception):
+                    print(f"Erreur : utilisateur '{username}' introuvable ou erreur lors de la recherche.")
+                    return False
+
+            # Appeler la méthode de suppression
+            result = DB_API.delete_user(user_id)
+            if isinstance(result, Exception):
+                print(f"Erreur lors de la suppression de l'utilisateur avec l'ID {user_id} : {result}")
                 return False
-        err = DB_API.delete_user(user_id)
-        if isinstance(err, Exception):
+
+            print(f"Utilisateur avec l'ID {user_id} supprimé avec succès.")
+            return True
+
+        except Exception as e:
+            print(f"Erreur inattendue lors de la suppression de l'utilisateur : {e}")
             return False
-        return True
 
     def send_invitation(self, user_id: int, permission: int, project_id: int):
         """
