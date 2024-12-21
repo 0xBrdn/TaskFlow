@@ -14,7 +14,7 @@ from backend.db_requests import _Requests
 _log = logging.getLogger(__name__)
 
 # Instanciation globale du PasswordHasher
-ph = PasswordHasher()
+ph = PasswordHasher(time_cost=2, memory_cost=65536, parallelism=1, hash_len=32, salt_len=16)
 
 class DB_API:
     """
@@ -74,7 +74,9 @@ class DB_API:
 
         # Insertion en DB
         try:
-            cursor.execute(_Requests.add_user.format(username, password, email, is_google_user))
+            # Nouveau code paramétré
+            cursor.execute(_Requests.add_user, (username, password, email, is_google_user))
+
             return cursor.lastrowid
         except Exception as e:
             return e
@@ -958,6 +960,33 @@ class DB_API:
         >>>     print("delete avec succes")
         """
         return cursor.execute(_Requests.delete_task, (task_id,))
+
+##2FA
+
+    @staticmethod
+    @cm_cursor()
+    def get_totp_secret(email: str, *, cursor: MySQLCursor) -> str:
+        """
+        Retourne la clé TOTP stockée pour cet email, ou None si pas trouvée.
+        """
+        cursor.execute("SELECT totp_secret FROM users WHERE email = %s", (email,))
+        row = cursor.fetchone()
+        if row:
+            return row[0]  # la clé
+        return None
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def set_totp_secret(email: str, secret: str, *, cursor: MySQLCursor) -> bool:
+        """
+        Stocke la clé TOTP 'secret' dans la table 'users' pour l'email donné.
+        Suppose qu'une colonne 'totp_secret' existe dans la table 'users'.
+        """
+        cursor.execute("UPDATE users SET totp_secret = %s WHERE email = %s", (secret, email))
+        return True
+
+
 
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))

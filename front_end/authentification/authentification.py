@@ -2,14 +2,106 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from backend.db_api import DB_API
 from pagePrincipale import Ui_MainWindow as MainWindowUI
 import webbrowser
+import pyotp
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
+# =====================
+# Config email pour TOTP
+# =====================
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+SENDER_EMAIL = "hgrigord1409@gmail.com"
+SENDER_PASSWORD = "giik leti bkyu jsbq"
+
+
+def send_otp_email(recipient_email: str, otp_code: str):
+    """
+    Envoie l'OTP (code TOTP) par email au user.
+    """
+    subject = "Votre code TOTP"
+    body = f"Votre code à 6 chiffres : {otp_code}\nIl est valable 30 secondes."
+    message = MIMEMultipart()
+    message["From"] = SENDER_EMAIL
+    message["To"] = recipient_email
+    message["Subject"] = subject
+    message.attach(MIMEText(body, "plain"))
+
+    with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+        server.starttls()
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        server.send_message(message)
+
+
+def send_totp_to_user(user_email: str, secret_key: str):
+    """
+    Génère le code TOTP et l'envoie par mail.
+    """
+    totp = pyotp.TOTP(secret_key)
+    current_otp = totp.now()
+    send_otp_email(user_email, current_otp)
+
+
+def verify_totp_code(secret_key: str, user_input_code: str) -> bool:
+    """
+    Vérifie si le code TOTP entré par l'utilisateur est correct
+    dans la fenêtre de code.
+    """
+    totp = pyotp.TOTP(secret_key)
+    return totp.verify(user_input_code)  # True si code correct, False sinon.
+
+
+# Identifiants Google
 CLIENT_ID = "428963010703-44ievtu901l6r9g8dhs2jjmf11mphidg.apps.googleusercontent.com"
 REDIRECT_URI = "http://localhost:5000/oauth2callback"
-
 AUTH_URL = (
     "https://accounts.google.com/o/oauth2/auth?response_type=code"
     "&client_id={}&redirect_uri={}&scope=email%20profile"
 )
+
+
+# -----------------------------------------------
+# Dialog pour la saisie du code TOTP
+# -----------------------------------------------
+class OtpDialog(QtWidgets.QDialog):
+    def __init__(self, secret_key, parent=None):
+        super().__init__(parent)
+        self.secret_key = secret_key
+        self.setWindowTitle("Vérification du code TOTP")
+        self.setModal(True)
+        self.setup_ui()
+        # Centrer la fenêtre
+        self.setFixedSize(300, 150)
+
+    def setup_ui(self):
+        layout = QtWidgets.QVBoxLayout(self)
+        label = QtWidgets.QLabel("Entrez le code reçu par email :")
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        label.setFont(font)
+
+        self.codeEdit = QtWidgets.QLineEdit()
+        self.codeEdit.setPlaceholderText("Code à 6 chiffres")
+        self.codeEdit.setFixedWidth(200)
+        self.codeEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.codeEdit.setMaxLength(6)
+        self.codeEdit.setValidator(QtGui.QIntValidator(0, 999999, self))
+
+        self.buttonBox = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
+            QtCore.Qt.Horizontal,
+            self
+        )
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        layout.addWidget(label, alignment=QtCore.Qt.AlignHCenter)
+        layout.addWidget(self.codeEdit, alignment=QtCore.Qt.AlignHCenter)
+        layout.addWidget(self.buttonBox, alignment=QtCore.Qt.AlignHCenter)
+
+    def get_code(self):
+        return self.codeEdit.text().strip()
 
 
 class Ui_MainWindow(object):
@@ -67,7 +159,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.addWidget(self.label)
         self.verticalLayout.addWidget(self.frameTitre, 0, QtCore.Qt.AlignHCenter)
 
-        # --- Frame "Nom d'utilisateur" (pour inscription)
+        # --- Frame "Nom d'utilisateur"
         self.frameUser = QtWidgets.QFrame(self.frameMire)
         self.frameUser.setObjectName("frameUser")
         self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.frameUser)
@@ -284,17 +376,50 @@ class Ui_MainWindow(object):
     def handle_login(self):
         """
         Connexion via Argon2
+        Puis envoi OTP TOTP si OK.
         """
         self.clear_error_message()
 
         email = self.inputMail.text().strip()
         password = self.inputPassword.text()
-        is_ok = DB_API.check_user_credentials(email, password)
-        if is_ok:
-            self.show_success_message("Connexion réussie", "Bienvenue!")
-            self.open_main_window()
-        else:
-            self.show_error_message("Échec de connexion", "Email ou mot de passe incorrect")
+
+        try:
+            is_ok = DB_API.check_user_credentials(email, password)
+            if not is_ok:
+                self.show_error_message("Échec de connexion", "Email ou mot de passe incorrect")
+                return
+
+            # 1) Authentification OK - Récupérer ou générer la clé secrète
+            secret_key = self.get_or_create_user_secret(email)
+            if not secret_key:
+                self.show_error_message("Erreur", "Impossible de récupérer ou de créer la clé TOTP")
+                return
+
+            # 2) Envoyer le code TOTP par email
+            print("Envoi du code TOTP par email...")
+            send_totp_to_user(email, secret_key)
+            print("Code TOTP envoyé avec succès.")
+
+            # 3) Ouvrir une popup demandant le code
+            otp_dialog = OtpDialog(secret_key)
+            print("Affichage de la popup OTP...")
+            result = otp_dialog.exec_()
+            print("Popup OTP fermée, résultat :", result)
+
+            if result == QtWidgets.QDialog.Accepted:
+                entered_code = otp_dialog.get_code()
+                print("Code OTP saisi :", entered_code)
+                if verify_totp_code(secret_key, entered_code):
+                    self.show_success_message("Connexion réussie", "Bienvenue!")
+                    self.open_main_window()
+                else:
+                    self.show_error_message("Erreur", "Code invalide ou expiré")
+            else:
+                self.show_error_message("OTP annulé", "Connexion abandonnée")
+
+        except Exception as e:
+            print(f"Erreur lors de la connexion ou de l'authentification : {e}")
+            self.show_error_message("Erreur critique", f"Une erreur est survenue : {e}")
 
     def login_with_google(self):
         webbrowser.open(AUTH_URL.format(CLIENT_ID, REDIRECT_URI))
@@ -305,11 +430,11 @@ class Ui_MainWindow(object):
         email = self.inputMail.text().strip()
         password = self.inputPassword.text()
 
-        # CHANGEMENT: On refuse la création pour @gmail.com ou les domaines finissant par .fr
-        if email.lower().endswith("@gmail.com") or email.lower().endswith(".fr"):
+        # CHANGEMENT: On refuse la création pour @gmail.com ou .fr
+        if email.lower().endswith("@gmail.com"):
             self.show_error_message(
                 "Erreur d'inscription",
-                "Impossible de créer un compte avec un email se terminant par '@gmail.com' ou '.fr'."
+                "Impossible de créer un compte avec un email se terminant par '@gmail.com'"
             )
             return False
 
@@ -333,9 +458,7 @@ class Ui_MainWindow(object):
             self.show_error_message("Erreur d'inscription", "Ce nom d'utilisateur est déjà utilisé")
             return False
 
-        # Si l'on ne veut vraiment pas autoriser @gmail.com => on force is_google_user = 0
-        # is_google_user = 1 if email.endswith("@gmail.com") else 0
-        is_google_user = 0  # forcé à 0, puisqu'on refuse .gmail.com
+        is_google_user = 0  # forcé à 0
         try:
             success = DB_API.add_user(username, password, email, is_google_user)
             if success and not isinstance(success, Exception):
@@ -354,6 +477,24 @@ class Ui_MainWindow(object):
         import re
         pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.match(pattern, email) is not None
+
+    # ==========================
+    # get_or_create_user_secret
+    # ==========================
+    def get_or_create_user_secret(self, email: str) -> str:
+        """
+        Récupère la clé secrète TOTP stockée en DB ou la crée si inexistante.
+        (Exemple fictif : DB_API peut gérer un champ 'totp_secret' dans 'users')
+        """
+        # Exemple: On imagine que DB_API.get_totp_secret(email) renvoie la clé ou None
+        existing_secret = DB_API.get_totp_secret(email)
+        if existing_secret and not isinstance(existing_secret, Exception):
+            return existing_secret
+
+        # Sinon on génère
+        new_secret = pyotp.random_base32()
+        DB_API.set_totp_secret(email, new_secret)
+        return new_secret
 
     def show_error_message(self, title, message):
         self.labelErreur.setText(message)
