@@ -368,6 +368,14 @@ class Ui_MainWindow(object):
             QMessageBox.warning(None, "Erreur", "Veuillez sélectionner un projet.")
             return
 
+        project_id = DB_API.get_project_id_by_project_name(self.current_project)
+        userID = DB_API.get_userID_by_email(self.current_user)
+        permission = DB_API.get_user_permission(project_id[0], userID[0])
+        if permission[0] < 1:
+            QMessageBox.warning(None, "Permission insuffisante",
+                                "Vous n'avez pas la permission pour ajouter cette tâche.")
+            return
+
         task_title = self.task_input.text().strip()
         task_date = self.date_input.date().toString("yyyy-MM-dd")
         task_comment = self.comment_input.text().strip()
@@ -464,13 +472,28 @@ class Ui_MainWindow(object):
             QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche parente.")
             return
 
+        project_id = DB_API.get_project_id_by_project_name(self.current_project)
+        userID = DB_API.get_userID_by_email(self.current_user)
+        permission = DB_API.get_user_permission(project_id[0], userID[0])
+        if permission[0] < 1:
+            QMessageBox.warning(None, "Permission insuffisante",
+                                "Vous n'avez pas la permission pour ajouter cette tâche.")
+            return
+
+        project_id = DB_API.get_project_id_by_project_name(project_name)
+        userID = DB_API.get_userID_by_email(email)
+        permission = DB_API.get_user_permission(project_id[0], userID[0])
+        if permission[0] < 1:
+            QMessageBox.warning(None, "Permission insuffisante",
+                                "Vous n'avez pas la permission pour ajouter cette sous-tâche.")
+            return
+
         parent_item = selected_items[0]
         subtask_title = self.subtask_input.text().strip()
         subtask_date = self.date_input.date().toString("yyyy-MM-dd")
         subtask_comment = self.comment_input.text().strip()
         subtask_priority = self.importance_input.currentIndex()
 
-        # Récupérer la liste des utilisateurs sélectionnés
         selected_users = [self.assigned_users_list.item(i).text()
                           for i in range(self.assigned_users_list.count())]
 
@@ -503,19 +526,17 @@ class Ui_MainWindow(object):
 
             for user in selected_users:
                 user_id = DB_API.get_user_id_by_username(user)
-                if user_id:  # Vérifier que l'ID utilisateur existe
+                if user_id:
                     DB_API.add_user_to_task_group(task_projectID, user_id)
 
-            # Créer l'élément visuel de la sous-tâche
             subtask_item = QtWidgets.QTreeWidgetItem(parent_item)
             subtask_item.setText(0, subtask_title)
             subtask_item.setText(1, subtask_date)
             subtask_item.setText(2, subtask_comment)
             subtask_item.setText(3,
                                  "Basse" if subtask_priority == 0 else "Moyenne" if subtask_priority == 1 else "Haute")
-            subtask_item.setText(4, ", ".join(selected_users))  # Ajouter les utilisateurs assignés
+            subtask_item.setText(4, ", ".join(selected_users))
 
-            # Nettoyer les champs
             self.subtask_input.clear()
             self.comment_input.clear()
             self.importance_input.setCurrentIndex(0)
@@ -529,6 +550,13 @@ class Ui_MainWindow(object):
 
     def delete_task(self):
         selected_items = self.tree.selectedItems()
+        project_id = DB_API.get_project_id_by_project_name(self.current_project)
+        userID = DB_API.get_userID_by_email(self.current_user)
+        permission = DB_API.get_user_permission(project_id[0], userID[0])
+        if permission[0] != 1:
+            QMessageBox.warning(None, "Permission insuffisante",
+                                "Vous n'avez pas la permission pour supprimer cette tâche.")
+            return
         if not selected_items:
             QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à supprimer.")
             return
@@ -551,8 +579,7 @@ class Ui_MainWindow(object):
         project_name = current_item.text()
 
         project_id = DB_API.get_project_id_by_project_name(project_name)
-        email = self.current_user
-        userID = DB_API.get_userID_by_email(email)
+        userID = DB_API.get_userID_by_email(self.current_user)
         permission = DB_API.get_user_permission(project_id[0], userID[0])
         if permission[0] != 2:
             QMessageBox.warning(None, "Permission insuffisante",
@@ -568,6 +595,12 @@ class Ui_MainWindow(object):
 
         if reponse == QMessageBox.Yes:
             DB_API.delete_user_group(project_id[0])
+            """
+            DB_API.delete_tasks_groups(project_id[0])
+            DB_API.delete_tasks_infos(project_id[0])
+            DB_API.delete_tasks(project_id[0])
+            Faire en sorte que les tâches se suppriment avec le projet
+            """
             err = DB_API.delete_project(project_id[0])
 
             if isinstance(err, Exception):
@@ -591,6 +624,13 @@ class Ui_MainWindow(object):
             QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à modifier.")
             return
 
+        project_id = DB_API.get_project_id_by_project_name(self.current_project)
+        userID = DB_API.get_userID_by_email(self.current_user)
+        permission = DB_API.get_user_permission(project_id[0], userID[0])
+        if permission[0] != 1:
+            QMessageBox.warning(None, "Permission insuffisante",
+                                "Vous n'avez pas la permission pour modifier cette tâche.")
+
         selected_item = selected_items[0]
         task_id = selected_item.data(0, QtCore.Qt.UserRole)
 
@@ -600,35 +640,27 @@ class Ui_MainWindow(object):
             if not task_info:
                 raise ValueError("Impossible de récupérer les informations de la tâche")
 
-            # Les indices correspondent à la requête SQL:
-            # 0: title, 1: description, 2: status, 3: priority, 4: covered, 5: assign, 6: dead_line
-
-            # Remplir les champs avec les infos de la tâche
             self.task_input.setText(task_info[0])  # title
             self.comment_input.setText(task_info[1])  # description
 
-            # Convertir et définir la date
             date = QtCore.QDate.fromString(task_info[6], "yyyy-MM-dd")
             self.date_input.setDate(date)
 
-            # Définir la priorité
-            self.importance_input.setCurrentIndex(task_info[3])  # priority
+            self.importance_input.setCurrentIndex(task_info[3])
 
-            # Remplir la liste des utilisateurs assignés
             self.assigned_users_list.clear()
-            task_group_id = task_info[5]  # assign
+            task_group_id = task_info[5]
             users = DB_API.get_users_in_tasks_group_by_group_id(task_group_id)
             for user in users:
-                if user[1].strip():  # Supposant que user[1] est le username
+                if user[1].strip():
                     self.assigned_users_list.addItem(user[1].strip())
 
-            # Créer et afficher le bouton Appliquer s'il n'existe pas
             if not hasattr(self, 'apply_button'):
                 self.apply_button = QtWidgets.QPushButton("Appliquer", self.task_tab)
                 self.apply_button.setStyleSheet("background-color: #4CAF50; color: white;")
                 self.button_layout.addWidget(self.apply_button)
                 self.apply_button.clicked.connect(
-                    lambda: self.apply_changes(selected_item, task_info[5]))  # Passer le task_group_id
+                    lambda: self.apply_changes(selected_item, task_info[5]))
             else:
                 self.apply_button.show()
 
@@ -636,32 +668,28 @@ class Ui_MainWindow(object):
             QMessageBox.critical(None, "Erreur", f"Erreur lors du chargement des informations : {str(e)}")
 
     def apply_changes(self, item, task_group_id):
-        """Applique les modifications aux champs"""
         try:
             task_id = item.data(0, QtCore.Qt.UserRole)
             task_info = DB_API.get_task_info_by_task_id(task_id)
             if not task_info:
                 raise ValueError("Impossible de récupérer les informations de la tâche")
 
-            # Récupérer les nouvelles valeurs
             new_title = self.task_input.text().strip()
             new_date = self.date_input.date().toString("yyyy-MM-dd")
             new_comment = self.comment_input.text().strip()
             new_priority = self.importance_input.currentIndex()
 
-            # Mettre à jour la tâche dans la base de données
             DB_API.update_task_info(
-                task_info_id=task_info[0],  # Supposant que c'est le task_infoID
-                status=task_info[2],  # Garder le status actuel
+                task_info_id=task_info[0],
+                status=task_info[2],
                 priority=new_priority,
                 title=new_title,
                 description=new_comment,
                 dead_line=new_date,
-                covered=task_info[4],  # Garder la valeur covered actuelle
+                covered=task_info[4],
                 assign=task_group_id
             )
 
-            # Mettre à jour les utilisateurs assignés
             DB_API.remove_all_users_from_task_group(task_group_id)
             for i in range(self.assigned_users_list.count()):
                 username = self.assigned_users_list.item(i).text()
@@ -669,7 +697,6 @@ class Ui_MainWindow(object):
                 if user_id:
                     DB_API.add_user_to_task_group(task_group_id, user_id)
 
-            # Mettre à jour l'affichage
             item.setText(0, new_title)
             item.setText(1, self.date_input.date().toString("dd/MM/yyyy"))
             item.setText(2, new_comment)
@@ -677,7 +704,6 @@ class Ui_MainWindow(object):
             item.setText(4, ", ".join([self.assigned_users_list.item(i).text()
                                        for i in range(self.assigned_users_list.count())]))
 
-            # Nettoyer l'interface
             self.task_input.clear()
             self.comment_input.clear()
             self.importance_input.setCurrentIndex(0)
