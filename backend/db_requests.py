@@ -25,7 +25,7 @@ class _Requests:
     """
 
     get_projects_by_user_id = """
-        SELECT p.projectID, p.name
+        SELECT p.projectID, p.name, ug.joined
         FROM projects p
         JOIN users_groups ug ON p.projectID = ug.projectID
         WHERE ug.userID = %s;
@@ -239,7 +239,9 @@ class _Requests:
         WHERE email = %s;
     """
 
-    get_user_permission = "SELECT permission FROM users_groups WHERE projectID = '{}' AND userID = '{}';"
+    get_user_permission = (
+        "SELECT permission FROM users_groups WHERE projectID = '{}'" "AND userID = '{}';"
+    )
 
     delete_project = "DELETE FROM projects WHERE projectID = '{}';"
 
@@ -252,6 +254,7 @@ class _Requests:
     )
 
     delete_users_groups = "DELETE FROM users_groups WHERE projectID = '{}';"
+
 
 if __name__ == "__main__":
     # Exemple fictif :
