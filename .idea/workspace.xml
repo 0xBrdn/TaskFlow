@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5338d278-2e09-40d0-8047-f0efcab8280b" name="Changes" comment="Ajout sécurisation création de compte , obligation d'avoir un mdp sécurisé">
+    <list default="true" id="5338d278-2e09-40d0-8047-f0efcab8280b" name="Changes" comment="correction supprimer son compte">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/db_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front_end/authentification/pagePrincipale.py" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/authentification/pagePrincipale.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -256,7 +254,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734819752611</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="correction supprimer son compte">
+      <option name="closed" value="true" />
+      <created>1734822021575</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1734822021575</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -278,7 +284,8 @@
     <MESSAGE value="Modifie la fonction cm_cursor() dans db_helper.py pour créer un curseur tamponné avec cursor = conn.cursor(buffered=True)." />
     <MESSAGE value="ajout argon2 pour hash mdp , modification création de compte pour stop les compte avec gmail.com" />
     <MESSAGE value="Ajout sécurisation création de compte , obligation d'avoir un mdp sécurisé" />
-    <option name="LAST_COMMIT_MESSAGE" value="Ajout sécurisation création de compte , obligation d'avoir un mdp sécurisé" />
+    <MESSAGE value="correction supprimer son compte" />
+    <option name="LAST_COMMIT_MESSAGE" value="correction supprimer son compte" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
