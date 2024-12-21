@@ -390,16 +390,14 @@ class Ui_MainWindow(object):
         try:
             is_ok = DB_API.check_user_credentials(email, password)
             if not is_ok:
-                self.show_error_message("Échec de connexion", "Email ou mot de passe incorrect")
+                self.show_error_message("Échec de connexion Email ou mot de passe incorrect")
                 return
 
             # 1) Authentification OK - Récupérer ou générer la clé secrète
             secret_key = self.get_or_create_user_secret(email)
             self.totp = pyotp.TOTP(secret_key)
             if not secret_key:
-                self.show_error_message(
-                    "Erreur", "Impossible de récupérer ou de créer la clé TOTP"
-                )
+                self.show_error_message("Erreur Impossible de récupérer ou de créer la clé TOTP")
                 return
 
             # 2) Ouvrir une popup demandant le code
@@ -419,16 +417,16 @@ class Ui_MainWindow(object):
                 print("Code OTP saisi :", entered_code)
 
                 if verify_totp_code(self.totp, entered_code):
-                    self.show_success_message("Connexion réussie", "Bienvenue!")
+                    self.show_success_message("Connexion réussie Bienvenue!")
                     self.open_main_window()
                 else:
-                    self.show_error_message("Erreur", "Code invalide ou expiré")
+                    self.show_error_message("Erreur Code invalide ou expiré")
             else:
-                self.show_error_message("OTP annulé", "Connexion abandonnée")
+                self.show_error_message("OTP annulé Connexion abandonnée")
 
         except Exception as e:
             print(f"Erreur lors de la connexion ou de l'authentification : {e}")
-            self.show_error_message("Erreur critique", f"Une erreur est survenue : {e}")
+            self.show_error_message("Erreur critique Une erreur est survenue : {e}")
 
     def login_with_google(self):
         webbrowser.open(AUTH_URL.format(CLIENT_ID, REDIRECT_URI))
@@ -442,20 +440,20 @@ class Ui_MainWindow(object):
         # CHANGEMENT: On refuse la création pour @gmail.com ou .fr
         if email.lower().endswith("@gmail.com"):
             self.show_error_message(
-                "Erreur d'inscription",
-                "Impossible de créer un compte avec un email se terminant par '@gmail.com'",
+                "Erreur d'inscription Impossible de créer un compte "
+                "avec un email se terminant par '@gmail.com'",
             )
             return False
 
         if not self.validate_email(email):
             self.show_error_message(
-                "Erreur d'inscription", "Veuillez entrer une adresse email valide"
+                "Erreur d'inscription Veuillez entrer une adresse email valide"
             )
             return False
 
         if len(password) < 8:
             self.show_error_message(
-                "Erreur d'inscription", "Le mot de passe doit contenir au moins 8 caractères"
+                "Erreur d'inscription Le mot de passe doit contenir au moins 8 caractères"
             )
             return False
 
@@ -470,9 +468,7 @@ class Ui_MainWindow(object):
         # Vérifie si le username existe déjà
         existing_username = DB_API.get_user(username)
         if existing_username and not isinstance(existing_username, Exception):
-            self.show_error_message(
-                "Erreur d'inscription", "Ce nom d'utilisateur est déjà utilisé"
-            )
+            self.show_error_message("Erreur d'inscription Ce nom d'utilisateur est déjà utilisé")
             return False
 
         is_google_user = 0  # forcé à 0
@@ -480,18 +476,18 @@ class Ui_MainWindow(object):
             success = DB_API.add_user(username, password, email, is_google_user)
             if success and not isinstance(success, Exception):
                 self.show_success_message(
-                    "Inscription réussie", "Votre compte a été créé avec succès!"
+                    "Inscription réussie Votre compte a été créé avec succès!"
                 )
                 self.is_login_form = True
                 self.update_form_state()
                 return True
             else:
                 self.show_error_message(
-                    "Erreur d'inscription", "Erreur lors de la création du compte"
+                    "Erreur d'inscription Erreur lors de la création du compte"
                 )
                 return False
-        except Exception as e:
-            self.show_error_message("Erreur d'inscription", f"Une erreur est survenue: {e!s}")
+        except Exception:
+            self.show_error_message("Erreur d'inscription Une erreur est survenue: {e!s}")
             return False
 
     def validate_email(self, email):
