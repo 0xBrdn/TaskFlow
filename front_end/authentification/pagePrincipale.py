@@ -52,6 +52,7 @@ class Ui_MainWindow(object):
         self.delete_account_button.clicked.connect(self.delete_account)
         self.add_user_button.clicked.connect(self.add_selected_user)
         self.remove_user_button.clicked.connect(self.remove_selected_user_from_list)
+        self.delete_project_button.clicked.connect(self.delete_project)
 
         self.retranslateUi(MainWindow)
 
@@ -66,9 +67,30 @@ class Ui_MainWindow(object):
         self.project_list_widget.setStyleSheet("font-size: 14px;")
         self.project_layout.addWidget(self.project_list_widget)
 
+        self.project_buttons_frame = QtWidgets.QFrame()
+        self.project_buttons_frame.setObjectName("project_buttons_frame")
+        self.project_buttons_layout = QtWidgets.QHBoxLayout(self.project_buttons_frame)
+
         self.add_project_button = QtWidgets.QPushButton("Ajouter un Projet")
         self.add_project_button.setObjectName("add_project_button")
-        self.project_layout.addWidget(self.add_project_button)
+
+        self.delete_project_button = QtWidgets.QPushButton("Supprimer le Projet")
+        self.delete_project_button.setObjectName("delete_project_button")
+        self.delete_project_button.setStyleSheet("""
+                            QPushButton#delete_project_button {
+                                background-color: #a40000;
+                                color: white;
+                                font-weight: bold;
+                                font-size: 14px;
+                            }
+                            QPushButton#delete_project_button:hover {
+                                background-color: #cc0000;
+                            }
+                        """)
+
+        self.project_buttons_layout.addWidget(self.add_project_button)
+        self.project_buttons_layout.addWidget(self.delete_project_button)
+        self.project_layout.addWidget(self.project_buttons_frame)
 
     def _setup_task_tab(self):
         self.task_layout = QtWidgets.QVBoxLayout(self.task_tab)
@@ -117,7 +139,6 @@ class Ui_MainWindow(object):
         self.importance_input.addItems(["Faible", "Moyenne", "Haute"])
         self.importance_input.setObjectName("importance_input")
 
-        # Ajout du QGroupBox pour assigner des utilisateurs
         assign_group = QGroupBox("Assigner des utilisateurs")
         assign_group.setStyleSheet("""
         QGroupBox {
@@ -176,6 +197,11 @@ class Ui_MainWindow(object):
         self.delete_task_button.setObjectName("delete_task_button")
         self.complete_task_button.setObjectName("complete_task_button")
 
+        self.modify_task_button = QtWidgets.QPushButton("Modifier", self.task_tab)
+        self.modify_task_button.setObjectName("modify_task_button")
+        self.button_layout.addWidget(self.modify_task_button)
+        self.modify_task_button.clicked.connect(self.modify_task)
+
         self.button_layout.addWidget(self.add_task_button)
         self.button_layout.addWidget(self.add_subtask_button)
         self.button_layout.addWidget(self.delete_task_button)
@@ -219,7 +245,8 @@ class Ui_MainWindow(object):
         account_layout.addWidget(deconnexion_button)
 
         self.delete_account_button = QPushButton("Supprimer mon compte")
-        self.delete_account_button.setStyleSheet("background-color: #a40000; color: white; font-weight: bold; font-size:14px;")
+        self.delete_account_button.setStyleSheet(
+            "background-color: #a40000; color: white; font-weight: bold; font-size:14px;")
         account_layout.addWidget(self.delete_account_button)
 
         account_layout.addStretch(1)
@@ -352,10 +379,13 @@ class Ui_MainWindow(object):
             QMessageBox.warning(None, "Erreur", "Veuillez entrer une tâche.")
             return
 
+        if not selected_users:
+            QMessageBox.warning(None, "Erreur", "Veuillez assigner au moins un utilisateur.")
+            return
+
         try:
             task_projectID = DB_API.add_task_group()
             project_id = DB_API.get_project_id_by_project_name(self.current_project)
-
             task_info_id = DB_API.add_task_info(
                 status=0,
                 priority=task_priority,
@@ -363,7 +393,7 @@ class Ui_MainWindow(object):
                 description=task_comment,
                 dead_line=task_date,
                 covered=0,
-                assign=task_projectID if selected_users else None
+                assign=task_projectID
             )
 
             user_id = DB_API.get_userID_by_email(self.current_user)
@@ -373,7 +403,6 @@ class Ui_MainWindow(object):
                 user_id=user_id[0]
             )
 
-            # Vérifier que c'est bien get_user_id_by_username dans db_api:
             for user in selected_users:
                 uid = DB_API.get_user_id_by_username(user)
                 DB_API.add_user_to_task_group(task_projectID, uid)
@@ -398,15 +427,17 @@ class Ui_MainWindow(object):
                 task_item = QtWidgets.QTreeWidgetItem(self.tree)
                 task_item.setText(0, task[1])
                 deadline = task[7]
-                formatted_date = deadline.strftime("%d/%m/%Y") if isinstance(deadline, datetime.datetime) else str(deadline)
+                formatted_date = deadline.strftime("%d/%m/%Y") if isinstance(deadline, datetime.datetime) else str(
+                    deadline)
                 task_item.setText(1, formatted_date)
                 task_item.setText(2, task[2])
                 priority = task[4]
-                priority_text = "Haute" if priority == 3 else "Moyenne" if priority == 2 else "Basse"
+                priority_text = "Haute" if priority == 2 else "Moyenne" if priority == 1 else "Basse"
                 task_item.setText(3, priority_text)
 
                 assigned_users = DB_API.get_users_in_tasks_group_by_group_id(task[6])
-                users_text = ", ".join([user[1] for user in assigned_users]) if assigned_users else "Aucun utilisateur assigné"
+                users_text = ", ".join(
+                    [user[1] for user in assigned_users]) if assigned_users else "Aucun utilisateur assigné"
                 task_item.setText(4, users_text)
 
                 color_map = {"Haute": "red", "Moyenne": "orange", "Basse": "green"}
@@ -420,7 +451,7 @@ class Ui_MainWindow(object):
                     subtask_item.setText(0, subtask[1])
                     subtask_item.setText(1, subtask[7].strftime("%d/%m/%Y"))
                     subtask_item.setText(2, subtask[2])
-                    subtask_item.setText(3, "Haute" if subtask[4] == 3 else "Moyenne" if subtask[4] == 2 else "Basse")
+                    subtask_item.setText(3, "Haute" if subtask[4] == 2 else "Moyenne" if subtask[4] == 1 else "Basse")
 
                 self.tree.setIndentation(20)
 
@@ -439,14 +470,24 @@ class Ui_MainWindow(object):
         subtask_comment = self.comment_input.text().strip()
         subtask_priority = self.importance_input.currentIndex()
 
+        # Récupérer la liste des utilisateurs sélectionnés
+        selected_users = [self.assigned_users_list.item(i).text()
+                          for i in range(self.assigned_users_list.count())]
+
         if not subtask_title:
             QMessageBox.warning(None, "Erreur", "Veuillez entrer une sous-tâche.")
+            return
+
+        if not selected_users:
+            QMessageBox.warning(None, "Erreur", "Veuillez assigner au moins un utilisateur.")
             return
 
         try:
             task_id = parent_item.data(0, QtCore.Qt.UserRole)
             if not task_id:
                 raise ValueError("ID de la tâche parente introuvable.")
+
+            task_projectID = DB_API.add_task_group()
 
             subtask_info_id = DB_API.add_task_info(
                 status=0,
@@ -455,21 +496,30 @@ class Ui_MainWindow(object):
                 description=subtask_comment,
                 dead_line=subtask_date,
                 covered=0,
-                assign=None
+                assign=task_projectID
             )
 
             DB_API.add_subtask(task_id=task_id, task_info_id=subtask_info_id)
 
+            for user in selected_users:
+                user_id = DB_API.get_user_id_by_username(user)
+                if user_id:  # Vérifier que l'ID utilisateur existe
+                    DB_API.add_user_to_task_group(task_projectID, user_id)
+
+            # Créer l'élément visuel de la sous-tâche
             subtask_item = QtWidgets.QTreeWidgetItem(parent_item)
             subtask_item.setText(0, subtask_title)
             subtask_item.setText(1, subtask_date)
             subtask_item.setText(2, subtask_comment)
             subtask_item.setText(3,
-                                 "Basse" if subtask_priority == 1 else "Moyenne" if subtask_priority == 2 else "Haute")
+                                 "Basse" if subtask_priority == 0 else "Moyenne" if subtask_priority == 1 else "Haute")
+            subtask_item.setText(4, ", ".join(selected_users))  # Ajouter les utilisateurs assignés
 
+            # Nettoyer les champs
             self.subtask_input.clear()
             self.comment_input.clear()
             self.importance_input.setCurrentIndex(0)
+            self.assigned_users_list.clear()
 
             QMessageBox.information(None, "Succès", "Sous-tâche ajoutée avec succès.")
 
@@ -482,15 +532,162 @@ class Ui_MainWindow(object):
         if not selected_items:
             QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à supprimer.")
             return
-
         for item in selected_items:
+            task_id = item.data(0, QtCore.Qt.UserRole)
+            DB_API.delete_task(task_id)
             if item.parent():
                 parent = item.parent()
                 parent.removeChild(item)
             else:
                 index = self.tree.indexOfTopLevelItem(item)
                 self.tree.takeTopLevelItem(index)
-                # plus de maj dans self.projects
+
+    def delete_project(self):
+        current_item = self.project_list_widget.currentItem()
+        if not current_item:
+            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner un projet à supprimer.")
+            return
+
+        project_name = current_item.text()
+
+        project_id = DB_API.get_project_id_by_project_name(project_name)
+        email = self.current_user
+        userID = DB_API.get_userID_by_email(email)
+        permission = DB_API.get_user_permission(project_id[0], userID[0])
+        if permission[0] != 2:
+            QMessageBox.warning(None, "Permission insuffisante",
+                                "Vous n'avez pas la permission de supprimer ce projet.")
+            return
+
+        reponse = QMessageBox.question(
+            None,
+            "Supprimer le projet",
+            f"Êtes-vous sûr de vouloir supprimer le projet '{project_name}' ? Cette action est irréversible.",
+            QMessageBox.Yes | QMessageBox.No
+        )
+
+        if reponse == QMessageBox.Yes:
+            DB_API.delete_user_group(project_id[0])
+            err = DB_API.delete_project(project_id[0])
+
+            if isinstance(err, Exception):
+                print("Erreur lors de la suppression du projet")
+                QMessageBox.critical(None, "Erreur", f"Impossible de supprimer le projet : {str(err)}")
+                return
+
+            self.project_list_widget.takeItem(self.project_list_widget.row(current_item))
+            self.current_project = None
+            if hasattr(self, 'current_project_label'):
+                self.current_project_label.setText("Aucun projet sélectionné")
+            if hasattr(self, 'tree'):
+                self.tree.clear()
+
+            QMessageBox.information(None, "Succès", "Le projet a été supprimé avec succès.")
+
+    def modify_task(self):
+        """Affiche les informations de la tâche sélectionnée dans les champs de saisie"""
+        selected_items = self.tree.selectedItems()
+        if not selected_items:
+            QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à modifier.")
+            return
+
+        selected_item = selected_items[0]
+        task_id = selected_item.data(0, QtCore.Qt.UserRole)
+
+        try:
+            task_info = DB_API.get_task_info_by_task_id(task_id)
+            print(task_info)
+            if not task_info:
+                raise ValueError("Impossible de récupérer les informations de la tâche")
+
+            # Les indices correspondent à la requête SQL:
+            # 0: title, 1: description, 2: status, 3: priority, 4: covered, 5: assign, 6: dead_line
+
+            # Remplir les champs avec les infos de la tâche
+            self.task_input.setText(task_info[0])  # title
+            self.comment_input.setText(task_info[1])  # description
+
+            # Convertir et définir la date
+            date = QtCore.QDate.fromString(task_info[6], "yyyy-MM-dd")
+            self.date_input.setDate(date)
+
+            # Définir la priorité
+            self.importance_input.setCurrentIndex(task_info[3])  # priority
+
+            # Remplir la liste des utilisateurs assignés
+            self.assigned_users_list.clear()
+            task_group_id = task_info[5]  # assign
+            users = DB_API.get_users_in_tasks_group_by_group_id(task_group_id)
+            for user in users:
+                if user[1].strip():  # Supposant que user[1] est le username
+                    self.assigned_users_list.addItem(user[1].strip())
+
+            # Créer et afficher le bouton Appliquer s'il n'existe pas
+            if not hasattr(self, 'apply_button'):
+                self.apply_button = QtWidgets.QPushButton("Appliquer", self.task_tab)
+                self.apply_button.setStyleSheet("background-color: #4CAF50; color: white;")
+                self.button_layout.addWidget(self.apply_button)
+                self.apply_button.clicked.connect(
+                    lambda: self.apply_changes(selected_item, task_info[5]))  # Passer le task_group_id
+            else:
+                self.apply_button.show()
+
+        except Exception as e:
+            QMessageBox.critical(None, "Erreur", f"Erreur lors du chargement des informations : {str(e)}")
+
+    def apply_changes(self, item, task_group_id):
+        """Applique les modifications aux champs"""
+        try:
+            task_id = item.data(0, QtCore.Qt.UserRole)
+            task_info = DB_API.get_task_info_by_task_id(task_id)
+            if not task_info:
+                raise ValueError("Impossible de récupérer les informations de la tâche")
+
+            # Récupérer les nouvelles valeurs
+            new_title = self.task_input.text().strip()
+            new_date = self.date_input.date().toString("yyyy-MM-dd")
+            new_comment = self.comment_input.text().strip()
+            new_priority = self.importance_input.currentIndex()
+
+            # Mettre à jour la tâche dans la base de données
+            DB_API.update_task_info(
+                task_info_id=task_info[0],  # Supposant que c'est le task_infoID
+                status=task_info[2],  # Garder le status actuel
+                priority=new_priority,
+                title=new_title,
+                description=new_comment,
+                dead_line=new_date,
+                covered=task_info[4],  # Garder la valeur covered actuelle
+                assign=task_group_id
+            )
+
+            # Mettre à jour les utilisateurs assignés
+            DB_API.remove_all_users_from_task_group(task_group_id)
+            for i in range(self.assigned_users_list.count()):
+                username = self.assigned_users_list.item(i).text()
+                user_id = DB_API.get_user_id_by_username(username)
+                if user_id:
+                    DB_API.add_user_to_task_group(task_group_id, user_id)
+
+            # Mettre à jour l'affichage
+            item.setText(0, new_title)
+            item.setText(1, self.date_input.date().toString("dd/MM/yyyy"))
+            item.setText(2, new_comment)
+            item.setText(3, "Haute" if new_priority == 2 else "Moyenne" if new_priority == 1 else "Basse")
+            item.setText(4, ", ".join([self.assigned_users_list.item(i).text()
+                                       for i in range(self.assigned_users_list.count())]))
+
+            # Nettoyer l'interface
+            self.task_input.clear()
+            self.comment_input.clear()
+            self.importance_input.setCurrentIndex(0)
+            self.assigned_users_list.clear()
+            self.apply_button.hide()
+
+            QMessageBox.information(None, "Succès", "Modifications appliquées avec succès.")
+
+        except Exception as e:
+            QMessageBox.critical(None, "Erreur", f"Erreur lors de la modification : {str(e)}")
 
     def mark_completed(self):
         selected_items = self.tree.selectedItems()
@@ -556,8 +753,10 @@ class Ui_MainWindow(object):
             return
         return
 
+
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
