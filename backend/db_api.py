@@ -16,6 +16,7 @@ _log = logging.getLogger(__name__)
 # Instanciation globale du PasswordHasher
 ph = PasswordHasher()
 
+
 class DB_API:
     """
     Classe permettant d'exécuter les commandes vers la DB SQL.
@@ -44,7 +45,9 @@ class DB_API:
             # Si les paramètres Argon2 ont changé, on peut re-hasher
             if ph.check_needs_rehash(hashed_password):
                 new_hash = ph.hash(plain_password)
-                cursor.execute("UPDATE users SET password = %s WHERE email = %s", (new_hash, email))
+                cursor.execute(
+                    "UPDATE users SET password = %s WHERE email = %s", (new_hash, email)
+                )
             return True
         except argon2_exceptions.VerifyMismatchError:
             return False
@@ -54,8 +57,9 @@ class DB_API:
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_user(username: str, password: str, email: str, is_google_user: bool, *,
-                 cursor: MySQLCursor) -> Union[Exception, Optional[int]]:
+    def add_user(
+        username: str, password: str, email: str, is_google_user: bool, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
         """
         Ajoute un nouvel utilisateur dans la DB.
         - Si is_google_user == False, hache le password (Argon2).
@@ -74,14 +78,15 @@ class DB_API:
 
         # Insertion en DB
         try:
-            cursor.execute(_Requests.add_user.format(username, password, email, is_google_user))
+            # Ici, _Requests.add_user doit être une requête du type:
+            # "INSERT INTO users (username, password, email, is_google_user) VALUES (%s, %s, %s, %s);" # noqa
+            cursor.execute(_Requests.add_user, (username, password, email, is_google_user))
             return cursor.lastrowid
         except Exception as e:
             return e
 
     @staticmethod
     @cm_cursor()
-
     def get_email_hashpass(email: str, *, cursor: MySQLCursor) -> Union[tuple, Exception, None]:
         """
         Retourne (hashed_password,) pour un utilisateur donné par son email,
@@ -170,7 +175,7 @@ class DB_API:
         >>> if not isinstance(hash_pass, Exception):
         >>>     print(hash_pass)
         """
-        cursor.execute(_Requests.get_email_hashpass.format(email))
+        cursor.execute(_Requests.get_email_hashpass, (email,))
         result = cursor.fetchone()
         return result
 
@@ -206,7 +211,7 @@ class DB_API:
         Permet de récuperer tous les projets d'un utilisateur en fonction de son userID.
 
         Cette fonction renvoie une liste de tuples comprenant les
-        projets sous la forme (projectID, name).
+        projets sous la forme (projectID, name, joined).
         Cette fonction peut ne pas fonctionner, dans ce cas elle
         renvoie None ou dans certains cas, un objet de type Exception.
 
@@ -729,30 +734,34 @@ class DB_API:
     @cm_cursor()
     def get_emails_by_task_projectID(task_project_id: int, *, cursor: MySQLCursor) -> list:
         """
-    Retrieves the emails of users associated with a specific task project.
+        Retrieves the emails of users associated with a specific task project.
 
-    Args:
-        task_project_id (int): The ID of the task project.
-        cursor (MySQLCursor): Cursor for the database connection (managed automatically by the cm_cursor decorator).
+        Args:
+            task_project_id (int): The ID of the task project.
+            cursor (MySQLCursor): Cursor for the database connection
+            (managed automatically by the cm_cursor decorator).
 
-    Returns:
-        list: A list of emails associated with the task project.
+        Returns:
+            list: A list of emails associated with the task project.
         """
         cursor.execute(_Requests.get_emails_by_task_projectID, (task_project_id,))
 
         result = cursor.fetchall()
         return [row[0] for row in result]
 
+    @staticmethod
+    @cm_cursor()
     def get_users_groups_by_project_name(name: str, *, cursor: MySQLCursor) -> ResultType:
         """
-    Récupère les groupes d'utilisateurs associés à un nom de projet spécifique.
+        Récupère les groupes d'utilisateurs associés à un nom de projet spécifique.
 
-    Args:
-        name (str): Le nom du projet.
-        cursor (MySQLCursor): Curseur pour la connexion à la base de données (géré automatiquement par le décorateur cm_cursor).
+        Args:
+            name (str): Le nom du projet.
+            cursor (MySQLCursor): Curseur pour la connexion à la base de données
+            (géré automatiquement par le décorateur cm_cursor).
 
-    Returns:
-        ResultType: Une liste de groupes d'utilisateurs associés au projet.
+        Returns:
+            ResultType: Une liste de groupes d'utilisateurs associés au projet.
         """
         cursor.execute(_Requests.get_users_groups_by_project_name, (name,))
 
@@ -831,26 +840,24 @@ class DB_API:
     @cm_cursor()
     def get_userID_by_email(email: str, *, cursor: MySQLCursor) -> ResultType:
         """
-    Récupère l'ID d'un utilisateur en fonction de son email.
+        Récupère l'ID d'un utilisateur en fonction de son email.
 
-    Cette fonction exécute une requête SQL pour obtenir l'ID de l'utilisateur
-    correspondant à l'email fourni. Elle renvoie le résultat de la requête
-    sous forme de tuple ou une exception en cas d'erreur.
+        Cette fonction exécute une requête SQL pour obtenir l'ID de l'utilisateur
+        correspondant à l'email fourni. Elle renvoie le résultat de la requête
+        sous forme de tuple ou une exception en cas d'erreur.
 
-    Args:
-        email (str): L'email de l'utilisateur.
-        cursor (MySQLCursor): Curseur pour la connexion à la base de données
-        (géré automatiquement par le décorateur cm_cursor).
+        Args:
+            email (str): L'email de l'utilisateur.
+            cursor (MySQLCursor): Curseur pour la connexion à la base de données
+            (géré automatiquement par le décorateur cm_cursor).
 
-    Returns:
-        ResultType: L'ID de l'utilisateur sous forme de tuple ou une exception.
+        Returns:
+            ResultType: L'ID de l'utilisateur sous forme de tuple ou une exception.
         """
         cursor.execute(_Requests.get_userID_by_email, (email,))
 
         result = cursor.fetchone()
         return result
-
-
 
     @staticmethod
     @cm_conn()
@@ -885,8 +892,7 @@ class DB_API:
         :param cursor: Curseur pour exécuter la requête SQL.
         :return: None si la suppression réussit, ou une Exception si elle échoue.
         """
-        cursor.execute(_Requests.delete_user, (user_id,))
-        return None
+        return cursor.execute(_Requests.delete_user, (user_id,))
 
     @staticmethod
     @cm_cursor()
@@ -919,11 +925,10 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def update_task_infos(
-            taskinfos_id: int, update_fields: list, values: list, *, cursor: MySQLCursor
+        taskinfos_id: int, update_fields: list, values: list, *, cursor: MySQLCursor
     ) -> Optional[Exception]:
         return cursor.execute(
-            _Requests.update_task_infos.format(", ".join(update_fields), taskinfos_id),
-            values
+            _Requests.update_task_infos.format(", ".join(update_fields), taskinfos_id), values
         )
 
     @staticmethod
@@ -951,7 +956,7 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def set_invites_status(
-            project_id: int, user_id: int, joined: bool, *, cursor: MySQLCursor
+        project_id: int, user_id: int, joined: int, *, cursor: MySQLCursor
     ) -> Optional[Exception]:
         """
         Permet d'accepter ou refuser une invitation vers un projet.
@@ -967,7 +972,19 @@ class DB_API:
         >>> if not isinstance(err, Exception):
         >>>     print("delete avec succes")
         """
-        return cursor.execute(_Requests.set_invites_status.format(joined, project_id, user_id))
+        return cursor.execute(_Requests.set_invites_status, (joined, project_id, user_id))
+
+    @staticmethod
+    @cm_cursor()
+    def get_totp_secret(email: str, *, cursor: MySQLCursor) -> Optional[str]:
+        """
+        Retourne la clé TOTP stockée pour cet email, ou None si pas trouvée.
+        """
+        cursor.execute("SELECT totp_secret FROM users WHERE email = %s", (email,))
+        row = cursor.fetchone()
+        if row:
+            return row[0]  # la clé
+        return None
 
     @staticmethod
     @cm_conn()
@@ -1000,6 +1017,15 @@ class DB_API:
     @staticmethod
     @cm_conn()
     @cm_cursor()
+    def set_totp_secret(email: str, secret: str, *, cursor: MySQLCursor) -> bool:
+        """
+        Stocke la clé TOTP 'secret' dans la table 'users' pour l'email donné.
+        Suppose qu'une colonne 'totp_secret' existe dans la table 'users'.
+        """
+        cursor.execute("UPDATE users SET totp_secret = %s WHERE email = %s", (secret, email))
+        return True
+
+
     def delete_project(project_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
         return cursor.execute(_Requests.delete_project.format(project_id))
 
