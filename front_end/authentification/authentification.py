@@ -34,21 +34,20 @@ def send_otp_email(recipient_email: str, otp_code: str):
         server.send_message(message)
 
 
-def send_totp_to_user(user_email: str, secret_key: str):
+def send_totp_to_user(totp, user_email: str):
     """
     Génère le code TOTP et l'envoie par mail.
     """
-    totp = pyotp.TOTP(secret_key)
     current_otp = totp.now()
+    print(current_otp, "sayez")
     send_otp_email(user_email, current_otp)
 
 
-def verify_totp_code(secret_key: str, user_input_code: str) -> bool:
+def verify_totp_code(totp, user_input_code: str) -> bool:
     """
     Vérifie si le code TOTP entré par l'utilisateur est correct
     dans la fenêtre de code.
     """
-    totp = pyotp.TOTP(secret_key)
     return totp.verify(user_input_code)  # True si code correct, False sinon.
 
 
@@ -91,7 +90,7 @@ class OtpDialog(QtWidgets.QDialog):
         self.buttonBox = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
             QtCore.Qt.Horizontal,
-            self
+            self,
         )
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
@@ -105,6 +104,9 @@ class OtpDialog(QtWidgets.QDialog):
 
 
 class Ui_MainWindow(object):
+    def __init__(self):
+        self.totp = None
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1035, 774)
@@ -296,7 +298,9 @@ class Ui_MainWindow(object):
         self.frameCreerCompte.setObjectName("frameCreerCompte")
         self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.frameCreerCompte)
         self.verticalLayout_6.setObjectName("verticalLayout_6")
-        self.boutonCreerCompte = QtWidgets.QLabel("<a href='#'>Créer un compte</a>", self.frameCreerCompte)
+        self.boutonCreerCompte = QtWidgets.QLabel(
+            "<a href='#'>Créer un compte</a>", self.frameCreerCompte
+        )
         self.boutonCreerCompte.setMinimumSize(QtCore.QSize(25, 25))
         self.boutonCreerCompte.setMaximumSize(QtCore.QSize(80, 25))
         self.boutonCreerCompte.setObjectName("boutonCreerCompte")
@@ -391,25 +395,30 @@ class Ui_MainWindow(object):
 
             # 1) Authentification OK - Récupérer ou générer la clé secrète
             secret_key = self.get_or_create_user_secret(email)
+            self.totp = pyotp.TOTP(secret_key)
             if not secret_key:
-                self.show_error_message("Erreur", "Impossible de récupérer ou de créer la clé TOTP")
+                self.show_error_message(
+                    "Erreur", "Impossible de récupérer ou de créer la clé TOTP"
+                )
                 return
 
-            # 2) Envoyer le code TOTP par email
-            print("Envoi du code TOTP par email...")
-            send_totp_to_user(email, secret_key)
-            print("Code TOTP envoyé avec succès.")
-
-            # 3) Ouvrir une popup demandant le code
+            # 2) Ouvrir une popup demandant le code
             otp_dialog = OtpDialog(secret_key)
             print("Affichage de la popup OTP...")
+
+            # 3) Envoyer le code TOTP par email
+            print("Envoi du code TOTP par email...")
+            send_totp_to_user(self.totp, email)
+            print("Code TOTP envoyé avec succès.")
+
             result = otp_dialog.exec_()
             print("Popup OTP fermée, résultat :", result)
 
             if result == QtWidgets.QDialog.Accepted:
                 entered_code = otp_dialog.get_code()
                 print("Code OTP saisi :", entered_code)
-                if verify_totp_code(secret_key, entered_code):
+
+                if verify_totp_code(self.totp, entered_code):
                     self.show_success_message("Connexion réussie", "Bienvenue!")
                     self.open_main_window()
                 else:
@@ -434,40 +443,52 @@ class Ui_MainWindow(object):
         if email.lower().endswith("@gmail.com"):
             self.show_error_message(
                 "Erreur d'inscription",
-                "Impossible de créer un compte avec un email se terminant par '@gmail.com'"
+                "Impossible de créer un compte avec un email se terminant par '@gmail.com'",
             )
             return False
 
         if not self.validate_email(email):
-            self.show_error_message("Erreur d'inscription", "Veuillez entrer une adresse email valide")
+            self.show_error_message(
+                "Erreur d'inscription", "Veuillez entrer une adresse email valide"
+            )
             return False
 
         if len(password) < 8:
-            self.show_error_message("Erreur d'inscription", "Le mot de passe doit contenir au moins 8 caractères")
+            self.show_error_message(
+                "Erreur d'inscription", "Le mot de passe doit contenir au moins 8 caractères"
+            )
             return False
 
         # Vérifie si l'email existe déjà
         existing_email = DB_API.get_email(email)
         if existing_email and not isinstance(existing_email, Exception):
-            self.show_error_message("Erreur d'inscription", "Cette adresse email est déjà utilisée")
+            self.show_error_message(
+                "Erreur d'inscription", "Cette adresse email est déjà utilisée"
+            )
             return False
 
         # Vérifie si le username existe déjà
         existing_username = DB_API.get_user(username)
         if existing_username and not isinstance(existing_username, Exception):
-            self.show_error_message("Erreur d'inscription", "Ce nom d'utilisateur est déjà utilisé")
+            self.show_error_message(
+                "Erreur d'inscription", "Ce nom d'utilisateur est déjà utilisé"
+            )
             return False
 
         is_google_user = 0  # forcé à 0
         try:
             success = DB_API.add_user(username, password, email, is_google_user)
             if success and not isinstance(success, Exception):
-                self.show_success_message("Inscription réussie", "Votre compte a été créé avec succès!")
+                self.show_success_message(
+                    "Inscription réussie", "Votre compte a été créé avec succès!"
+                )
                 self.is_login_form = True
                 self.update_form_state()
                 return True
             else:
-                self.show_error_message("Erreur d'inscription", "Erreur lors de la création du compte")
+                self.show_error_message(
+                    "Erreur d'inscription", "Erreur lors de la création du compte"
+                )
                 return False
         except Exception as e:
             self.show_error_message("Erreur d'inscription", f"Une erreur est survenue: {e!s}")
@@ -475,6 +496,7 @@ class Ui_MainWindow(object):
 
     def validate_email(self, email):
         import re
+
         pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.match(pattern, email) is not None
 
@@ -496,14 +518,14 @@ class Ui_MainWindow(object):
         DB_API.set_totp_secret(email, new_secret)
         return new_secret
 
-    def show_error_message(self, title, message):
+    def show_error_message(self, message):
         self.labelErreur.setText(message)
         QtCore.QTimer.singleShot(3000, self.clear_error_message)
 
     def clear_error_message(self):
         self.labelErreur.clear()
 
-    def show_success_message(self, title, message):
+    def show_success_message(self, message):
         self.labelErreur.setStyleSheet("color: white;")
         self.labelErreur.setText(message)
         QtCore.QTimer.singleShot(3000, self.clear_error_message)
