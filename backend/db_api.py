@@ -965,6 +965,55 @@ class DB_API:
         """
         return cursor.execute(_Requests.delete_task, (task_id,))
 
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_subtask(subtask_id, *, cursor: MySQLCursor) -> Optional[Exception]:
+        """
+        Permet de delete une subtask de la db et toutes ses dépendances.
+
+        Cette fonction renvoie None ou None, une exception de façon rare. En cas d'échec,
+        elle renverra une exc et en cas de succes, elle renverra None.
+
+        :param subtask_id: ID de la tache
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+
+        Exemple:
+        >>> err = DB_API.delete_subtask(1)
+        >>> if and not isinstance(err, Exception):
+        >>>     print("delete avec succes")
+        """
+        return cursor.execute(_Requests.delete_task.format(subtask_id))
+
+    @staticmethod
+    @cm_cursor()
+    def get_user_permission(project_id: int, user_id: int, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_user_permission.format(project_id, user_id))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_project(project_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
+        return cursor.execute(_Requests.delete_project.format(project_id))
+
+    @staticmethod
+    @cm_cursor()
+    def get_task_info_by_task_id(taskID: str, *, cursor: MySQLCursor) -> ResultType:
+        query = _Requests.get_tasks_by_title.format(taskID)
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_user_group(project_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
+        return cursor.execute(_Requests.delete_users_groups.format(project_id))
+        
+    
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
     # t = (DB_API.add_user(username="vlad", password="trql",
