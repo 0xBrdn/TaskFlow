@@ -81,6 +81,7 @@ class DB_API:
 
     @staticmethod
     @cm_cursor()
+
     def get_email_hashpass(email: str, *, cursor: MySQLCursor) -> Union[tuple, Exception, None]:
         """
         Retourne (hashed_password,) pour un utilisateur donné par son email,
@@ -88,7 +89,7 @@ class DB_API:
         (Fonction legacy, vous pouvez la garder si du code l'utilise.)
         """
         try:
-            cursor.execute("SELECT password FROM users WHERE email = %s", (email,))
+            cursor.execute(_Requests.get_email_hashpass, (email,))
             row = cursor.fetchone()
             if row:
                 return (row[0],)  # pour rester compatible
@@ -96,10 +97,6 @@ class DB_API:
                 return None
         except Exception as e:
             return e
-
-
-
-
 
     @staticmethod
     @cm_cursor()
@@ -147,7 +144,8 @@ class DB_API:
         >>>     print(project_id)
 
         """
-        cursor.execute(_Requests.get_project_id_by_project_name.format(project_name))
+        cursor.execute(_Requests.get_project_id_by_project_name, (project_name,))
+
         result = cursor.fetchone()
         return result
 
@@ -197,7 +195,7 @@ class DB_API:
         >>> if hash_pass and not isinstance(:
         >>>     print(hash_pass)
         """
-        cursor.execute(_Requests.get_user_hashpass.format(user_id))
+        cursor.execute(_Requests.get_user_hashpass, (user_id,))
         result = cursor.fetchone()
         return result
 
@@ -222,7 +220,8 @@ class DB_API:
         >>> if projects and not isinstance(projects, Exception):
         >>>     print(projects)
         """
-        cursor.execute(_Requests.get_projects_by_user_id.format(user_id))
+        cursor.execute(_Requests.get_projects_by_user_id, (user_id,))
+
         result = cursor.fetchall()
         return result
 
@@ -248,7 +247,8 @@ class DB_API:
         >>> if tasks and not isinstance(tasks, Exception):
         >>>     print(tasks)
         """
-        cursor.execute(_Requests.get_tasks_by_project_id.format(project_id))
+        cursor.execute(_Requests.get_tasks_by_project_id, (project_id,))
+
         result = cursor.fetchall()
         return result
 
@@ -274,7 +274,8 @@ class DB_API:
         >>> if subtasks and not isinstance(subtasks, Exception):
         >>>     print(subtasks)
         """
-        cursor.execute(_Requests.get_subtasks_by_task_id.format(task_id))
+        cursor.execute(_Requests.get_subtasks_by_task_id, (task_id,))
+
         result = cursor.fetchall()
         return result
 
@@ -299,7 +300,8 @@ class DB_API:
         >>> if logs and not isinstance(logs, Exception):
         >>>     print(logs)
         """
-        cursor.execute(_Requests.get_user_logs_by_id.format(log_id))
+        cursor.execute(_Requests.get_user_logs_by_id, (log_id,))
+
         result = cursor.fetchall()
         return result
 
@@ -324,7 +326,7 @@ class DB_API:
         >>> if users_in_project and not isinstance(users_in_project, Exception):
         >>>     print(users_in_project)
         """
-        cursor.execute(_Requests.get_users_in_project_by_project_id.format(project_id))
+        cursor.execute(_Requests.get_users_in_project_by_project_id, (project_id,))
         result = cursor.fetchall()
         return result
 
@@ -349,7 +351,7 @@ class DB_API:
         >>> if user_tasks and not isinstance(user_tasks, Exception):
         >>>     print(user_tasks)
         """
-        cursor.execute(_Requests.get_tasks_by_user_id.format(user_id))
+        cursor.execute(_Requests.get_tasks_by_user_id, (user_id,))
         result = cursor.fetchall()
         return result
 
@@ -375,7 +377,7 @@ class DB_API:
         >>> if users_in_group and not isinstance(users_in_group, Exception):
         >>>     print(users_in_group)
         """
-        cursor.execute(_Requests.get_users_in_tasks_group_by_group_id.format(group_id))
+        cursor.execute(_Requests.get_users_in_tasks_group_by_group_id, (group_id,))
         result = cursor.fetchall()
         return result
 
@@ -405,35 +407,6 @@ class DB_API:
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_user(
-            username: str,
-            password: Optional[str],
-            email: str,
-            is_google_user: bool,
-            *,
-            cursor: MySQLCursor,
-    ) -> Union[Exception, Optional[int]]:
-        # Si c'est un compte local (non Google), on hache le password
-        # et seulement si password n'est pas None
-        if password and not is_google_user:
-            try:
-                password = ph.hash(password)
-            except Exception as e:
-                return e
-        else:
-            # Si l'utilisateur se connecte via Google,
-            # ou pas de password, on peut mettre un placeholder (ex: "")
-            password = password or ""
-
-        # Ensuite on insère le password haché ou placeholder
-        cursor.execute(_Requests.add_user.format(username, password, email, is_google_user))
-        return cursor.lastrowid
-
-
-
-    @staticmethod
-    @cm_conn()
-    @cm_cursor()
     def add_status(
         user_id: int, status: int, *, cursor: MySQLCursor
     ) -> Union[Exception, Optional[int]]:
@@ -453,7 +426,7 @@ class DB_API:
         >>> if status_id and not isinstance(status_id, Exception):
         >>>     print(status_id)
         """
-        cursor.execute(_Requests.add_status.format(user_id, status))
+        cursor.execute(_Requests.add_status, (user_id, status))
         return cursor.lastrowid
 
     @staticmethod
@@ -475,7 +448,7 @@ class DB_API:
         >>> if project_id and not isinstance(project_id, Exception):
         >>>     print(project_id)
         """
-        cursor.execute(_Requests.add_project.format(name))
+        cursor.execute(_Requests.add_project, (name,))
         return cursor.lastrowid
 
     @staticmethod
@@ -503,7 +476,7 @@ class DB_API:
         >>> if user_group_id and not isinstance(user_group_id, Exception):
         >>>     print(user_group_id)
         """
-        cursor.execute(_Requests.add_user_to_group.format(project_id, user_id, permission, joined))
+        cursor.execute(_Requests.add_user_to_group, (project_id, user_id, permission, joined))
         return cursor.lastrowid
 
     @staticmethod
@@ -545,9 +518,8 @@ class DB_API:
         >>>     print(taskinfo_id)
         """
         cursor.execute(
-            _Requests.add_task_info.format(
-                status, priority, title, description, dead_line, covered, assign
-            )
+            _Requests.add_task_info,
+            (status, priority, title, description, dead_line, covered, assign),
         )
 
         return cursor.lastrowid
@@ -575,7 +547,8 @@ class DB_API:
         >>> if task_id and not isinstance(task_id, Exception):
         >>>     print(task_id)
         """
-        cursor.execute(_Requests.add_task.format(project_id, task_info_id, user_id))
+        cursor.execute(_Requests.add_task, (project_id, task_info_id, user_id))
+
         return cursor.lastrowid
 
     @staticmethod
@@ -600,7 +573,8 @@ class DB_API:
         >>> if subtask_id and not isinstance(subtask_id, Exception):
         >>>     print(subtask_id)
         """
-        cursor.execute(_Requests.add_subtask.format(task_id, task_info_id))
+        cursor.execute(_Requests.add_subtask, (task_id, task_info_id))
+
         return cursor.lastrowid
 
     @staticmethod
@@ -625,7 +599,8 @@ class DB_API:
         >>> if users_tasks_groups_id and not isinstance(users_tasks_groups_id, Exception):
         >>>     print(users_tasks_groups_id)
         """
-        cursor.execute(_Requests.add_user_to_task_group.format(task_project_id, user_id))
+        cursor.execute(_Requests.add_user_to_task_group, (task_project_id, user_id))
+
         return cursor.lastrowid
 
     @staticmethod
@@ -651,7 +626,8 @@ class DB_API:
         >>> if user_log_id and not isinstance(user_log_id, Exception):
         >>>     print(user_log_id)
         """
-        cursor.execute(_Requests.add_user_log.format(user_id, action, details))
+        cursor.execute(_Requests.add_user_log, (user_id, action, details))
+
         return cursor.lastrowid
 
     @staticmethod
@@ -673,7 +649,8 @@ class DB_API:
         >>> if user_id and not isinstance(user_id, Exception):
         >>>     print(f"user_id = {user_id}")
         """
-        cursor.execute(_Requests.get_userID_by_username.format(username))
+        cursor.execute(_Requests.get_userID_by_username, (username,))
+
         result = cursor.fetchone()
         return result[0]
 
@@ -743,7 +720,8 @@ class DB_API:
         >>> if email and not isinstance(email, Exception):
         >>>     print(f"email = {email}")
         """
-        cursor.execute(_Requests.get_user_email.format(user_id))
+        cursor.execute(_Requests.get_user_email, (user_id,))
+
         result = cursor.fetchone()
         return result
 
@@ -760,7 +738,8 @@ class DB_API:
     Returns:
         list: A list of emails associated with the task project.
         """
-        cursor.execute(_Requests.get_emails_by_task_projectID.format(task_project_id))
+        cursor.execute(_Requests.get_emails_by_task_projectID, (task_project_id,))
+
         result = cursor.fetchall()
         return [row[0] for row in result]
 
@@ -775,7 +754,8 @@ class DB_API:
     Returns:
         ResultType: Une liste de groupes d'utilisateurs associés au projet.
         """
-        cursor.execute(_Requests.get_users_groups_by_project_name.format(name))
+        cursor.execute(_Requests.get_users_groups_by_project_name, (name,))
+
         result = cursor.fetchall()
         return result
 
@@ -797,8 +777,7 @@ class DB_API:
         Returns:
             ResultType: Une liste de tuples représentant les tâches ou une exception.
         """
-        query = _Requests.get_tasks_by_title.format(title)
-        cursor.execute(query)
+        cursor.execute(_Requests.get_tasks_by_title, (title,))
         result = cursor.fetchall()
         return result
 
@@ -820,7 +799,8 @@ class DB_API:
         Returns:
             ResultType: Un tuple représentant l'email ou une exception.
         """
-        cursor.execute(_Requests.get_email.format(email))
+        cursor.execute(_Requests.get_email, (email,))
+
         result = cursor.fetchone()
         return result
 
@@ -842,7 +822,8 @@ class DB_API:
         Returns:
             ResultType: Un tuple représentant les informations de l'utilisateur ou une exception.
         """
-        cursor.execute(_Requests.get_user.format(username))
+        cursor.execute(_Requests.get_user, (username,))
+
         result = cursor.fetchone()
         return result
 
@@ -864,34 +845,12 @@ class DB_API:
     Returns:
         ResultType: L'ID de l'utilisateur sous forme de tuple ou une exception.
         """
-        cursor.execute(_Requests.get_userID_by_email.format(email))
+        cursor.execute(_Requests.get_userID_by_email, (email,))
+
         result = cursor.fetchone()
         return result
 
-    @staticmethod
-    @cm_cursor()
-    def get_emails_by_task_project_id(
-        task_project_id: int, *, cursor: MySQLCursor
-    ) -> Union[Exception, Optional[list]]:
-        """
-        Permet d'ajouter un task_group dans la db.
 
-        Cette fonction renvoie l'id du task_group ou None, une exception de façon rare.
-        En cas d'échec, elle renverra une exc et en cas de succes,
-        elle renverra l'id du task_group.
-
-        :param task_project_id: L'id du task_project
-        :param cursor: Curseur d'une connexion vers une DB
-        (optionnel, géré automatiquement par le décorateur cm_cursor())
-
-        Exemple:
-        >>> emails = DB_API.get_emails_by_task_project_id(2)
-        >>> if emails and not isinstance(emails, Exception):
-        >>>     print(f"emails = {emails}")
-        """
-        cursor.execute(_Requests.get_emails_by_task_projectID.format(task_project_id))
-        result = cursor.fetchall()
-        return [row[0] for row in result]
 
     @staticmethod
     @cm_conn()
@@ -938,7 +897,8 @@ class DB_API:
         >>> if not isinstance(err, Exception):
         >>>     print("delete avec succes")
         """
-        return cursor.execute(_Requests.delete_user.format(user_id))
+        return cursor.execute(_Requests.delete_user, (user_id,))
+
 
     @staticmethod
     @cm_cursor()
@@ -962,7 +922,8 @@ class DB_API:
         >>>     print(projects)
 
         """
-        cursor.execute(_Requests.get_project_in_users_groups.format(user_id))
+        cursor.execute(_Requests.get_project_in_users_groups, (user_id,))
+
         result = cursor.fetchall()
         return result
 
@@ -970,27 +931,11 @@ class DB_API:
     @cm_conn()
     @cm_cursor()
     def update_task_infos(
-        taskinfos_id: int, update_fields: list, values: list, *, cursor: MySQLCursor
+            taskinfos_id: int, update_fields: list, values: list, *, cursor: MySQLCursor
     ) -> Optional[Exception]:
-        """
-        Permet d'update un ou plusieurs objets d'une task_infos.
-
-        Cette fonction renvoie None ou None, une exception de façon rare. En cas d'échec,
-        elle renverra une exc et en cas de succes, elle renverra None.
-
-        :param taskinfos_id: ID de la task info
-        :param update_fields: Tous les objets a modifier
-        :param values: Les valeurs des objets a modifier
-        :param cursor: Curseur d'une connexion vers une DB
-        (optionnel, géré automatiquement par le décorateur cm_cursor())
-
-        Exemple:
-        >>> err = DB_API.update_task_infos(4, ['status', 'title'], [3, 'nouveau title'])
-        >>> if and not isinstance(err, Exception):
-        >>>     print("delete avec succes")
-        """
         return cursor.execute(
-            _Requests.update_task_infos.format(", ".join(update_fields), taskinfos_id), values
+            _Requests.update_task_infos.format(", ".join(update_fields), taskinfos_id),
+            values
         )
 
     @staticmethod
@@ -1012,63 +957,7 @@ class DB_API:
         >>> if and not isinstance(err, Exception):
         >>>     print("delete avec succes")
         """
-        return cursor.execute(_Requests.delete_task.format(task_id))
-
-    @staticmethod
-    @cm_conn()
-    @cm_cursor()
-    def set_invites_status(
-        project_id: int, user_id: int, joined: bool, *, cursor: MySQLCursor
-    ) -> Optional[Exception]:
-        """
-        Permet d'accepter ou refuser une invitation vers un projet.
-        Cette fonction renvoie None ou une exception. En cas d'échec,
-        elle renverra une exc et en cas de succes, elle renverra None.
-        :param project_id: Le project_ID
-        :param user_id: ID de l'utilisateur
-        :param joined: Accepter ou pas l'invit
-        :param cursor: Curseur d'une connexion vers une DB
-        (optionnel, géré automatiquement par le décorateur cm_cursor())
-        Exemple:
-        >>> err = DB_API.set_invites_status(1, 1, False)
-        >>> if not isinstance(err, Exception):
-        >>>     print("delete avec succes")
-        """
-        return cursor.execute(_Requests.set_invites_status.format(joined, project_id, user_id))
-
-    @staticmethod
-    @cm_conn()
-    @cm_cursor()
-    def delete_subtask(subtask_id, *, cursor: MySQLCursor) -> Optional[Exception]:
-        """
-        Permet de delete une subtask de la db et toutes ses dépendances.
-
-        Cette fonction renvoie None ou None, une exception de façon rare. En cas d'échec,
-        elle renverra une exc et en cas de succes, elle renverra None.
-
-        :param subtask_id: ID de la tache
-        :param cursor: Curseur d'une connexion vers une DB
-        (optionnel, géré automatiquement par le décorateur cm_cursor())
-
-        Exemple:
-        >>> err = DB_API.delete_subtask(1)
-        >>> if and not isinstance(err, Exception):
-        >>>     print("delete avec succes")
-        """
-        return cursor.execute(_Requests.delete_task.format(subtask_id))
-
-    @staticmethod
-    @cm_cursor()
-    def get_user_info(email: str, *, cursor):
-        """
-        Retourne les infos de l'utilisateur sous forme de dict {username, role}
-        """
-        cursor.execute("SELECT username FROM users WHERE email=%s", (email,))
-        row = cursor.fetchone()
-        if not row:
-            return {"username":"Inconnu","role":"Membre"}
-        return {"username": row[0], "role":"Membre"}
-
+        return cursor.execute(_Requests.delete_task, (task_id,))
 
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
