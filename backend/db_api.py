@@ -54,47 +54,53 @@ class DB_API:
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_user(username: str, password: str, email: str, is_google_user: bool, *,
-                 cursor: MySQLCursor) -> Union[Exception, Optional[int]]:
+    def add_user(
+            username: str,
+            password: str,
+            email: str,
+            is_google_user: bool,
+            *,
+            cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
         """
         Ajoute un nouvel utilisateur dans la DB.
         - Si is_google_user == False, hache le password (Argon2).
         - Sinon, on stocke un placeholder (ex: "").
         Retourne l'ID (userID) inséré, ou un objet Exception en cas d'erreur.
         """
+        # Hachage conditionnel du password
         if not is_google_user:
             try:
-                # Hachage Argon2 du mot de passe
-                password = ph.hash(password)
+                password = ph.hash(password)  # Argon2 hashing
             except Exception as e:
                 return e
         else:
-            # Compte Google => mot de passe vide ou placeholder
-            password = ""
+            password = ""  # Compte Google => placeholder
 
-        # Insertion en DB
+        # Insertion paramétrée dans la DB
         try:
-            cursor.execute(_Requests.add_user.format(username, password, email, is_google_user))
+            # Ici, _Requests.add_user doit être une requête du type:
+            # "INSERT INTO users (username, password, email, is_google_user) VALUES (%s, %s, %s, %s);"
+            cursor.execute(_Requests.add_user, (username, password, email, is_google_user))
             return cursor.lastrowid
         except Exception as e:
             return e
 
     @staticmethod
     @cm_cursor()
-
-    def get_email_hashpass(email: str, *, cursor: MySQLCursor) -> Union[tuple, Exception, None]:
+    @staticmethod
+    @cm_cursor()
+    def get_email_hashpass(email: int, *, cursor: MySQLCursor) -> ResultType:
         """
-        Retourne (hashed_password,) pour un utilisateur donné par son email,
-        ou None si non trouvé, ou Exception si erreur DB.
-        (Fonction legacy, vous pouvez la garder si du code l'utilise.)
+        Permet de récupérer le mdp hash d'un user en fonction de l'email dans la DB.
+        Cette fonction renvoie un tuple (mot_de_passe_hash,) ou None, ou un Exception.
         """
         try:
+            # _Requests.get_email_hashpass doit être du type:
+            # "SELECT password FROM users WHERE email = %s;"
             cursor.execute(_Requests.get_email_hashpass, (email,))
-            row = cursor.fetchone()
-            if row:
-                return (row[0],)  # pour rester compatible
-            else:
-                return None
+            result = cursor.fetchone()
+            return result
         except Exception as e:
             return e
 

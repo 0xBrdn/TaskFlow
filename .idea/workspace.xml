@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="5338d278-2e09-40d0-8047-f0efcab8280b" name="Changes" comment="Modifie la fonction cm_cursor() dans db_helper.py pour créer un curseur tamponné avec cursor = conn.cursor(buffered=True).">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/db_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/db_requests.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db_requests.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +22,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="securisation" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -52,26 +50,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.authentification.executor&quot;: &quot;Run&quot;,
-    &quot;Python.front_end2 (1).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.front_end2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main (1).executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pagePrincipale (1).executor&quot;: &quot;Run&quot;,
-    &quot;Python.temp.executor&quot;: &quot;Run&quot;,
-    &quot;Python.temp01.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test.executor&quot;: &quot;Run&quot;,
-    &quot;Python.todo liste.executor&quot;: &quot;Run&quot;,
-    &quot;Python.try.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;securisation&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/defaultuser0/miniconda3/condabin/conda.bat&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.authentification.executor": "Run",
+    "Python.front_end2 (1).executor": "Debug",
+    "Python.front_end2.executor": "Run",
+    "Python.main (1).executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.pagePrincipale (1).executor": "Run",
+    "Python.temp.executor": "Run",
+    "Python.temp01.executor": "Run",
+    "Python.test.executor": "Run",
+    "Python.todo liste.executor": "Run",
+    "Python.try.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/defaultuser0/miniconda3/condabin/conda.bat",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\godot\projets\SAE502-TaskFlow\front-end\authentification\images\pagePrincipale" />
@@ -192,11 +190,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.main (1)" />
         <item itemvalue="Python.try" />
         <item itemvalue="Python.todo liste" />
         <item itemvalue="Python.pagePrincipale (1)" />
         <item itemvalue="Python.pagePrincipale" />
+        <item itemvalue="Python.main (1)" />
       </list>
     </recent_temporary>
   </component>
