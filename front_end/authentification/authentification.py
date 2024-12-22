@@ -29,7 +29,7 @@ def send_otp_email(recipient_email: str, otp_code: str):
     subject = "Votre code TOTP"
     body = f"Votre code à 6 chiffres : {otp_code}\nIl est valable 30 secondes."
     message = MIMEMultipart()
-    acc = accounts[randint(0, len(accounts))]
+    acc = accounts[randint(0, len(accounts) - 1)]
     SENDER_EMAIL = acc.get("email")
     SENDER_PASSWORD = acc.get("password")
     message["From"] = SENDER_EMAIL
