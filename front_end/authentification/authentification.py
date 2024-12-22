@@ -7,14 +7,19 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from zxcvbn import zxcvbn
+from random import randint
 
 # =====================
 # Config email pour TOTP
 # =====================
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
-SENDER_EMAIL = "hgrigord1409@gmail.com"
-SENDER_PASSWORD = "giik leti bkyu jsbq"
+
+accounts = [
+    {"email": "taskflowreminder1@gmail.com", "password": "bgnt irxw fblu vemb"},
+    {"email": "taskflowreminder2@gmail.com", "password": "lkya wtsu opzy pnse"},
+    {"email": "taskflowreminder3@gmail.com", "password": "jjnw nuhq eopy azfw"},
+]
 
 
 def send_otp_email(recipient_email: str, otp_code: str):
@@ -24,6 +29,9 @@ def send_otp_email(recipient_email: str, otp_code: str):
     subject = "Votre code TOTP"
     body = f"Votre code à 6 chiffres : {otp_code}\nIl est valable 30 secondes."
     message = MIMEMultipart()
+    acc = accounts[randint(0, len(accounts))]
+    SENDER_EMAIL = acc.get("email")
+    SENDER_PASSWORD = acc.get("password")
     message["From"] = SENDER_EMAIL
     message["To"] = recipient_email
     message["Subject"] = subject
@@ -455,13 +463,13 @@ class Ui_MainWindow(object):
 
         # Vérification de la force du mot de passe avec zxcvbn
         password_strength = zxcvbn(password)
-        if password_strength['score'] < 3:  # Score requis : 3 ou plus
-            feedback = password_strength['feedback']
-            warning = feedback.get('warning', "")
-            suggestions = " ".join(feedback.get('suggestions', []))
+        if password_strength["score"] < 3:  # Score requis : 3 ou plus
+            feedback = password_strength["feedback"]
+            warning = feedback.get("warning", "")
+            suggestions = " ".join(feedback.get("suggestions", []))
             self.show_error_message(
                 "Mot de passe faible",
-                f"Votre mot de passe est trop faible. {warning} {suggestions}"
+                f"Votre mot de passe est trop faible. {warning} {suggestions}",
             )
             return False
 
