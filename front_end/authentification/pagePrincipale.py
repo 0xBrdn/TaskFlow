@@ -7,10 +7,89 @@ from PyQt5.QtWidgets import (
     QInputDialog,
     QGroupBox,
     QHBoxLayout,
+    QListWidgetItem,
 )
 from backend.db_api import DB_API
 import datetime
 from typing import Optional
+
+
+class InviteUsersDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None, deny=False):
+        super().__init__(parent)
+        self.deny = deny
+        self.setWindowTitle("Inviter des utilisateurs")
+        self.setMinimumWidth(400)
+        self.setup_ui()
+
+    def setup_ui(self):
+        layout = QVBoxLayout(self)
+        if self.deny:
+            error_label = QLabel(
+                "Vous n'avez pas les permissions requises "
+                "pour inviter des utilisateurs dans ce projet."
+            )
+            error_label.setStyleSheet("color: red; font-weight: bold; font-size: 14px;")
+            layout.addWidget(error_label)
+
+            close_button = QtWidgets.QPushButton("Fermer")
+            close_button.clicked.connect(self.reject)
+            layout.addWidget(close_button)
+        else:
+            # Liste des utilisateurs
+            self.user_list = QtWidgets.QListWidget(self)
+            self.user_list.setSelectionMode(QtWidgets.QListWidget.MultiSelection)
+            layout.addWidget(QLabel("Sélectionnez les utilisateurs à inviter:"))
+            layout.addWidget(self.user_list)
+
+            # Droits d'accès
+            rights_layout = QtWidgets.QHBoxLayout()
+            self.rights_combo = QtWidgets.QComboBox(self)
+            self.rights_combo.addItems(["lecture", "lecture + ecriture", "administration"])
+            self.map_rights_combo = {"lecture": 0, "lecture + ecriture": 1, "administration": 2}
+            rights_layout.addWidget(QtWidgets.QLabel("Droits d'accès:"))
+            rights_layout.addWidget(self.rights_combo)
+            layout.addLayout(rights_layout)
+
+            # Boutons
+            button_layout = QtWidgets.QHBoxLayout()
+            self.invite_button = QtWidgets.QPushButton("Inviter")
+            self.invite_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #0066cc;
+                    color: white;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
+                QPushButton:hover {
+                    background-color: #0080ff;
+                }
+            """)
+            self.cancel_button = QtWidgets.QPushButton("Annuler")
+
+            button_layout.addWidget(self.invite_button)
+            button_layout.addWidget(self.cancel_button)
+            layout.addLayout(button_layout)
+
+            # Connexions
+            self.invite_button.clicked.connect(self.accept)
+            self.cancel_button.clicked.connect(self.reject)
+
+    def load_users(self, users):
+        self.user_list.clear()
+        for user in users:
+            item = QListWidgetItem(f"{user}")
+            item.setData(QtCore.Qt.UserRole, user)
+            self.user_list.addItem(item)
+
+    def get_selected_users(self):
+        selected_items = self.user_list.selectedItems()
+        users = []
+        rights = self.rights_combo.currentText()
+        for item in selected_items:
+            user = item.data(QtCore.Qt.UserRole)
+            users.append((user, self.map_rights_combo.get(rights)))
+        return users
 
 
 class Ui_MainWindow(object):
@@ -67,6 +146,7 @@ class Ui_MainWindow(object):
         self.add_subtask_button.clicked.connect(self.add_subtask)
         self.delete_task_button.clicked.connect(self.delete_task)
         self.complete_task_button.clicked.connect(self.mark_completed)
+        self.invite_users_button.clicked.connect(self.show_invite_dialog)
         self.tree.itemSelectionChanged.connect(self.update_subtask_availability)
         self.delete_account_button.clicked.connect(self.delete_account)
         self.add_user_button.clicked.connect(self.add_selected_user)
@@ -226,19 +306,19 @@ class Ui_MainWindow(object):
 
         assign_group = QGroupBox("Assigner des utilisateurs")
         assign_group.setStyleSheet("""
-        QGroupBox {
-            border: 2px solid #8f8f91;
-            border-radius: 10px;
-            margin-top: 1em;
-            background-color: #e0f0ff;
-        }
-        QGroupBox:title {
-            subcontrol-origin: margin;
-            subcontrol-position: top center;
-            padding: 0 3px;
-            background-color: transparent;
-        }
-        """)
+         QGroupBox {
+             border: 2px solid #8f8f91;
+             border-radius: 10px;
+             margin-top: 1em;
+             background-color: #e0f0ff;
+         }
+         QGroupBox:title {
+             subcontrol-origin: margin;
+             subcontrol-position: top center;
+             padding: 0 3px;
+             background-color: transparent;
+         }
+         """)
         assign_layout = QHBoxLayout(assign_group)
 
         self.assign_user_dropdown = QtWidgets.QComboBox(self.task_tab)
@@ -280,11 +360,13 @@ class Ui_MainWindow(object):
         self.add_subtask_button.setEnabled(False)
         self.delete_task_button = QtWidgets.QPushButton("Supprimer", self.task_tab)
         self.complete_task_button = QtWidgets.QPushButton("Marquer comme terminé", self.task_tab)
+        self.invite_users_button = QtWidgets.QPushButton("Inviter des utilisateurs", self.task_tab)
 
         self.add_task_button.setObjectName("add_task_button")
         self.add_subtask_button.setObjectName("add_subtask_button")
         self.delete_task_button.setObjectName("delete_task_button")
         self.complete_task_button.setObjectName("complete_task_button")
+        self.invite_users_button.setObjectName("invite_user")
 
         self.modify_task_button = QtWidgets.QPushButton("Modifier", self.task_tab)
         self.modify_task_button.setObjectName("modify_task_button")
@@ -295,6 +377,7 @@ class Ui_MainWindow(object):
         self.button_layout.addWidget(self.add_subtask_button)
         self.button_layout.addWidget(self.delete_task_button)
         self.button_layout.addWidget(self.complete_task_button)
+        self.button_layout.addWidget(self.invite_users_button)
         self.task_layout.addLayout(self.button_layout)
 
     def _setup_account_tab(self):
@@ -829,7 +912,7 @@ class Ui_MainWindow(object):
                 parent=self.task_tab,
                 task_info=task_info,
                 assigned_users=assigned_users,
-                all_users=all_users
+                all_users=all_users,
             )
 
             print("\n--- Attente de la réponse utilisateur ---")
@@ -842,10 +925,10 @@ class Ui_MainWindow(object):
                 DB_API.update_task_info(
                     task_info_id=task_info[0],
                     status=task_info[2],
-                    priority=form_data['priority'],
-                    title=form_data['title'],
-                    description=form_data['comment'],
-                    dead_line=form_data['date'],
+                    priority=form_data["priority"],
+                    title=form_data["title"],
+                    description=form_data["comment"],
+                    dead_line=form_data["date"],
                     covered=task_info[4],
                     assign=task_group_id,
                 )
@@ -855,25 +938,35 @@ class Ui_MainWindow(object):
                 print(f"Suppression des utilisateurs du groupe {task_group_id}")
                 DB_API.remove_all_users_from_task_group(task_group_id)
 
-                for username in form_data['assigned_users']:
+                for username in form_data["assigned_users"]:
                     print(f"Ajout de l'utilisateur {username}")
                     user_id = DB_API.get_user_id_by_username(username)
                     if user_id:
                         print(f"User ID trouvé: {user_id}, ajout au groupe")
                         DB_API.add_user_to_task_group(task_group_id, user_id)
                     else:
-                        print(f"Attention: Impossible de trouver l'ID pour l'utilisateur {username}")
+                        print(
+                            f"Attention: Impossible de trouver l'ID pour l'utilisateur {username}"
+                        )
 
                 print("\n--- Mise à jour de l'affichage ---")
-                selected_item.setText(0, form_data['title'])
-                selected_item.setText(1,
-                                      QtCore.QDate.fromString(form_data['date'], "yyyy-MM-dd").toString("dd/MM/yyyy"))
-                selected_item.setText(2, form_data['comment'])
+                selected_item.setText(0, form_data["title"])
+                selected_item.setText(
+                    1,
+                    QtCore.QDate.fromString(form_data["date"], "yyyy-MM-dd").toString(
+                        "dd/MM/yyyy"
+                    ),
+                )
+                selected_item.setText(2, form_data["comment"])
                 selected_item.setText(
                     3,
-                    "Haute" if form_data['priority'] == 2 else "Moyenne" if form_data['priority'] == 1 else "Basse"
+                    "Haute"
+                    if form_data["priority"] == 2
+                    else "Moyenne"
+                    if form_data["priority"] == 1
+                    else "Basse",
                 )
-                selected_item.setText(4, ", ".join(form_data['assigned_users']))
+                selected_item.setText(4, ", ".join(form_data["assigned_users"]))
                 print("Mise à jour de l'affichage terminée")
 
                 QMessageBox.information(None, "Succès", "Modifications appliquées avec succès.")
@@ -881,9 +974,10 @@ class Ui_MainWindow(object):
                 print("Dialog annulé par l'utilisateur")
 
         except Exception as e:
-            print(f"\n!!! ERREUR: {str(e)}")
+            print(f"\n!!! ERREUR: {e!s}")
             print(f"Type d'erreur: {type(e)}")
             import traceback
+
             print(f"Traceback:\n{traceback.format_exc()}")
             QMessageBox.critical(
                 None, "Erreur", f"Erreur lors du chargement des informations : {e!s}"
@@ -1070,6 +1164,32 @@ class Ui_MainWindow(object):
             return
         return
 
+    def get_user_to_invite(self, _list_users: list, _list_users_in_projects: list):
+        list_users = [user[1] for user in _list_users]
+        list_users_in_projects = [user[1] for user in _list_users_in_projects]
+        return [user for user in list_users if user not in list_users_in_projects]
+
+    def show_invite_dialog(self):
+        project_id = DB_API.get_project_id_by_project_name(self.current_project)[0]
+        _list_users = DB_API.get_all_users()
+        _list_users_in_projects = DB_API.get_users_in_project_by_project_id(project_id)
+        perms = next(user[2] for user in _list_users_in_projects if user[0] == self.user_id)
+        if perms == 2:
+            users = self.get_user_to_invite(_list_users, _list_users_in_projects)
+            dialog = InviteUsersDialog(self.task_tab)
+            dialog.load_users(users)
+
+            if dialog.exec_() == QtWidgets.QDialog.Accepted:
+                selected_users = dialog.get_selected_users()
+                for user, rights in selected_users:
+                    user_id = next(u[0] for u in _list_users if u[1] == user)
+                    print(user, rights, user_id, _list_users, project_id)
+                    self.send_invitation(project_id, user_id, rights)
+        else:
+            dialog = InviteUsersDialog(self.task_tab, deny=True)
+            dialog.exec_()
+
+
 class TaskEditDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, task_info=None, assigned_users=None, all_users=None):
         super().__init__(parent)
@@ -1176,15 +1296,16 @@ class TaskEditDialog(QtWidgets.QDialog):
 
     def get_form_data(self):
         return {
-            'title': self.title_input.text().strip(),
-            'date': self.date_input.date().toString("yyyy-MM-dd"),
-            'comment': self.comment_input.text().strip(),
-            'priority': self.importance_input.currentIndex(),
-            'assigned_users': [
+            "title": self.title_input.text().strip(),
+            "date": self.date_input.date().toString("yyyy-MM-dd"),
+            "comment": self.comment_input.text().strip(),
+            "priority": self.importance_input.currentIndex(),
+            "assigned_users": [
                 self.assigned_users_list.item(i).text()
                 for i in range(self.assigned_users_list.count())
-            ]
+            ],
         }
+
 
 if __name__ == "__main__":
     # u = Ui_MainWindow()

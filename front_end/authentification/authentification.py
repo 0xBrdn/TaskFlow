@@ -483,9 +483,7 @@ class Ui_MainWindow(object):
         # Vérification si l'email existe déjà
         existing_email = DB_API.get_email(email)
         if existing_email and not isinstance(existing_email, Exception):
-            self.show_error_message(
-                "Erreur d'inscription", "Cette adresse email est déjà utilisée"
-            )
+            self.show_error_message("Erreur d'inscription Cette adresse email est déjà utilisée")
             return False
 
         # Vérification si le nom d'utilisateur existe déjà
