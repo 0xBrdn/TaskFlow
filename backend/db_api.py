@@ -1063,7 +1063,23 @@ class DB_API:
     def delete_tasks(project_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
         return cursor.execute(_Requests.delete_tasks.format(project_id))
         
-    
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def check_projects(project_name: str, *, cursor: MySQLCursor) -> bool:
+        """
+        Vérifie si un projet existe dans la base de données par son nom.
+
+        :param project_name: Nom du projet à vérifier.
+        :param cursor: Curseur de la base de données.
+        :return: True si le projet existe, False sinon.
+        """
+        cursor.execute(_Requests.check_projects.format(project_name))
+        result = cursor.fetchone()
+
+        return result[0] > 0 if result else False
+
+
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
     # t = (DB_API.add_user(username="vlad", password="trql",

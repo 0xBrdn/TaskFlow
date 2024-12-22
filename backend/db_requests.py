@@ -268,6 +268,8 @@ class _Requests:
         "DELETE FROM tasks where projectID = '{}';"
     )
     
+    check_projects = "SELECT COUNT(*) AS project_count FROM projects WHERE name = '{}';"
+
 
 if __name__ == "__main__":
     # Exemple fictif :
