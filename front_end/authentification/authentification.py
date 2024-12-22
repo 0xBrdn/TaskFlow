@@ -468,7 +468,8 @@ class Ui_MainWindow(object):
             warning = feedback.get("warning", "")
             suggestions = " ".join(feedback.get("suggestions", []))
             self.show_error_message(
-                f"Mot de passe faible Votre mot de passe est trop faible. {warning} {suggestions}",
+                "Mot de passe faible"
+                f"Votre mot de passe est trop faible. {warning} {suggestions}",
             )
             return False
 
