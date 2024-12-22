@@ -375,18 +375,22 @@ class Ui_MainWindow(object):
             None,
             "Supprimer le compte",
             "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.",
-            QMessageBox.Yes | QMessageBox.No
+            QMessageBox.Yes | QMessageBox.No,
         )
 
         if reponse == QMessageBox.Yes:
             # Récupérer l'ID de l'utilisateur à partir de l'email
             user_id = DB_API.get_userID_by_email(self.current_user)
             if isinstance(user_id, Exception) or not user_id:
-                QMessageBox.critical(None, "Erreur", "Impossible de récupérer l'ID de l'utilisateur.")
+                QMessageBox.critical(
+                    None, "Erreur", "Impossible de récupérer l'ID de l'utilisateur."
+                )
                 return
 
             # Supprimer l'utilisateur et ses dépendances
-            err = DB_API.delete_user(user_id[0])  # Appelle directement la fonction existante dans db_api.py
+            err = DB_API.delete_user(
+                user_id[0]
+            )  # Appelle directement la fonction existante dans db_api.py
             if err is None:  # Si aucune erreur, suppression réussie
                 QMessageBox.information(None, "Succès", "Compte supprimé avec succès.")
 
@@ -422,14 +426,16 @@ class Ui_MainWindow(object):
         self.pending_project.clear()
         try:
             projects = DB_API.get_projects_by_user_id(self.user_id)
-            for project in projects:
-                project_id, project_name, joined = project
-                if joined == 2:
-                    self.project_list_widget.addItem(f"{project_name}")
+            if projects:
+                for project in projects:
+                    project_id, project_name, joined = project
+                    if joined == 2:
+                        self.project_list_widget.addItem(f"{project_name}")
             pending_project = self.get_invitation(user_id=self.user_id, only_pending=True)
-            for p_project in pending_project:
-                project_id, project_name, permission, joined = p_project
-                self.pending_project.addItem(f"{project_name}")
+            if pending_project:
+                for p_project in pending_project:
+                    project_id, project_name, permission, joined = p_project
+                    self.pending_project.addItem(f"{project_name}")
 
         except Exception as e:
             QMessageBox.warning(None, "Erreur", f"Impossible de charger les projets : {e!s}")
@@ -485,8 +491,11 @@ class Ui_MainWindow(object):
         userID = DB_API.get_userID_by_email(self.current_user)
         permission = DB_API.get_user_permission(project_id[0], userID[0])
         if permission[0] < 1:
-            QMessageBox.warning(None, "Permission insuffisante",
-                                "Vous n'avez pas la permission pour ajouter cette tâche.")
+            QMessageBox.warning(
+                None,
+                "Permission insuffisante",
+                "Vous n'avez pas la permission pour ajouter cette tâche.",
+            )
             return
 
         task_title = self.task_input.text().strip()
@@ -599,19 +608,13 @@ class Ui_MainWindow(object):
             return
 
         project_id = DB_API.get_project_id_by_project_name(self.current_project)
-        userID = DB_API.get_userID_by_email(self.current_user)
-        permission = DB_API.get_user_permission(project_id[0], userID[0])
+        permission = DB_API.get_user_permission(project_id[0], self.user_id)
         if permission[0] < 1:
-            QMessageBox.warning(None, "Permission insuffisante",
-                                "Vous n'avez pas la permission pour ajouter cette tâche.")
-            return
-
-        project_id = DB_API.get_project_id_by_project_name(project_name)
-        userID = DB_API.get_userID_by_email(email)
-        permission = DB_API.get_user_permission(project_id[0], userID[0])
-        if permission[0] < 1:
-            QMessageBox.warning(None, "Permission insuffisante",
-                                "Vous n'avez pas la permission pour ajouter cette sous-tâche.")
+            QMessageBox.warning(
+                None,
+                "Permission insuffisante",
+                "Vous n'avez pas la permission pour ajouter cette tâche.",
+            )
             return
 
         parent_item = selected_items[0]
@@ -692,8 +695,11 @@ class Ui_MainWindow(object):
         userID = DB_API.get_userID_by_email(self.current_user)
         permission = DB_API.get_user_permission(project_id[0], userID[0])
         if permission[0] != 1:
-            QMessageBox.warning(None, "Permission insuffisante",
-                                "Vous n'avez pas la permission pour supprimer cette tâche.")
+            QMessageBox.warning(
+                None,
+                "Permission insuffisante",
+                "Vous n'avez pas la permission pour supprimer cette tâche.",
+            )
             return
         if not selected_items:
             QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à supprimer.")
@@ -771,8 +777,11 @@ class Ui_MainWindow(object):
         userID = DB_API.get_userID_by_email(self.current_user)
         permission = DB_API.get_user_permission(project_id[0], userID[0])
         if permission[0] != 1:
-            QMessageBox.warning(None, "Permission insuffisante",
-                                "Vous n'avez pas la permission pour modifier cette tâche.")
+            QMessageBox.warning(
+                None,
+                "Permission insuffisante",
+                "Vous n'avez pas la permission pour modifier cette tâche.",
+            )
 
         selected_item = selected_items[0]
         task_id = selected_item.data(0, QtCore.Qt.UserRole)
@@ -928,13 +937,19 @@ class Ui_MainWindow(object):
             if not user_id:
                 user_id = DB_API.get_user_id_by_username(username)
                 if user_id is None or isinstance(user_id, Exception):
-                    print(f"Erreur : utilisateur '{username}' introuvable ou erreur lors de la recherche.")
+                    print(
+                        f"Erreur : utilisateur '{username}' introuvable "
+                        f"ou erreur lors de la recherche."
+                    )
                     return False
 
             # Appeler la méthode de suppression
             result = DB_API.delete_user(user_id)
             if isinstance(result, Exception):
-                print(f"Erreur lors de la suppression de l'utilisateur avec l'ID {user_id} : {result}")
+                print(
+                    f"Erreur lors de la suppression de l'utilisateur avec "
+                    f"l'ID {user_id} : {result}"
+                )
                 return False
 
             print(f"Utilisateur avec l'ID {user_id} supprimé avec succès.")
