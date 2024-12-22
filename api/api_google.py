@@ -1,41 +1,3 @@
-"""
-Module d'authentification Google OAuth2 pour une application Flask.
-
-Ce module permet de gérer l'authentification via Google OAuth2 à travers deux routes principales :
-- `/oauth2callback` : Route de redirection après la connexion Google OAuth2.
-- `/api/login/google` : API permettant la connexion via Google en envoyant un token ID.
-
-Imports:
-    sys (module): Utilisé pour manipuler le chemin d'accès aux modules Python.
-    os (module): Utilisé pour gérer les chemins d'accès aux fichiers et dossiers.
-    auth.login_with_google (fonction): Fonction externe pour gérer l'authentification avec Google.
-    flask.Flask (classe): Classe de l'application Flask.
-    flask.request (objet): Objet pour récupérer les requêtes HTTP entrantes.
-    flask.jsonify (fonction): Fonction pour retourner une réponse JSON.
-    flask.redirect (fonction): Fonction pour rediriger les utilisateurs vers une autre URL.
-    flask.url_for (fonction): Génère les URLs pour les routes définies.
-    requests (module): Utilisé pour faire des requêtes HTTP externes (ici vers l'API Google).
-
-Variables:
-    CLIENT_ID (str): ID client Google OAuth2.
-    CLIENT_SECRET (str): Clé secrète client Google OAuth2.
-    REDIRECT_URI (str): URI de redirection après authentification via Google OAuth2.
-
-Routes:
-    /oauth2callback (fonction):
-        Gère le retour après authentification Google OAuth2 et traite le code d'autorisation.
-
-        Returns:
-            str: Message de succès ou d'échec de l'authentification.
-            tuple: En cas d'erreur, retourne un message et un code HTTP 400.
-
-    /api/login/google (fonction):
-        API pour la connexion via Google en utilisant un token ID.
-
-        Returns:
-            json: Réponse JSON avec un message de succès ou d'échec et un code HTTP.
-"""
-
 import sys
 import os
 
@@ -53,19 +15,11 @@ REDIRECT_URI = "http://localhost:5000/oauth2callback"
 
 @app.route("/oauth2callback")
 def oauth2callback():
-    """
-    Route de redirection après l'authentification Google OAuth2.
-
-    Cette route est appelée lorsque Google redirige l'utilisateur après une tentative de connexion.
-    Elle traite le code d'autorisation reçu et échange celui-ci contre un
-    token d'accès auprès de l'API Google.
-
-    Returns:
-        str: Message de confirmation de la connexion réussie ou d'erreur en cas d'échec.
-        tuple: En cas de problème lors de l'obtention du token, retourne un message
-        d'erreur et un code HTTP 400.
-    """
     code = request.args.get("code")
+    print(f"Code reçu : {code}")  # Vérifiez le code reçu ici
+
+    if not code:
+        return jsonify({"success": False, "message": "Code manquant."}), 400
 
     token_url = "https://oauth2.googleapis.com/token"
     data = {
@@ -76,26 +30,31 @@ def oauth2callback():
         "grant_type": "authorization_code",
     }
 
-    response = requests.post(token_url, data=data)
-    if response.status_code == 200:
-        tokens = response.json()
-        id_token = tokens.get("id_token")
+    try:
+        response = requests.post(token_url, data=data)
+        print(f"Réponse de Google : {response.status_code}, {response.text}")  # Log de la réponse de Google
 
-        if id_token:
-            success = login_with_google(id_token)
-            if success:
-                return (
-                    "L'utilisateur exite déjà ! Vous pouvez fermer cette page et "
-                    "vous connecter en rentrtant uniquement l'adresse mail de "
-                    "votre compte Google."
-                )
+        if response.status_code == 200:
+            tokens = response.json()
+            id_token = tokens.get("id_token")
+            print(f"ID Token reçu : {id_token}")  # Vérifiez si le ID token est bien reçu
+
+            if id_token:
+                success = login_with_google(id_token)
+                if success:
+                    return jsonify({"success": True, "id_token": id_token, "message": "Connexion réussie."})
+                else:
+                    print("Échec de l'authentification dans login_with_google.")  # Log si la connexion échoue
+                    return jsonify({"success": False, "message": "Échec de la connexion avec Google."}), 400
             else:
-                return "Échec de la connexion avec Google."
+                print("ID token manquant dans la réponse.")  # Log si l'ID token est manquant
+                return jsonify({"success": False, "message": "Erreur lors de la récupération du token ID."}), 400
         else:
-            return "Erreur lors de la récupération du token ID."
-    else:
-        return "Erreur lors de l'obtention du token.", 400
-
+            print(f"Erreur lors de l'obtention du token : {response.status_code}")  # Log de l'erreur de Google
+            return jsonify({"success": False, "message": "Erreur lors de l'obtention du token."}), 400
+    except Exception as e:
+        print(f"Erreur lors de l'appel API : {e}")  # Log de l'exception
+        return jsonify({"success": False, "message": "Erreur lors de la récupération du token."}), 500
 
 @app.route("/api/login/google", methods=["POST"])
 def google_login():
