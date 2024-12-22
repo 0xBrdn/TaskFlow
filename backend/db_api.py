@@ -1079,6 +1079,22 @@ class DB_API:
 
         return result[0] > 0 if result else False
 
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_users_from_users_tasks_groups(task_group_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
+        """
+        Supprime tous les utilisateurs d'un groupe de tâches spécifique
+
+        Args:
+            task_group_id (int): L'ID du groupe de tâches
+            cursor (MySQLCursor): Curseur de base de données (injecté par le décorateur)
+
+        Returns:
+            Optional[Exception]: None si succès, Exception si erreur
+        """
+        return cursor.execute(_Requests.delete_users_from_users_tasks_groups.format(task_group_id))
+
 
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
