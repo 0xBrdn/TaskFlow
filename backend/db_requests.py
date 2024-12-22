@@ -226,18 +226,7 @@ class _Requests:
         WHERE subtaskID = %s;
     """
 
-    # UPDATE dynamique (avec {columns} géré côté code)
-    update_task_infos = """
-        UPDATE tasks_infos
-        SET {columns}
-        WHERE task_infoID = %s;
-    """
-
-    get_user_info_by_email = """
-        SELECT username
-        FROM users
-        WHERE email = %s;
-    """
+        update_task_infos = "UPDATE tasks_infos SET {columns} WHERE task_infoID = %s"
 
     get_user_permission = (
         "SELECT permission FROM users_groups WHERE projectID = '{}'" "AND userID = '{}';"
@@ -269,6 +258,11 @@ class _Requests:
     )
     
     check_projects = "SELECT COUNT(*) AS project_count FROM projects WHERE name = '{}';"
+
+    delete_users_from_users_tasks_groups = (
+        "DELETE FROM users_tasks_groups "
+        "WHERE task_projectID = %s;"
+    )
 
 
 if __name__ == "__main__":
