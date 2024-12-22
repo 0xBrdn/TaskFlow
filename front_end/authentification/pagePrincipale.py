@@ -927,6 +927,7 @@ class Ui_MainWindow(object):
 
         selected_item = selected_items[0]
         task_id = selected_item.data(0, QtCore.Qt.UserRole)
+        print(f"task_id: {task_id}")
 
         try:
             task_info = DB_API.get_task_info_by_task_id(task_id)
