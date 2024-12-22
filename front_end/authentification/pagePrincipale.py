@@ -856,117 +856,91 @@ class Ui_MainWindow(object):
             QMessageBox.information(None, "Succès", "Le projet a été supprimé avec succès.")
 
     def modify_task(self):
-        print("\n=== Début modify_task() ===")
         selected_items = self.tree.selectedItems()
         if not selected_items:
-            print("Erreur: Aucun élément sélectionné")
             QMessageBox.warning(None, "Erreur", "Veuillez sélectionner une tâche à modifier.")
             return
 
-        print(f"Nombre d'éléments sélectionnés: {len(selected_items)}")
-
         project_id = DB_API.get_project_id_by_project_name(self.current_project)
-        print(f"Project ID obtenu: {project_id}")
 
         userID = DB_API.get_userID_by_email(self.current_user)
-        print(f"User ID obtenu: {userID}")
 
         permission = DB_API.get_user_permission(project_id[0], userID[0])
-        print(f"Permission obtenue: {permission}")
 
-        # if permission != 1:
-        #     print(f"Permission insuffisante: {permission}")
-        #     QMessageBox.warning(
-        #         None,
-        #         "Permission insuffisante",
-        #         "Vous n'avez pas la permission pour modifier cette tâche.",
-        #     )
-        #     return
+        if permission[0] < 1:
+            QMessageBox.warning(
+                None,
+                "Permission insuffisante",
+                "Vous n'avez pas la permission pour modifier cette tâche.",
+            )
+            return
 
         selected_item = selected_items[0]
         task_id = selected_item.data(0, QtCore.Qt.UserRole)
-        print(f"Task ID sélectionné: {task_id}")
 
         try:
-            print("\n--- Récupération des informations de la tâche ---")
             task_info = DB_API.get_task_info_by_task_id(task_id)
-            print(f"Task info récupérée: {task_info}")
-
-            if not task_info:
-                print("Erreur: Impossible de récupérer les informations de la tâche")
+            if not task_info or len(task_info) == 0:
                 raise ValueError("Impossible de récupérer les informations de la tâche")
 
-            # Récupérer les utilisateurs assignés et tous les utilisateurs du projet
-            task_group_id = task_info[5]
-            print(f"Task group ID: {task_group_id}")
+            task_info = task_info[0]
 
-            print("\n--- Récupération des utilisateurs ---")
+            task_group_id = task_info[5]
+
             assigned_users = DB_API.get_users_in_tasks_group_by_group_id(task_group_id)
-            print(f"Utilisateurs assignés: {assigned_users}")
 
             all_users = DB_API.get_users_in_project_by_project_id(project_id[0])
-            print(f"Tous les utilisateurs du projet: {all_users}")
 
-            print("\n--- Création de la boîte de dialogue ---")
             dialog = TaskEditDialog(
                 parent=self.task_tab,
                 task_info=task_info,
                 assigned_users=assigned_users,
-                all_users=all_users,
+                all_users=all_users
             )
 
-            print("\n--- Attente de la réponse utilisateur ---")
             if dialog.exec_() == QtWidgets.QDialog.Accepted:
-                print("Dialog accepté - Récupération des données du formulaire")
                 form_data = dialog.get_form_data()
-                print(f"Données du formulaire: {form_data}")
 
-                print("\n--- Mise à jour de la tâche ---")
-                DB_API.update_task_info(
+                DB_API.update_task_infos(
                     task_info_id=task_info[0],
                     status=task_info[2],
-                    priority=form_data["priority"],
-                    title=form_data["title"],
-                    description=form_data["comment"],
-                    dead_line=form_data["date"],
+                    priority=form_data['priority'],
+                    title=form_data['title'],
+                    description=form_data['comment'],
+                    dead_line=form_data['date'],
                     covered=task_info[4],
                     assign=task_group_id,
                 )
-                print("Mise à jour task_info terminée")
+
+                DB_API.delete_users_from_users_tasks_groups(task_group_id)
 
                 print("\n--- Mise à jour des utilisateurs assignés ---")
                 print(f"Suppression des utilisateurs du groupe {task_group_id}")
-                DB_API.remove_all_users_from_task_group(task_group_id)
+                DB_API.delete_users_from_users_tasks_groups(task_group_id)
 
-                for username in form_data["assigned_users"]:
-                    print(f"Ajout de l'utilisateur {username}")
-                    user_id = DB_API.get_user_id_by_username(username)
-                    if user_id:
-                        print(f"User ID trouvé: {user_id}, ajout au groupe")
-                        DB_API.add_user_to_task_group(task_group_id, user_id)
-                    else:
-                        print(
-                            f"Attention: Impossible de trouver l'ID pour l'utilisateur {username}"
-                        )
+                added_users = set()
+
+                for username in form_data['assigned_users']:
+                    if username not in added_users:
+                        print(f"Ajout de l'utilisateur {username}")
+                        user_id = DB_API.get_user_id_by_username(username)
+                        if user_id:
+                            print(f"User ID trouvé: {user_id}, ajout au groupe")
+                            DB_API.add_user_to_task_group(task_group_id, user_id)
+                            added_users.add(username)
+                        else:
+                            print(f"Attention: Impossible de trouver l'ID pour l'utilisateur {username}")
 
                 print("\n--- Mise à jour de l'affichage ---")
-                selected_item.setText(0, form_data["title"])
-                selected_item.setText(
-                    1,
-                    QtCore.QDate.fromString(form_data["date"], "yyyy-MM-dd").toString(
-                        "dd/MM/yyyy"
-                    ),
-                )
-                selected_item.setText(2, form_data["comment"])
+                selected_item.setText(0, form_data['title'])
+                selected_item.setText(1,
+                                      QtCore.QDate.fromString(form_data['date'], "yyyy-MM-dd").toString("dd/MM/yyyy"))
+                selected_item.setText(2, form_data['comment'])
                 selected_item.setText(
                     3,
-                    "Haute"
-                    if form_data["priority"] == 2
-                    else "Moyenne"
-                    if form_data["priority"] == 1
-                    else "Basse",
+                    "Haute" if form_data['priority'] == 2 else "Moyenne" if form_data['priority'] == 1 else "Basse"
                 )
-                selected_item.setText(4, ", ".join(form_data["assigned_users"]))
+                selected_item.setText(4, ", ".join(form_data['assigned_users']))
                 print("Mise à jour de l'affichage terminée")
 
                 QMessageBox.information(None, "Succès", "Modifications appliquées avec succès.")
@@ -974,10 +948,9 @@ class Ui_MainWindow(object):
                 print("Dialog annulé par l'utilisateur")
 
         except Exception as e:
-            print(f"\n!!! ERREUR: {e!s}")
+            print(f"\n!!! ERREUR: {str(e)}")
             print(f"Type d'erreur: {type(e)}")
             import traceback
-
             print(f"Traceback:\n{traceback.format_exc()}")
             QMessageBox.critical(
                 None, "Erreur", f"Erreur lors du chargement des informations : {e!s}"
@@ -997,7 +970,7 @@ class Ui_MainWindow(object):
             new_comment = self.comment_input.text().strip()
             new_priority = self.importance_input.currentIndex()
 
-            DB_API.update_task_info(
+            DB_API.update_task_infos(
                 task_info_id=task_info[0],
                 status=task_info[2],
                 priority=new_priority,
@@ -1197,18 +1170,16 @@ class TaskEditDialog(QtWidgets.QDialog):
         self.setModal(True)
         self.resize(400, 500)
 
-        # Layout principal
         layout = QtWidgets.QVBoxLayout(self)
         form_layout = QtWidgets.QFormLayout()
 
-        # Champs de saisie
         self.title_input = QtWidgets.QLineEdit(self)
         self.title_input.setText(task_info[0] if task_info else "")
 
         self.date_input = QtWidgets.QDateEdit(self)
         self.date_input.setCalendarPopup(True)
         if task_info:
-            date = QtCore.QDate.fromString(task_info[6], "yyyy-MM-dd")
+            date = QtCore.QDate(task_info[6].year, task_info[6].month, task_info[6].day)
             self.date_input.setDate(date)
 
         self.comment_input = QtWidgets.QLineEdit(self)
