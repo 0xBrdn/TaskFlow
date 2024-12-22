@@ -358,13 +358,13 @@ class Ui_MainWindow(object):
         self.add_task_button = QtWidgets.QPushButton("Ajouter une Tâche", self.task_tab)
         self.add_subtask_button = QtWidgets.QPushButton("Ajouter Sous-Tâche", self.task_tab)
         self.add_subtask_button.setEnabled(False)
-        self.delete_task_button = QtWidgets.QPushButton("Supprimer", self.task_tab)
+        self._button = QtWidgets.QPushButton("Supprimer", self.task_tab)
         self.complete_task_button = QtWidgets.QPushButton("Marquer comme terminé", self.task_tab)
         self.invite_users_button = QtWidgets.QPushButton("Inviter des utilisateurs", self.task_tab)
 
         self.add_task_button.setObjectName("add_task_button")
         self.add_subtask_button.setObjectName("add_subtask_button")
-        self.delete_task_button.setObjectName("delete_task_button")
+        self._button.setObjectName("_button")
         self.complete_task_button.setObjectName("complete_task_button")
         self.invite_users_button.setObjectName("invite_user")
 
@@ -375,7 +375,7 @@ class Ui_MainWindow(object):
 
         self.button_layout.addWidget(self.add_task_button)
         self.button_layout.addWidget(self.add_subtask_button)
-        self.button_layout.addWidget(self.delete_task_button)
+        self.button_layout.addWidget(self._button)
         self.button_layout.addWidget(self.complete_task_button)
         self.button_layout.addWidget(self.invite_users_button)
         self.task_layout.addLayout(self.button_layout)
@@ -784,7 +784,7 @@ class Ui_MainWindow(object):
         project_id = DB_API.get_project_id_by_project_name(self.current_project)
         userID = DB_API.get_userID_by_email(self.current_user)
         permission = DB_API.get_user_permission(project_id[0], userID[0])
-        if permission[0] != 1:
+        if permission[0] < 1:
             QMessageBox.warning(
                 None,
                 "Permission insuffisante",
