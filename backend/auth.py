@@ -76,47 +76,51 @@ def close_db_connection(connection):
 def login_with_google(id_token_str):
     """
     Authentifie un utilisateur avec un compte Google en validant le jeton.
-    Args:
-        id_token_str (str): Le jeton ID reçu de l'authentification Google.
-    Returns:
-        bool: True si l'authentification réussit, False sinon.
     """
     cursor = None
     connection = None
 
     try:
         CLIENT_ID = "428963010703-44ievtu901l6r9g8dhs2jjmf11mphidg.apps.googleusercontent.com"
+        print(f"Vérification du token ID : {id_token_str}")  # Log du token ID reçu
 
         idinfo = id_token.verify_oauth2_token(id_token_str, google_requests.Request(), CLIENT_ID)
+        print(f"IDinfo reçu : {idinfo}")  # Log de l'information extraite du token
 
         email = idinfo.get("email")
         google_name = idinfo.get("name")
+        print(f"Utilisateur trouvé : {google_name}, Email : {email}")  # Log de l'email et du nom
 
         connection = connect_to_db()
         if connection is None:
+            print("Erreur de connexion à la base de données.")  # Log si la connexion DB échoue
             return False
 
         cursor = connection.cursor()
-
         query = "SELECT * FROM users WHERE email = %s"
         cursor.execute(query, (email,))
         result = cursor.fetchone()
 
         if result:
+            print(f"Utilisateur existant : {result}")  # Log si l'utilisateur existe
             return True
         else:
+            print(f"Utilisateur inexistant, création de : {google_name}, {email}")  # Log de la création de l'utilisateur
             create_user_google(google_name, email)
             return True
 
-    except ValueError:
+    except ValueError as e:
+        print(f"Erreur de vérification du token : {e}")  # Log de l'erreur de validation du token
         return False
-    except Error:
+    except Error as e:
+        print(f"Erreur base de données : {e}")  # Log d'erreur dans la base de données
         return False
     finally:
         if cursor:
             cursor.close()
         if connection:
             close_db_connection(connection)
+
 
 
 def create_user_google(username, email):

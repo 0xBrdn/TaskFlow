@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from backend.db_api import DB_API
 from pagePrincipale import Ui_MainWindow as MainWindowUI
 import webbrowser
+import requests
 import pyotp
 import smtplib
 from email.mime.text import MIMEText
@@ -63,10 +64,7 @@ def verify_totp_code(totp, user_input_code: str) -> bool:
 # Identifiants Google
 CLIENT_ID = "428963010703-44ievtu901l6r9g8dhs2jjmf11mphidg.apps.googleusercontent.com"
 REDIRECT_URI = "http://localhost:5000/oauth2callback"
-AUTH_URL = (
-    "https://accounts.google.com/o/oauth2/auth?response_type=code"
-    "&client_id={}&redirect_uri={}&scope=email%20profile"
-)
+AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id={}&redirect_uri={}&scope=email+profile+openid"
 
 
 # -----------------------------------------------
@@ -438,7 +436,9 @@ class Ui_MainWindow(object):
             self.show_error_message("Erreur critique Une erreur est survenue : {e}")
 
     def login_with_google(self):
+        print("Ouverture de la page de connexion Google...")  # Log avant l'ouverture du navigateur
         webbrowser.open(AUTH_URL.format(CLIENT_ID, REDIRECT_URI))
+        print("Navigateur ouvert. En attente du callback Google...")  # Log après l'ouverture
 
     def handle_signup(self):
         self.clear_error_message()
