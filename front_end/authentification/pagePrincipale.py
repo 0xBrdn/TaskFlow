@@ -880,6 +880,7 @@ class Ui_MainWindow(object):
 
         try:
             task_info = DB_API.get_task_info_by_task_id(task_id)
+            print(f"task_info:{task_info}")
             if not task_info or len(task_info) == 0:
                 raise ValueError("Impossible de récupérer les informations de la tâche")
 

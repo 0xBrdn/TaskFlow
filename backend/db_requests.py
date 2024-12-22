@@ -239,7 +239,7 @@ class _Requests:
         "ti.assign, ti.dead_line "
         "FROM tasks t "
         "JOIN tasks_infos ti ON t.task_infoID = ti.task_infoID "
-        "WHERE t.taskID = 11;"
+        "WHERE t.taskID = %s;"
     )
 
     delete_users_groups = "DELETE FROM users_groups WHERE projectID = '{}';"
