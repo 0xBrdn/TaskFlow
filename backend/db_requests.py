@@ -226,7 +226,7 @@ class _Requests:
         WHERE subtaskID = %s;
     """
 
-        update_task_infos = "UPDATE tasks_infos SET {columns} WHERE task_infoID = %s"
+    update_task_infos = "UPDATE tasks_infos SET {columns} WHERE task_infoID = %s"
 
     get_user_permission = (
         "SELECT permission FROM users_groups WHERE projectID = '{}'" "AND userID = '{}';"
