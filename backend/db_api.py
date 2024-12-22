@@ -1025,7 +1025,9 @@ class DB_API:
         cursor.execute("UPDATE users SET totp_secret = %s WHERE email = %s", (secret, email))
         return True
 
-
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
     def delete_project(project_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
         return cursor.execute(_Requests.delete_project.format(project_id))
 
