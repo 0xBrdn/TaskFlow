@@ -270,6 +270,12 @@ class _Requests:
         WHERE task_infoID = %s;
     """
 
+    update_task_status_to_zero = """
+        UPDATE tasks_infos
+        SET status = %s
+        WHERE task_infoID = %s;
+    """
+
 if __name__ == "__main__":
     # Exemple fictif :
     # print(_Requests.get_user_hashpass % "test_user")

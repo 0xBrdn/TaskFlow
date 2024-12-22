@@ -380,6 +380,13 @@ class Ui_MainWindow(object):
         self.button_layout.addWidget(self.invite_users_button)
         self.task_layout.addLayout(self.button_layout)
 
+        self.uncomplete_task_button = QtWidgets.QPushButton("Marquer comme non terminé", self.task_tab)
+        self.uncomplete_task_button.setObjectName("uncomplete_task_button")
+        self.button_layout.addWidget(self.uncomplete_task_button)
+
+        # Connectez le bouton à la nouvelle fonction
+        self.uncomplete_task_button.clicked.connect(self.mark_uncompleted)
+
     def _setup_account_tab(self):
         layout = QVBoxLayout(self.account_tab)
 
@@ -676,6 +683,8 @@ class Ui_MainWindow(object):
                 # Vérifier le statut en direct et appliquer la couleur en fonction
                 if task[3] == 1:  # Statut = 1 signifie "terminé"
                     self.set_task_background(task_item, "green")
+                else:  # Statut différent de 1 signifie "non terminé"
+                    self.set_task_background(task_item, "white")
 
                 # Charger les sous-tâches
                 subtasks = DB_API.get_subtasks_by_task_id(task[0])
@@ -693,6 +702,8 @@ class Ui_MainWindow(object):
                     # Vérifier le statut en direct et appliquer la couleur verte si terminé
                     if subtask[3] == 1:  # Statut = 1 signifie "terminé"
                         self.set_task_background(subtask_item, "green")
+                    else:  # Statut différent de 1 signifie "non terminé"
+                        self.set_task_background(subtask_item, "white")
 
             self.tree.setIndentation(20)
 
@@ -1100,6 +1111,56 @@ class Ui_MainWindow(object):
             )
             return
 
+    def mark_uncompleted(self):
+        # Récupérer les éléments sélectionnés dans l'interface
+        selected_items = self.tree.selectedItems()
+        if not selected_items:
+            QMessageBox.warning(
+                None, "Erreur", "Veuillez sélectionner une tâche à marquer comme non terminée."
+            )
+            return
+
+        # Supposons que l'ID de la tâche (taskID) est stocké dans la colonne 0
+        task_id = selected_items[0].data(0, QtCore.Qt.UserRole)  # Utilisez UserRole pour stocker l'ID
+        print(f"Tâche sélectionnée, ID récupéré : {task_id}")  # Debug
+
+        if not task_id:
+            QMessageBox.warning(
+                None, "Erreur", "L'élément sélectionné ne contient pas un ID de tâche valide."
+            )
+            return
+
+        # Récupérer task_infoID depuis la table tasks
+        task_info_id = DB_API.get_task_info_id_by_task_id(task_id)  # Nouvelle méthode dans DB_API
+        print(f"task_info_id récupéré : {task_info_id}")  # Debug
+        if not task_info_id:
+            QMessageBox.critical(
+                None,
+                "Erreur",
+                "Impossible de récupérer les informations de la tâche sélectionnée.",
+            )
+            return
+
+        # Appeler la méthode dans DB_API pour mettre à jour le statut
+        success = DB_API.update_task_status(int(task_info_id), 0)  # Mettre le statut à 0 (non terminé)
+        print(f"Statut mis à jour : {success}")  # Debug
+
+        if success:
+            QMessageBox.information(None, "Succès", "La tâche a été marquée comme non terminée.")
+            print("Tâche mise à jour avec succès.")  # Debug
+
+            # Remettre la tâche à la couleur par défaut
+            self.set_task_background(selected_items[0], "white")
+
+            # Rafraîchir la liste des tâches
+            self.load_tasks_for_project(self.current_project)
+        else:
+            QMessageBox.critical(
+                None,
+                "Erreur",
+                "Une erreur s'est produite lors de la mise à jour du statut de la tâche.",
+            )
+            return
 
     def update_subtask_availability(self):
         selected_items = self.tree.selectedItems()

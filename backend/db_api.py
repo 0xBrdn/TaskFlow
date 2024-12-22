@@ -1127,6 +1127,22 @@ class DB_API:
             print(f"Erreur lors de la récupération de task_infoID : {e}")
             return None
 
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def update_task_status_to_zero(task_info_id: int, status: int = 0, *, cursor: MySQLCursor) -> bool:
+        """
+        Met à jour le statut de la tâche dans la table tasks_infos en mettant le statut à 0 (non terminé).
+        """
+        try:
+            query = "UPDATE tasks_infos SET status = %s WHERE task_infoID = %s"
+            cursor.execute(query, (status, task_info_id))
+            print(f"Mise à jour du statut : task_infoID={task_info_id}, status={status}")
+            return cursor.rowcount > 0  # Retourne True si une ligne a été affectée
+        except Exception as e:
+            print(f"Erreur lors de la mise à jour du statut de la tâche : {e}")
+            return False
+
 
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
