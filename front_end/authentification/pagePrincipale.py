@@ -21,6 +21,13 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1200, 800)
+        icon = QtGui.QIcon()
+        icon.addPixmap(
+            QtGui.QPixmap("images/authentification/logo_alternatif.png"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
+        MainWindow.setWindowIcon(icon)
 
         # Chargement du fichier de style
         try:
@@ -785,14 +792,14 @@ class Ui_MainWindow(object):
         permission = DB_API.get_user_permission(project_id[0], userID[0])
         print(f"Permission obtenue: {permission}")
 
-        if permission != 1:
-            print(f"Permission insuffisante: {permission}")
-            QMessageBox.warning(
-                None,
-                "Permission insuffisante",
-                "Vous n'avez pas la permission pour modifier cette tâche.",
-            )
-            return
+        # if permission != 1:
+        #     print(f"Permission insuffisante: {permission}")
+        #     QMessageBox.warning(
+        #         None,
+        #         "Permission insuffisante",
+        #         "Vous n'avez pas la permission pour modifier cette tâche.",
+        #     )
+        #     return
 
         selected_item = selected_items[0]
         task_id = selected_item.data(0, QtCore.Qt.UserRole)
@@ -967,7 +974,7 @@ class Ui_MainWindow(object):
             self.subtask_input.setEnabled(False)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle("Gestionnaire de Projets et Tâches")
+        MainWindow.setWindowTitle("TaskFlow")
 
     def accept_project(self):
         selected_item = self.pending_project.currentItem()
