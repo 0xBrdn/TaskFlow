@@ -412,14 +412,14 @@ class Ui_MainWindow(object):
         project_name, ok = QInputDialog.getText(None, "Nouveau Projet", "Nom du projet :")
         if not ok or not project_name.strip():
             return
-        try:
-            project_id = DB_API.add_project(project_name)
-            permission = 2
-            joined = 2
-            DB_API.add_user_to_group(project_id, self.user_id, permission, joined)
-            self.load_projects()
-        except Exception as e:
-            QMessageBox.warning(None, "Erreur", f"Impossible d'ajouter le projet : {e!s}")
+        existant = DB_API.check_projects(project_name)
+        if existant:
+            return
+        project_id = DB_API.add_project(project_name)
+        permission = 2
+        joined = 2
+        DB_API.add_user_to_group(project_id, self.user_id, permission, joined)
+        self.load_projects()
 
     def load_projects(self):
         self.project_list_widget.clear()
@@ -749,7 +749,6 @@ class Ui_MainWindow(object):
             Faire en sorte que les tâches se suppriment avec le projet
             """
             err = DB_API.delete_project(project_id[0])
-
             if isinstance(err, Exception):
                 print("Erreur lors de la suppression du projet")
                 QMessageBox.critical(
