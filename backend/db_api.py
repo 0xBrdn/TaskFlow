@@ -1095,6 +1095,38 @@ class DB_API:
         """
         return cursor.execute(_Requests.delete_users_from_users_tasks_groups.format(task_group_id))
 
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def update_task_status(task_info_id: int, status: int, *, cursor: MySQLCursor) -> bool:
+        """
+        Met à jour le statut de la tâche dans la table tasks_infos.
+        """
+        try:
+            query = "UPDATE tasks_infos SET status = %s WHERE task_infoID = %s"
+            cursor.execute(query, (status, task_info_id))
+            print(f"Mise à jour du statut : task_infoID={task_info_id}, status={status}")
+            return cursor.rowcount > 0  # Retourne True si une ligne a été affectée
+        except Exception as e:
+            print(f"Erreur lors de la mise à jour du statut de la tâche : {e}")
+            return False
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def get_task_info_id_by_task_id(task_id: int, *, cursor: MySQLCursor) -> Optional[int]:
+        """
+        Récupère task_infoID associé à une tâche (taskID).
+        """
+        try:
+            query = "SELECT task_infoID FROM tasks WHERE taskID = %s"
+            cursor.execute(query, (task_id,))
+            result = cursor.fetchone()
+            return result[0] if result else None
+        except Exception as e:
+            print(f"Erreur lors de la récupération de task_infoID : {e}")
+            return None
+
 
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))

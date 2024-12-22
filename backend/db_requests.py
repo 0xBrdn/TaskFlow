@@ -264,6 +264,11 @@ class _Requests:
         "WHERE task_projectID = %s;"
     )
 
+    update_task_status = """
+        UPDATE tasks_infos
+        SET status = %s
+        WHERE task_infoID = %s;
+    """
 
 if __name__ == "__main__":
     # Exemple fictif :

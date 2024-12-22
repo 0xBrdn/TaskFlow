@@ -647,20 +647,20 @@ class Ui_MainWindow(object):
             tasks = DB_API.get_tasks_by_project_id(project_id[0])
             for task in tasks:
                 task_item = QtWidgets.QTreeWidgetItem(self.tree)
-                task_item.setText(0, task[1])
+                task_item.setText(0, task[1])  # Titre de la tâche
                 deadline = task[7]
                 formatted_date = (
                     deadline.strftime("%d/%m/%Y")
                     if isinstance(deadline, datetime.datetime)
                     else str(deadline)
                 )
-                task_item.setText(1, formatted_date)
-                task_item.setText(2, task[2])
+                task_item.setText(1, formatted_date)  # Date limite
+                task_item.setText(2, task[2])  # Description
                 priority = task[4]
                 priority_text = (
                     "Haute" if priority == 2 else "Moyenne" if priority == 1 else "Basse"
                 )
-                task_item.setText(3, priority_text)
+                task_item.setText(3, priority_text)  # Priorité
 
                 assigned_users = DB_API.get_users_in_tasks_group_by_group_id(task[6])
                 users_text = (
@@ -668,28 +668,67 @@ class Ui_MainWindow(object):
                     if assigned_users
                     else "Aucun utilisateur assigné"
                 )
-                task_item.setText(4, users_text)
+                task_item.setText(4, users_text)  # Utilisateurs assignés
 
-                color_map = {"Haute": "red", "Moyenne": "orange", "Basse": "green"}
-                task_item.setForeground(3, QtGui.QColor(color_map.get(priority_text, "black")))
-
+                # Stocker l'ID réel de la tâche pour un usage futur
                 task_item.setData(0, QtCore.Qt.UserRole, task[0])
 
+                # Vérifier le statut en direct et appliquer la couleur en fonction
+                if task[3] == 1:  # Statut = 1 signifie "terminé"
+                    self.set_task_background(task_item, "green")
+
+                # Charger les sous-tâches
                 subtasks = DB_API.get_subtasks_by_task_id(task[0])
                 for subtask in subtasks:
                     subtask_item = QtWidgets.QTreeWidgetItem(task_item)
-                    subtask_item.setText(0, subtask[1])
-                    subtask_item.setText(1, subtask[7].strftime("%d/%m/%Y"))
-                    subtask_item.setText(2, subtask[2])
+                    subtask_item.setText(0, subtask[1])  # Titre de la sous-tâche
+                    subtask_item.setText(1, subtask[7].strftime("%d/%m/%Y"))  # Date limite
+                    subtask_item.setText(2, subtask[2])  # Description
                     subtask_item.setText(
                         3,
                         "Haute" if subtask[4] == 2 else "Moyenne" if subtask[4] == 1 else "Basse",
                     )
+                    subtask_item.setData(0, QtCore.Qt.UserRole, subtask[0])  # ID de la sous-tâche
 
-                self.tree.setIndentation(20)
+                    # Vérifier le statut en direct et appliquer la couleur verte si terminé
+                    if subtask[3] == 1:  # Statut = 1 signifie "terminé"
+                        self.set_task_background(subtask_item, "green")
+
+            self.tree.setIndentation(20)
+
+            # Mettre à jour les tâches périodiquement en cas de changement de statut
+            self.refresh_task_status(project_id[0])
 
         except Exception as e:
             QMessageBox.critical(None, "Erreur", f"Impossible de charger les tâches : {e!s}")
+
+    def set_task_background(self, item, color):
+        """
+        Applique un fond coloré à un item.
+        """
+        brush = QtGui.QBrush(QtGui.QColor(color))
+        for i in range(item.columnCount()):
+            item.setBackground(i, brush)
+
+    def refresh_task_status(self, project_id):
+        """
+        Rafraîchit périodiquement le statut des tâches et met à jour la couleur.
+        """
+        tasks = DB_API.get_tasks_by_project_id(project_id)
+        for i in range(self.tree.topLevelItemCount()):
+            task_item = self.tree.topLevelItem(i)
+            task_id = task_item.data(0, QtCore.Qt.UserRole)
+            for task in tasks:
+                if task[0] == task_id:
+                    # Vérifier et appliquer la couleur en fonction du statut
+                    if task[3] == 1:  # Statut = 1 signifie "terminé"
+                        self.set_task_background(task_item, "green")
+                    else:
+                        self.set_task_background(task_item, "white")  # Couleur par défaut
+                    break
+
+        # Planifier un nouveau rafraîchissement après 2 secondes
+        QtCore.QTimer.singleShot(2000, lambda: self.refresh_task_status(project_id))
 
     def add_subtask(self):
         selected_items = self.tree.selectedItems()
@@ -1016,6 +1055,7 @@ class Ui_MainWindow(object):
             QMessageBox.critical(None, "Erreur", f"Erreur lors de la modification : {e!s}")
 
     def mark_completed(self):
+        # Récupérer les éléments sélectionnés dans l'interface
         selected_items = self.tree.selectedItems()
         if not selected_items:
             QMessageBox.warning(
@@ -1023,12 +1063,43 @@ class Ui_MainWindow(object):
             )
             return
 
-        for item in selected_items:
-            for col in range(4):
-                item.setBackground(col, QtGui.QColor("lightgreen"))
-                font = item.font(col)
-                font.setStrikeOut(True)
-                item.setFont(col, font)
+        # Supposons que l'ID de la tâche (taskID) est stocké dans la colonne 0
+        task_id = selected_items[0].data(0, QtCore.Qt.UserRole)  # Utilisez UserRole pour stocker l'ID
+        print(f"Tâche sélectionnée, ID récupéré : {task_id}")  # Debug
+
+        if not task_id:
+            QMessageBox.warning(
+                None, "Erreur", "L'élément sélectionné ne contient pas un ID de tâche valide."
+            )
+            return
+
+        # Récupérer task_infoID depuis la table tasks
+        task_info_id = DB_API.get_task_info_id_by_task_id(task_id)  # Nouvelle méthode dans DB_API
+        print(f"task_info_id récupéré : {task_info_id}")  # Debug
+        if not task_info_id:
+            QMessageBox.critical(
+                None,
+                "Erreur",
+                "Impossible de récupérer les informations de la tâche sélectionnée.",
+            )
+            return
+
+        # Appeler la méthode dans DB_API pour mettre à jour le statut
+        success = DB_API.update_task_status(int(task_info_id), 1)  # Mettre le statut à 1 (terminé)
+        print(f"Statut mis à jour : {success}")  # Debug
+
+        if success:
+            QMessageBox.information(None, "Succès", "La tâche a été marquée comme terminée.")
+            print("Tâche mise à jour avec succès.")  # Debug
+            #self.refresh_task_list()  # Rafraîchir l'interface
+        else:
+            QMessageBox.critical(
+                None,
+                "Erreur",
+                "Une erreur s'est produite lors de la mise à jour du statut de la tâche.",
+            )
+            return
+
 
     def update_subtask_availability(self):
         selected_items = self.tree.selectedItems()
@@ -1276,6 +1347,8 @@ class TaskEditDialog(QtWidgets.QDialog):
                 for i in range(self.assigned_users_list.count())
             ],
         }
+
+
 
 
 if __name__ == "__main__":
