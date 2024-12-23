@@ -1034,7 +1034,7 @@ class DB_API:
     @staticmethod
     @cm_cursor()
     def get_task_info_by_task_id(taskID: str, *, cursor: MySQLCursor) -> ResultType:
-        query = _Requests.get_tasks_by_title
+        query = _Requests.get_task_info_by_task_id
         cursor.execute(query, (taskID,))
         result = cursor.fetchall()
         return result
