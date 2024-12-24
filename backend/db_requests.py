@@ -242,6 +242,14 @@ class _Requests:
         "WHERE t.taskID = %s;"
     )
 
+    get_subtask_info_by_subtask_id = (
+        "SELECT ti.title, ti.description, ti.status, ti.priority, ti.covered,"
+        "ti.assign, ti.dead_line "
+        "FROM subtasks s "
+        "JOIN tasks_infos ti ON s.task_infoID = ti.task_infoID "
+        "WHERE s.subtaskID = %s;"
+    )
+
     delete_users_groups = "DELETE FROM users_groups WHERE projectID = '{}';"
 
     delete_tasks_groups = (
@@ -256,7 +264,7 @@ class _Requests:
     delete_tasks = (
         "DELETE FROM tasks where projectID = '{}';"
     )
-    
+
     check_projects = "SELECT COUNT(*) AS project_count FROM projects WHERE name = '{}';"
 
     delete_users_from_users_tasks_groups = (
@@ -275,6 +283,17 @@ class _Requests:
         SET status = %s
         WHERE task_infoID = %s;
     """
+
+    update_task_title = "UPDATE tasks_infos SET title = %s WHERE task_infoID = %s;"
+
+    get_task_infoID_by_title = "SELECT task_infoID FROM tasks_infos WHERE title = '{}';"
+
+    update_task_description = "UPDATE tasks_infos SET description = %s WHERE task_infoID = %s;"
+
+    update_task_priority = "UPDATE tasks_infos SET priority = %s WHERE task_infoID = %s;"
+
+    update_task_date = "UPDATE tasks_infos SET dead_line = %s WHERE task_infoID = %s;"
+
 
 if __name__ == "__main__":
     # Exemple fictif :
