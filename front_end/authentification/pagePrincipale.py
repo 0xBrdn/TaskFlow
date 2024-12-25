@@ -587,7 +587,7 @@ class Ui_MainWindow(object):
         project_id = DB_API.get_project_id_by_project_name(self.current_project)
         userID = DB_API.get_userID_by_email(self.current_user)
         permission = DB_API.get_user_permission(project_id[0], userID[0])
-        if permission[0] != 1:
+        if permission[0] < 1:
             QMessageBox.warning(
                 None,
                 "Permission insuffisante",
@@ -813,7 +813,7 @@ class Ui_MainWindow(object):
                 if subtask_priority == 1
                 else "Haute",
             )
-            subtask_item.setText(4, ", ".join(selected_users))  # Ajouter les utilisateurs assignés
+            subtask_item.setText(4, ", ".join(selected_users))
 
             self.subtask_input.clear()
             self.comment_input.clear()
@@ -930,7 +930,6 @@ class Ui_MainWindow(object):
 
         if is_subtask:
             task_info = DB_API.get_subtask_info_by_subtask_id(task_id)
-            print(task_info)
             task_info = task_info[0]
             task_infoID = DB_API.get_task_infoID_by_title(task_info[0])
         else:
@@ -983,8 +982,31 @@ class Ui_MainWindow(object):
             )
             return
 
-        task_id = selected_items[0].data(0, QtCore.Qt.UserRole)  # Utilisez UserRole pour stocker l'ID
-        print(f"Tâche sélectionnée, ID récupéré : {task_id}")  # Debug
+        project_id = DB_API.get_project_id_by_project_name(self.current_project)
+        userID = DB_API.get_userID_by_email(self.current_user)
+        permission = DB_API.get_user_permission(project_id[0], userID[0])
+
+        if permission[0] < 1:
+            QMessageBox.warning(
+                None,
+                "Permission insuffisante",
+                "Vous n'avez pas la permission pour modifier cette tâche.",
+            )
+            return
+
+        selected_item = selected_items[0]
+        parent_item = selected_item.parent()
+        is_subtask = bool(parent_item)
+        task_id = selected_item.data(0, QtCore.Qt.UserRole)
+
+        if is_subtask:
+            task_info = DB_API.get_subtask_info_by_subtask_id(task_id)
+            task_info = task_info[0]
+            task_info_id = DB_API.get_task_infoID_by_title(task_info[0])
+        else:
+            task_info = DB_API.get_task_info_by_task_id(task_id)
+            task_info = task_info[0]
+            task_info_id = DB_API.get_task_infoID_by_title(task_info[0])
 
         if not task_id:
             QMessageBox.warning(
@@ -992,9 +1014,6 @@ class Ui_MainWindow(object):
             )
             return
 
-        # Récupérer task_infoID depuis la table tasks
-        task_info_id = DB_API.get_task_info_id_by_task_id(task_id)  # Nouvelle méthode dans DB_API
-        print(f"task_info_id récupéré : {task_info_id}")  # Debug
         if not task_info_id:
             QMessageBox.critical(
                 None,
@@ -1003,14 +1022,10 @@ class Ui_MainWindow(object):
             )
             return
 
-        # Appeler la méthode dans DB_API pour mettre à jour le statut
-        success = DB_API.update_task_status(int(task_info_id), 1)  # Mettre le statut à 1 (terminé)
-        print(f"Statut mis à jour : {success}")  # Debug
+        success = DB_API.update_task_status(int(task_info_id[0]), 1)
 
         if success:
             QMessageBox.information(None, "Succès", "La tâche a été marquée comme terminée.")
-            print("Tâche mise à jour avec succès.")  # Debug
-            #self.refresh_task_list()  # Rafraîchir l'interface
         else:
             QMessageBox.critical(
                 None,
@@ -1027,8 +1042,31 @@ class Ui_MainWindow(object):
             )
             return
 
-        task_id = selected_items[0].data(0, QtCore.Qt.UserRole)
-        print(f"Tâche sélectionnée, ID récupéré : {task_id}")  # Debug
+        project_id = DB_API.get_project_id_by_project_name(self.current_project)
+        userID = DB_API.get_userID_by_email(self.current_user)
+        permission = DB_API.get_user_permission(project_id[0], userID[0])
+
+        if permission[0] < 1:
+            QMessageBox.warning(
+                None,
+                "Permission insuffisante",
+                "Vous n'avez pas la permission pour modifier cette tâche.",
+            )
+            return
+
+        selected_item = selected_items[0]
+        parent_item = selected_item.parent()
+        is_subtask = bool(parent_item)
+        task_id = selected_item.data(0, QtCore.Qt.UserRole)
+
+        if is_subtask:
+            task_info = DB_API.get_subtask_info_by_subtask_id(task_id)
+            task_info = task_info[0]
+            task_info_id = DB_API.get_task_infoID_by_title(task_info[0])
+        else:
+            task_info = DB_API.get_task_info_by_task_id(task_id)
+            task_info = task_info[0]
+            task_info_id = DB_API.get_task_infoID_by_title(task_info[0])
 
         if not task_id:
             QMessageBox.warning(
@@ -1036,7 +1074,6 @@ class Ui_MainWindow(object):
             )
             return
 
-        task_info_id = DB_API.get_task_info_id_by_task_id(task_id)
         if not task_info_id:
             QMessageBox.critical(
                 None,
@@ -1045,17 +1082,13 @@ class Ui_MainWindow(object):
             )
             return
 
-        success = DB_API.update_task_status(int(task_info_id), 0)  # Mettre le statut à 0 (non terminé)
-        print(f"Statut mis à jour : {success}")  # Debug
+        success = DB_API.update_task_status(int(task_info_id[0]), 0)
 
         if success:
             QMessageBox.information(None, "Succès", "La tâche a été marquée comme non terminée.")
-            print("Tâche mise à jour avec succès.")  # Debug
 
-            # Remettre la tâche à la couleur par défaut
             self.set_task_background(selected_items[0], "white")
 
-            # Rafraîchir la liste des tâches
             self.load_tasks_for_project(self.current_project)
         else:
             QMessageBox.critical(
