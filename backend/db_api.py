@@ -924,27 +924,6 @@ class DB_API:
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def update_task_infos(
-            task_info_id: int, *, cursor: MySQLCursor, **kwargs
-    ) -> Optional[Union[Exception, str]]:
-        if not kwargs:
-            raise ValueError("No fields to update provided")
-
-        set_clause = ", ".join(f"{key} = %s" for key in kwargs.keys())
-        values = list(kwargs.values()) + [task_info_id]
-
-        query = _Requests.update_task_infos.format(columns=set_clause)
-        try:
-            cursor.execute(query, values)
-            if cursor.rowcount == 0:
-                return f"No task found with ID {task_info_id} or no changes were made."
-            return f"Task with ID {task_info_id} updated successfully."
-        except Exception as e:
-            return e
-
-    @staticmethod
-    @cm_conn()
-    @cm_cursor()
     def delete_task(task_id, *, cursor: MySQLCursor) -> Optional[Exception]:
         """
         Permet de delete une task de la db et toutes ses dépendances.
@@ -991,7 +970,7 @@ class DB_API:
         """
         Retourne la clé TOTP stockée pour cet email, ou None si pas trouvée.
         """
-        cursor.execute("SELECT totp_secret FROM users WHERE email = %s", (email,))
+        cursor.execute(_Requests.get_totp_secret, (email,))
         row = cursor.fetchone()
         if row:
             return row[0]  # la clé
@@ -1033,7 +1012,7 @@ class DB_API:
         Stocke la clé TOTP 'secret' dans la table 'users' pour l'email donné.
         Suppose qu'une colonne 'totp_secret' existe dans la table 'users'.
         """
-        cursor.execute("UPDATE users SET totp_secret = %s WHERE email = %s", (secret, email))
+        cursor.execute(_Requests.set_totp_secret, (secret, email))
         return True
 
     @staticmethod
@@ -1124,9 +1103,8 @@ class DB_API:
         Met à jour le statut de la tâche dans la table tasks_infos.
         """
         try:
-            query = "UPDATE tasks_infos SET status = %s WHERE task_infoID = %s"
+            query = _Requests.update_task_status
             cursor.execute(query, (status, task_info_id))
-            print(f"Mise à jour du statut : task_infoID={task_info_id}, status={status}")
             return cursor.rowcount > 0
         except Exception as e:
             print(f"Erreur lors de la mise à jour du statut de la tâche : {e}")
@@ -1139,7 +1117,7 @@ class DB_API:
         """
         Récupère task_infoID associé à une tâche (taskID).
         """
-        query = "SELECT task_infoID FROM tasks WHERE taskID = %s"
+        query = _Requests.get_task_info_id_by_task_id
         cursor.execute(query, (task_id,))
         result = cursor.fetchone()
         return result[0] if result else None
