@@ -924,16 +924,6 @@ class DB_API:
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def update_task_infos(
-        taskinfos_id: int, update_fields: list, values: list, *, cursor: MySQLCursor
-    ) -> Optional[Exception]:
-        return cursor.execute(
-            _Requests.update_task_infos.format(", ".join(update_fields), taskinfos_id), values
-        )
-
-    @staticmethod
-    @cm_conn()
-    @cm_cursor()
     def delete_task(task_id, *, cursor: MySQLCursor) -> Optional[Exception]:
         """
         Permet de delete une task de la db et toutes ses dépendances.
@@ -980,7 +970,7 @@ class DB_API:
         """
         Retourne la clé TOTP stockée pour cet email, ou None si pas trouvée.
         """
-        cursor.execute("SELECT totp_secret FROM users WHERE email = %s", (email,))
+        cursor.execute(_Requests.get_totp_secret, (email,))
         row = cursor.fetchone()
         if row:
             return row[0]  # la clé
@@ -1022,7 +1012,7 @@ class DB_API:
         Stocke la clé TOTP 'secret' dans la table 'users' pour l'email donné.
         Suppose qu'une colonne 'totp_secret' existe dans la table 'users'.
         """
-        cursor.execute("UPDATE users SET totp_secret = %s WHERE email = %s", (secret, email))
+        cursor.execute(_Requests.set_totp_secret, (secret, email))
         return True
 
     @staticmethod
@@ -1034,8 +1024,16 @@ class DB_API:
     @staticmethod
     @cm_cursor()
     def get_task_info_by_task_id(taskID: str, *, cursor: MySQLCursor) -> ResultType:
-        query = _Requests.get_tasks_by_title.format(taskID)
-        cursor.execute(query)
+        query = _Requests.get_task_info_by_task_id
+        cursor.execute(query, (taskID,))
+        result = cursor.fetchall()
+        return result
+
+    @staticmethod
+    @cm_cursor()
+    def get_subtask_info_by_subtask_id(subtaskID: str, *, cursor: MySQLCursor) -> ResultType:
+        query = _Requests.get_subtask_info_by_subtask_id
+        cursor.execute(query, (subtaskID,))
         result = cursor.fetchall()
         return result
 
@@ -1093,7 +1091,87 @@ class DB_API:
         Returns:
             Optional[Exception]: None si succès, Exception si erreur
         """
-        return cursor.execute(_Requests.delete_users_from_users_tasks_groups.format(task_group_id))
+        query = _Requests.delete_users_from_users_tasks_groups
+        cursor.execute(query, (task_group_id,))
+        return None
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def update_task_status(task_info_id: int, status: int, *, cursor: MySQLCursor) -> bool:
+        """
+        Met à jour le statut de la tâche dans la table tasks_infos.
+        """
+        try:
+            query = _Requests.update_task_status
+            cursor.execute(query, (status, task_info_id))
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Erreur lors de la mise à jour du statut de la tâche : {e}")
+            return False
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def get_task_info_id_by_task_id(task_id: int, *, cursor: MySQLCursor) -> Optional[int]:
+        """
+        Récupère task_infoID associé à une tâche (taskID).
+        """
+        query = _Requests.get_task_info_id_by_task_id
+        cursor.execute(query, (task_id,))
+        result = cursor.fetchone()
+        return result[0] if result else None
+
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def update_task_status_to_zero(task_info_id: int, status: int = 0, *, cursor: MySQLCursor) -> bool:
+        """
+        Met à jour le statut de la tâche dans la table tasks_infos en mettant le statut à 0 (non terminé).
+        """
+        query = _Requests.update_task_status_to_zero
+        cursor.execute(query, (status, task_info_id))
+        return cursor.rowcount > 0
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def update_task_title(title: str, task_info_id: int, *, cursor: MySQLCursor) -> bool:
+        query = _Requests.update_task_title
+        cursor.execute(query, (title, task_info_id))
+        return cursor.rowcount > 0
+
+    @staticmethod
+    @cm_cursor()
+    def get_task_infoID_by_title(title: str, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_task_infoID_by_title.format(title))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def update_task_description(description: str, task_info_id: int, *, cursor: MySQLCursor) -> bool:
+        query = _Requests.update_task_description
+        cursor.execute(query, (description, task_info_id))
+        return cursor.rowcount > 0
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def update_task_priority(priority: int, task_info_id: int, *, cursor: MySQLCursor) -> bool:
+        query = _Requests.update_task_priority
+        cursor.execute(query, (priority, task_info_id))
+        return cursor.rowcount > 0
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def update_task_date(date: datetime, task_info_id: int, *, cursor: MySQLCursor) -> bool:
+        query = _Requests.update_task_date
+        cursor.execute(query, (date, task_info_id))
+        return cursor.rowcount > 0
 
 
 if __name__ == "__main__":

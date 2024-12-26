@@ -1,4 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QColor, QPalette
 from PyQt5.QtWidgets import (
     QMessageBox,
     QLabel,
@@ -8,6 +10,8 @@ from PyQt5.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
     QListWidgetItem,
+    QScrollArea,
+    QWidget,
 )
 from backend.db_api import DB_API
 import datetime
@@ -380,6 +384,13 @@ class Ui_MainWindow(object):
         self.button_layout.addWidget(self.invite_users_button)
         self.task_layout.addLayout(self.button_layout)
 
+        self.uncomplete_task_button = QtWidgets.QPushButton("Marquer comme non terminé", self.task_tab)
+        self.uncomplete_task_button.setObjectName("uncomplete_task_button")
+        self.button_layout.addWidget(self.uncomplete_task_button)
+
+        # Connectez le bouton à la nouvelle fonction
+        self.uncomplete_task_button.clicked.connect(self.mark_uncompleted)
+
     def _setup_account_tab(self):
         layout = QVBoxLayout(self.account_tab)
 
@@ -540,6 +551,67 @@ class Ui_MainWindow(object):
             self.tabs.setCurrentWidget(self.task_tab)
             self.load_tasks_for_project(project_name)
             self.load_users_for_project(project_name)
+            self.display_users_in_project()
+
+    def display_users_in_project(self):
+        """
+        Affiche les utilisateurs du projet actuel et leur statut en ligne
+        dans une nouvelle section de l'interface.
+        """
+        if not hasattr(self, 'current_project'):
+            return
+
+        try:
+            if not hasattr(self, 'users_scroll_area'):
+                self.users_widget = QWidget(self.task_tab)
+                users_layout = QVBoxLayout(self.users_widget)
+
+                title_label = QLabel("Utilisateurs du projet")
+                title_label.setStyleSheet("font-size: 16px; font-weight: bold; margin: 10px;")
+                users_layout.addWidget(title_label)
+
+                self.users_scroll_area = QScrollArea(self.task_tab)
+                self.users_scroll_area.setWidgetResizable(True)
+                self.users_scroll_area.setFixedHeight(200)
+                self.users_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+                self.users_container = QWidget()
+                self.users_container_layout = QVBoxLayout(self.users_container)
+                self.users_scroll_area.setWidget(self.users_container)
+
+                users_layout.addWidget(self.users_scroll_area)
+
+                self.task_layout.addWidget(self.users_widget)
+
+            for i in reversed(range(self.users_container_layout.count())):
+                self.users_container_layout.itemAt(i).widget().setParent(None)
+
+            project_id = DB_API.get_project_id_by_project_name(self.current_project)[0]
+            users_in_project = DB_API.get_users_in_project_by_project_id(project_id)
+
+            for user in users_in_project:
+                username = user[1]
+                is_online = user[0] == self.user_id
+
+                user_widget = UserStatusWidget(username, is_online)
+                self.users_container_layout.addWidget(user_widget)
+
+            self.users_container_layout.addStretch()
+
+            if not hasattr(self, 'update_timer'):
+                self.update_timer = QTimer()
+                self.update_timer.timeout.connect(self.update_users_status)
+                self.update_timer.start(30000)  # Mise à jour toutes les 30 secondes
+
+        except Exception as e:
+            QMessageBox.critical(None, "Erreur", f"Erreur lors de l'affichage des utilisateurs : {str(e)}")
+
+    def update_users_status(self):
+        """
+        Met à jour le statut des utilisateurs périodiquement.
+        """
+        if hasattr(self, 'current_project'):
+            self.display_users_in_project()
 
     def load_users_for_project(self, project_name):
         self.assign_user_dropdown.clear()
@@ -647,20 +719,20 @@ class Ui_MainWindow(object):
             tasks = DB_API.get_tasks_by_project_id(project_id[0])
             for task in tasks:
                 task_item = QtWidgets.QTreeWidgetItem(self.tree)
-                task_item.setText(0, task[1])
+                task_item.setText(0, task[1])  # Titre de la tâche
                 deadline = task[7]
                 formatted_date = (
                     deadline.strftime("%d/%m/%Y")
                     if isinstance(deadline, datetime.datetime)
                     else str(deadline)
                 )
-                task_item.setText(1, formatted_date)
-                task_item.setText(2, task[2])
+                task_item.setText(1, formatted_date)  # Date limite
+                task_item.setText(2, task[2])  # Description
                 priority = task[4]
                 priority_text = (
                     "Haute" if priority == 2 else "Moyenne" if priority == 1 else "Basse"
                 )
-                task_item.setText(3, priority_text)
+                task_item.setText(3, priority_text)  # Priorité
 
                 assigned_users = DB_API.get_users_in_tasks_group_by_group_id(task[6])
                 users_text = (
@@ -670,26 +742,65 @@ class Ui_MainWindow(object):
                 )
                 task_item.setText(4, users_text)
 
-                color_map = {"Haute": "red", "Moyenne": "orange", "Basse": "green"}
-                task_item.setForeground(3, QtGui.QColor(color_map.get(priority_text, "black")))
-
                 task_item.setData(0, QtCore.Qt.UserRole, task[0])
 
+                if task[3] == 1:  # Statut = 1 signifie "terminé"
+                    self.set_task_background(task_item, "green")
+                else:
+                    self.set_task_background(task_item, "white")
+
+                # Charger les sous-tâches
                 subtasks = DB_API.get_subtasks_by_task_id(task[0])
                 for subtask in subtasks:
                     subtask_item = QtWidgets.QTreeWidgetItem(task_item)
-                    subtask_item.setText(0, subtask[1])
-                    subtask_item.setText(1, subtask[7].strftime("%d/%m/%Y"))
-                    subtask_item.setText(2, subtask[2])
+                    subtask_item.setText(0, subtask[1])  # Titre de la sous-tâche
+                    subtask_item.setText(1, subtask[7].strftime("%d/%m/%Y"))  # Date limite
+                    subtask_item.setText(2, subtask[2])  # Description
                     subtask_item.setText(
                         3,
                         "Haute" if subtask[4] == 2 else "Moyenne" if subtask[4] == 1 else "Basse",
                     )
+                    subtask_item.setData(0, QtCore.Qt.UserRole, subtask[0])  # ID de la sous-tâche
 
-                self.tree.setIndentation(20)
+                    # Vérifier le statut en direct et appliquer la couleur verte si terminé
+                    if subtask[3] == 1:  # Statut = 1 signifie "terminé"
+                        self.set_task_background(subtask_item, "green")
+                    else:  # Statut différent de 1 signifie "non terminé"
+                        self.set_task_background(subtask_item, "white")
+
+            self.tree.setIndentation(20)
+
+            # Mettre à jour les tâches périodiquement en cas de changement de statut
+            self.refresh_task_status(project_id[0])
 
         except Exception as e:
             QMessageBox.critical(None, "Erreur", f"Impossible de charger les tâches : {e!s}")
+
+    def set_task_background(self, item, color):
+        """
+        Applique un fond coloré à un item.
+        """
+        brush = QtGui.QBrush(QtGui.QColor(color))
+        for i in range(item.columnCount()):
+            item.setBackground(i, brush)
+
+    def refresh_task_status(self, project_id):
+        """
+        Rafraîchit périodiquement le statut des tâches et met à jour la couleur.
+        """
+        tasks = DB_API.get_tasks_by_project_id(project_id)
+        for i in range(self.tree.topLevelItemCount()):
+            task_item = self.tree.topLevelItem(i)
+            task_id = task_item.data(0, QtCore.Qt.UserRole)
+            for task in tasks:
+                if task[0] == task_id:
+                    if task[3] == 1:
+                        self.set_task_background(task_item, "green")
+                    else:
+                        self.set_task_background(task_item, "white")  # Couleur par défaut
+                    break
+
+        QtCore.QTimer.singleShot(2000, lambda: self.refresh_task_status(project_id))
 
     def add_subtask(self):
         selected_items = self.tree.selectedItems()
@@ -763,7 +874,7 @@ class Ui_MainWindow(object):
                 if subtask_priority == 1
                 else "Haute",
             )
-            subtask_item.setText(4, ", ".join(selected_users))  # Ajouter les utilisateurs assignés
+            subtask_item.setText(4, ", ".join(selected_users))
 
             self.subtask_input.clear()
             self.comment_input.clear()
@@ -784,7 +895,7 @@ class Ui_MainWindow(object):
         project_id = DB_API.get_project_id_by_project_name(self.current_project)
         userID = DB_API.get_userID_by_email(self.current_user)
         permission = DB_API.get_user_permission(project_id[0], userID[0])
-        if permission[0] != 1:
+        if permission[0] < 1:
             QMessageBox.warning(
                 None,
                 "Permission insuffisante",
@@ -862,9 +973,7 @@ class Ui_MainWindow(object):
             return
 
         project_id = DB_API.get_project_id_by_project_name(self.current_project)
-
         userID = DB_API.get_userID_by_email(self.current_user)
-
         permission = DB_API.get_user_permission(project_id[0], userID[0])
 
         if permission[0] < 1:
@@ -876,144 +985,55 @@ class Ui_MainWindow(object):
             return
 
         selected_item = selected_items[0]
+        parent_item = selected_item.parent()
+        is_subtask = bool(parent_item)
         task_id = selected_item.data(0, QtCore.Qt.UserRole)
 
-        try:
-            task_info = DB_API.get_task_info_by_task_id(task_id)
-            if not task_info or len(task_info) == 0:
-                raise ValueError("Impossible de récupérer les informations de la tâche")
-
+        if is_subtask:
+            task_info = DB_API.get_subtask_info_by_subtask_id(task_id)
             task_info = task_info[0]
-
-            task_group_id = task_info[5]
-
-            assigned_users = DB_API.get_users_in_tasks_group_by_group_id(task_group_id)
-
-            all_users = DB_API.get_users_in_project_by_project_id(project_id[0])
-
-            dialog = TaskEditDialog(
-                parent=self.task_tab,
-                task_info=task_info,
-                assigned_users=assigned_users,
-                all_users=all_users
-            )
-
-            if dialog.exec_() == QtWidgets.QDialog.Accepted:
-                form_data = dialog.get_form_data()
-
-                DB_API.update_task_infos(
-                    task_info_id=task_info[0],
-                    status=task_info[2],
-                    priority=form_data['priority'],
-                    title=form_data['title'],
-                    description=form_data['comment'],
-                    dead_line=form_data['date'],
-                    covered=task_info[4],
-                    assign=task_group_id,
-                )
-
-                DB_API.delete_users_from_users_tasks_groups(task_group_id)
-
-                print("\n--- Mise à jour des utilisateurs assignés ---")
-                print(f"Suppression des utilisateurs du groupe {task_group_id}")
-                DB_API.delete_users_from_users_tasks_groups(task_group_id)
-
-                added_users = set()
-
-                for username in form_data['assigned_users']:
-                    if username not in added_users:
-                        print(f"Ajout de l'utilisateur {username}")
-                        user_id = DB_API.get_user_id_by_username(username)
-                        if user_id:
-                            print(f"User ID trouvé: {user_id}, ajout au groupe")
-                            DB_API.add_user_to_task_group(task_group_id, user_id)
-                            added_users.add(username)
-                        else:
-                            print(f"Attention: Impossible de trouver l'ID pour l'utilisateur {username}")
-
-                print("\n--- Mise à jour de l'affichage ---")
-                selected_item.setText(0, form_data['title'])
-                selected_item.setText(1,
-                                      QtCore.QDate.fromString(form_data['date'], "yyyy-MM-dd").toString("dd/MM/yyyy"))
-                selected_item.setText(2, form_data['comment'])
-                selected_item.setText(
-                    3,
-                    "Haute" if form_data['priority'] == 2 else "Moyenne" if form_data['priority'] == 1 else "Basse"
-                )
-                selected_item.setText(4, ", ".join(form_data['assigned_users']))
-                print("Mise à jour de l'affichage terminée")
-
-                QMessageBox.information(None, "Succès", "Modifications appliquées avec succès.")
-            else:
-                print("Dialog annulé par l'utilisateur")
-
-        except Exception as e:
-            print(f"\n!!! ERREUR: {str(e)}")
-            print(f"Type d'erreur: {type(e)}")
-            import traceback
-            print(f"Traceback:\n{traceback.format_exc()}")
-            QMessageBox.critical(
-                None, "Erreur", f"Erreur lors du chargement des informations : {e!s}"
-            )
-
-        print("=== Fin modify_task() ===\n")
-
-    def apply_changes(self, item, task_group_id):
-        try:
-            task_id = item.data(0, QtCore.Qt.UserRole)
+            task_infoID = DB_API.get_task_infoID_by_title(task_info[0])
+        else:
             task_info = DB_API.get_task_info_by_task_id(task_id)
-            if not task_info:
-                raise ValueError("Impossible de récupérer les informations de la tâche")
+            task_info = task_info[0]
+            task_infoID = DB_API.get_task_infoID_by_title(task_info[0])
 
-            new_title = self.task_input.text().strip()
-            new_date = self.date_input.date().toString("yyyy-MM-dd")
-            new_comment = self.comment_input.text().strip()
-            new_priority = self.importance_input.currentIndex()
+        task_group_id = task_info[5]
 
-            DB_API.update_task_infos(
-                task_info_id=task_info[0],
-                status=task_info[2],
-                priority=new_priority,
-                title=new_title,
-                description=new_comment,
-                dead_line=new_date,
-                covered=task_info[4],  # Garder la valeur covered actuelle
-                assign=task_group_id,
+        assigned_users = DB_API.get_users_in_tasks_group_by_group_id(task_group_id)
+        all_users = DB_API.get_users_in_project_by_project_id(project_id[0])
+
+        dialog = TaskEditDialog(
+            parent=self.task_tab,
+            task_info=task_info,
+            assigned_users=assigned_users,
+            all_users=all_users
+        )
+
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            form_data = dialog.get_form_data()
+            DB_API.update_task_title(form_data['title'], task_infoID[0])
+            DB_API.update_task_description(form_data['comment'], task_infoID[0])
+            DB_API.update_task_priority(form_data['priority'], task_infoID[0])
+            DB_API.update_task_date(form_data['date'], task_infoID[0])
+            DB_API.delete_users_from_users_tasks_groups(task_group_id)
+            added_users = set()
+            for username in form_data['assigned_users']:
+                if username not in added_users:
+                    user_id = DB_API.get_user_id_by_username(username)
+                    if user_id:
+                        DB_API.add_user_to_task_group(task_group_id, user_id)
+                        added_users.add(username)
+
+            selected_item.setText(0, form_data['title'])
+            selected_item.setText(1, QtCore.QDate.fromString(form_data['date'], "yyyy-MM-dd").toString("dd/MM/yyyy"))
+            selected_item.setText(2, form_data['comment'])
+            selected_item.setText(
+                3, "Haute" if form_data['priority'] == 2 else "Moyenne" if form_data['priority'] == 1 else "Basse"
             )
-
-            DB_API.remove_all_users_from_task_group(task_group_id)
-            for i in range(self.assigned_users_list.count()):
-                username = self.assigned_users_list.item(i).text()
-                user_id = DB_API.get_user_id_by_username(username)
-                if user_id:
-                    DB_API.add_user_to_task_group(task_group_id, user_id)
-
-            item.setText(0, new_title)
-            item.setText(1, self.date_input.date().toString("dd/MM/yyyy"))
-            item.setText(2, new_comment)
-            item.setText(
-                3, "Haute" if new_priority == 2 else "Moyenne" if new_priority == 1 else "Basse"
-            )
-            item.setText(
-                4,
-                ", ".join(
-                    [
-                        self.assigned_users_list.item(i).text()
-                        for i in range(self.assigned_users_list.count())
-                    ]
-                ),
-            )
-
-            self.task_input.clear()
-            self.comment_input.clear()
-            self.importance_input.setCurrentIndex(0)
-            self.assigned_users_list.clear()
-            self.apply_button.hide()
+            selected_item.setText(4, ", ".join(form_data['assigned_users']))
 
             QMessageBox.information(None, "Succès", "Modifications appliquées avec succès.")
-
-        except Exception as e:
-            QMessageBox.critical(None, "Erreur", f"Erreur lors de la modification : {e!s}")
 
     def mark_completed(self):
         selected_items = self.tree.selectedItems()
@@ -1023,12 +1043,121 @@ class Ui_MainWindow(object):
             )
             return
 
-        for item in selected_items:
-            for col in range(4):
-                item.setBackground(col, QtGui.QColor("lightgreen"))
-                font = item.font(col)
-                font.setStrikeOut(True)
-                item.setFont(col, font)
+        project_id = DB_API.get_project_id_by_project_name(self.current_project)
+        userID = DB_API.get_userID_by_email(self.current_user)
+        permission = DB_API.get_user_permission(project_id[0], userID[0])
+
+        if permission[0] < 1:
+            QMessageBox.warning(
+                None,
+                "Permission insuffisante",
+                "Vous n'avez pas la permission pour modifier cette tâche.",
+            )
+            return
+
+        selected_item = selected_items[0]
+        parent_item = selected_item.parent()
+        is_subtask = bool(parent_item)
+        task_id = selected_item.data(0, QtCore.Qt.UserRole)
+
+        if is_subtask:
+            task_info = DB_API.get_subtask_info_by_subtask_id(task_id)
+            task_info = task_info[0]
+            task_info_id = DB_API.get_task_infoID_by_title(task_info[0])
+        else:
+            task_info = DB_API.get_task_info_by_task_id(task_id)
+            task_info = task_info[0]
+            task_info_id = DB_API.get_task_infoID_by_title(task_info[0])
+
+        if not task_id:
+            QMessageBox.warning(
+                None, "Erreur", "L'élément sélectionné ne contient pas un ID de tâche valide."
+            )
+            return
+
+        if not task_info_id:
+            QMessageBox.critical(
+                None,
+                "Erreur",
+                "Impossible de récupérer les informations de la tâche sélectionnée.",
+            )
+            return
+
+        success = DB_API.update_task_status(int(task_info_id[0]), 1)
+
+        if success:
+            QMessageBox.information(None, "Succès", "La tâche a été marquée comme terminée.")
+        else:
+            QMessageBox.critical(
+                None,
+                "Erreur",
+                "Une erreur s'est produite lors de la mise à jour du statut de la tâche.",
+            )
+            return
+
+    def mark_uncompleted(self):
+        selected_items = self.tree.selectedItems()
+        if not selected_items:
+            QMessageBox.warning(
+                None, "Erreur", "Veuillez sélectionner une tâche à marquer comme non terminée."
+            )
+            return
+
+        project_id = DB_API.get_project_id_by_project_name(self.current_project)
+        userID = DB_API.get_userID_by_email(self.current_user)
+        permission = DB_API.get_user_permission(project_id[0], userID[0])
+
+        if permission[0] < 1:
+            QMessageBox.warning(
+                None,
+                "Permission insuffisante",
+                "Vous n'avez pas la permission pour modifier cette tâche.",
+            )
+            return
+
+        selected_item = selected_items[0]
+        parent_item = selected_item.parent()
+        is_subtask = bool(parent_item)
+        task_id = selected_item.data(0, QtCore.Qt.UserRole)
+
+        if is_subtask:
+            task_info = DB_API.get_subtask_info_by_subtask_id(task_id)
+            task_info = task_info[0]
+            task_info_id = DB_API.get_task_infoID_by_title(task_info[0])
+        else:
+            task_info = DB_API.get_task_info_by_task_id(task_id)
+            task_info = task_info[0]
+            task_info_id = DB_API.get_task_infoID_by_title(task_info[0])
+
+        if not task_id:
+            QMessageBox.warning(
+                None, "Erreur", "L'élément sélectionné ne contient pas un ID de tâche valide."
+            )
+            return
+
+        if not task_info_id:
+            QMessageBox.critical(
+                None,
+                "Erreur",
+                "Impossible de récupérer les informations de la tâche sélectionnée.",
+            )
+            return
+
+        success = DB_API.update_task_status(int(task_info_id[0]), 0)
+
+        if success:
+            QMessageBox.information(None, "Succès", "La tâche a été marquée comme non terminée.")
+
+            self.set_task_background(selected_items[0], "white")
+
+            self.load_tasks_for_project(self.current_project)
+        else:
+            QMessageBox.critical(
+                None,
+                "Erreur",
+                "Une erreur s'est produite lors de la mise à jour du statut de la tâche.",
+            )
+            return
 
     def update_subtask_availability(self):
         selected_items = self.tree.selectedItems()
@@ -1161,6 +1290,37 @@ class Ui_MainWindow(object):
         else:
             dialog = InviteUsersDialog(self.task_tab, deny=True)
             dialog.exec_()
+
+
+class UserStatusWidget(QWidget):
+    def __init__(self, username, is_online=False, parent=None):
+        super().__init__(parent)
+        layout = QVBoxLayout(self)
+
+        user_widget = QWidget()
+        user_widget.setFixedHeight(40)
+        user_widget.setAutoFillBackground(True)
+
+        palette = user_widget.palette()
+        bg_color = QColor("#E8F5E9") if is_online else QColor("#FFFFFF")
+        palette.setColor(QPalette.Window, bg_color)
+        user_widget.setPalette(palette)
+
+        user_layout = QVBoxLayout(user_widget)
+
+        username_label = QLabel(username)
+        username_label.setStyleSheet("font-size: 14px; font-weight: bold;")
+
+        status_text = "En ligne" if is_online else "Hors ligne"
+        status_color = "#4CAF50" if is_online else "#757575"
+        status_label = QLabel(status_text)
+        status_label.setStyleSheet(f"color: {status_color}; font-size: 12px;")
+
+        user_layout.addWidget(username_label)
+        user_layout.addWidget(status_label)
+
+        layout.addWidget(user_widget)
+        layout.setContentsMargins(0, 0, 0, 0)
 
 
 class TaskEditDialog(QtWidgets.QDialog):
