@@ -1,4 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QColor, QPalette
 from PyQt5.QtWidgets import (
     QMessageBox,
     QLabel,
@@ -8,6 +10,8 @@ from PyQt5.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
     QListWidgetItem,
+    QScrollArea,
+    QWidget,
 )
 from backend.db_api import DB_API
 import datetime
@@ -547,6 +551,67 @@ class Ui_MainWindow(object):
             self.tabs.setCurrentWidget(self.task_tab)
             self.load_tasks_for_project(project_name)
             self.load_users_for_project(project_name)
+            self.display_users_in_project()
+
+    def display_users_in_project(self):
+        """
+        Affiche les utilisateurs du projet actuel et leur statut en ligne
+        dans une nouvelle section de l'interface.
+        """
+        if not hasattr(self, 'current_project'):
+            return
+
+        try:
+            if not hasattr(self, 'users_scroll_area'):
+                self.users_widget = QWidget(self.task_tab)
+                users_layout = QVBoxLayout(self.users_widget)
+
+                title_label = QLabel("Utilisateurs du projet")
+                title_label.setStyleSheet("font-size: 16px; font-weight: bold; margin: 10px;")
+                users_layout.addWidget(title_label)
+
+                self.users_scroll_area = QScrollArea(self.task_tab)
+                self.users_scroll_area.setWidgetResizable(True)
+                self.users_scroll_area.setFixedHeight(200)
+                self.users_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+                self.users_container = QWidget()
+                self.users_container_layout = QVBoxLayout(self.users_container)
+                self.users_scroll_area.setWidget(self.users_container)
+
+                users_layout.addWidget(self.users_scroll_area)
+
+                self.task_layout.addWidget(self.users_widget)
+
+            for i in reversed(range(self.users_container_layout.count())):
+                self.users_container_layout.itemAt(i).widget().setParent(None)
+
+            project_id = DB_API.get_project_id_by_project_name(self.current_project)[0]
+            users_in_project = DB_API.get_users_in_project_by_project_id(project_id)
+
+            for user in users_in_project:
+                username = user[1]
+                is_online = user[0] == self.user_id
+
+                user_widget = UserStatusWidget(username, is_online)
+                self.users_container_layout.addWidget(user_widget)
+
+            self.users_container_layout.addStretch()
+
+            if not hasattr(self, 'update_timer'):
+                self.update_timer = QTimer()
+                self.update_timer.timeout.connect(self.update_users_status)
+                self.update_timer.start(30000)  # Mise à jour toutes les 30 secondes
+
+        except Exception as e:
+            QMessageBox.critical(None, "Erreur", f"Erreur lors de l'affichage des utilisateurs : {str(e)}")
+
+    def update_users_status(self):
+        """
+        Met à jour le statut des utilisateurs périodiquement.
+        """
+        if hasattr(self, 'current_project'):
+            self.display_users_in_project()
 
     def load_users_for_project(self, project_name):
         self.assign_user_dropdown.clear()
@@ -675,15 +740,13 @@ class Ui_MainWindow(object):
                     if assigned_users
                     else "Aucun utilisateur assigné"
                 )
-                task_item.setText(4, users_text)  # Utilisateurs assignés
+                task_item.setText(4, users_text)
 
-                # Stocker l'ID réel de la tâche pour un usage futur
                 task_item.setData(0, QtCore.Qt.UserRole, task[0])
 
-                # Vérifier le statut en direct et appliquer la couleur en fonction
                 if task[3] == 1:  # Statut = 1 signifie "terminé"
                     self.set_task_background(task_item, "green")
-                else:  # Statut différent de 1 signifie "non terminé"
+                else:
                     self.set_task_background(task_item, "white")
 
                 # Charger les sous-tâches
@@ -731,14 +794,12 @@ class Ui_MainWindow(object):
             task_id = task_item.data(0, QtCore.Qt.UserRole)
             for task in tasks:
                 if task[0] == task_id:
-                    # Vérifier et appliquer la couleur en fonction du statut
-                    if task[3] == 1:  # Statut = 1 signifie "terminé"
+                    if task[3] == 1:
                         self.set_task_background(task_item, "green")
                     else:
                         self.set_task_background(task_item, "white")  # Couleur par défaut
                     break
 
-        # Planifier un nouveau rafraîchissement après 2 secondes
         QtCore.QTimer.singleShot(2000, lambda: self.refresh_task_status(project_id))
 
     def add_subtask(self):
@@ -1229,6 +1290,37 @@ class Ui_MainWindow(object):
         else:
             dialog = InviteUsersDialog(self.task_tab, deny=True)
             dialog.exec_()
+
+
+class UserStatusWidget(QWidget):
+    def __init__(self, username, is_online=False, parent=None):
+        super().__init__(parent)
+        layout = QVBoxLayout(self)
+
+        user_widget = QWidget()
+        user_widget.setFixedHeight(40)
+        user_widget.setAutoFillBackground(True)
+
+        palette = user_widget.palette()
+        bg_color = QColor("#E8F5E9") if is_online else QColor("#FFFFFF")
+        palette.setColor(QPalette.Window, bg_color)
+        user_widget.setPalette(palette)
+
+        user_layout = QVBoxLayout(user_widget)
+
+        username_label = QLabel(username)
+        username_label.setStyleSheet("font-size: 14px; font-weight: bold;")
+
+        status_text = "En ligne" if is_online else "Hors ligne"
+        status_color = "#4CAF50" if is_online else "#757575"
+        status_label = QLabel(status_text)
+        status_label.setStyleSheet(f"color: {status_color}; font-size: 12px;")
+
+        user_layout.addWidget(username_label)
+        user_layout.addWidget(status_label)
+
+        layout.addWidget(user_widget)
+        layout.setContentsMargins(0, 0, 0, 0)
 
 
 class TaskEditDialog(QtWidgets.QDialog):
