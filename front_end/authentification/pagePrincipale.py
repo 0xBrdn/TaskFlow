@@ -591,8 +591,13 @@ class Ui_MainWindow(object):
 
             for user in users_in_project:
                 username = user[1]
-                is_online = user[0] == self.user_id
-
+                is_online = DB_API.get_user_status_by_userID(user[0])
+                is_online = is_online[0]
+                # is_online = user[0] == self.user_id
+                if is_online == 1:
+                    is_online = True
+                else:
+                    is_online = False
                 user_widget = UserStatusWidget(username, is_online)
                 self.users_container_layout.addWidget(user_widget)
 
