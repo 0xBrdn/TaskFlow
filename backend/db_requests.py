@@ -257,12 +257,14 @@ class _Requests:
     update_task_priority = "UPDATE tasks_infos SET priority = %s WHERE task_infoID = %s;"
 
     update_task_date = "UPDATE tasks_infos SET dead_line = %s WHERE task_infoID = %s;"
+  
+    get_totp_secret = "SELECT totp_secret FROM users WHERE email = %s;"
 
-    get_totp_secret = "SELECT totp_secret FROM users WHERE email = %s"
+    set_totp_secret = "UPDATE users SET totp_secret = %s WHERE email = %s;"
 
-    set_totp_secret = "UPDATE users SET totp_secret = %s WHERE email = %s"
+    get_task_info_id_by_task_id = "SELECT task_infoID FROM tasks WHERE taskID = %s;"
 
-    get_task_info_id_by_task_id = "SELECT task_infoID FROM tasks WHERE taskID = %s"
+    get_user_status_by_userID = "SELECT status FROM status WHERE userID = '{}';"
 
 
 if __name__ == "__main__":
