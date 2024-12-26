@@ -87,24 +87,6 @@ class DB_API:
 
     @staticmethod
     @cm_cursor()
-    def get_email_hashpass(email: str, *, cursor: MySQLCursor) -> Union[tuple, Exception, None]:
-        """
-        Retourne (hashed_password,) pour un utilisateur donné par son email,
-        ou None si non trouvé, ou Exception si erreur DB.
-        (Fonction legacy, vous pouvez la garder si du code l'utilise.)
-        """
-        try:
-            cursor.execute(_Requests.get_email_hashpass, (email,))
-            row = cursor.fetchone()
-            if row:
-                return (row[0],)  # pour rester compatible
-            else:
-                return None
-        except Exception as e:
-            return e
-
-    @staticmethod
-    @cm_cursor()
     def get_all_users(*, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer tous les utilisateurs de la DB.
@@ -1173,7 +1155,13 @@ class DB_API:
         cursor.execute(query, (date, task_info_id))
         return cursor.rowcount > 0
 
-
+    @staticmethod
+    @cm_cursor()
+    def get_user_status_by_userID(user_id: int, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_user_status_by_userID.format(user_id))
+        result = cursor.fetchone()
+        return result
+        
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
     # t = (DB_API.add_user(username="vlad", password="trql",
