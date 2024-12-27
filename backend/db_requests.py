@@ -207,7 +207,9 @@ class _Requests:
 
     delete_subtask = "DELETE FROM subtasks WHERE subtaskID = %s;"
 
-    get_user_permission = "SELECT permission FROM users_groups WHERE projectID = '{}'" "AND userID = '{}';"
+    get_user_permission = (
+        "SELECT permission FROM users_groups WHERE projectID = '{}'" "AND userID = '{}';"
+    )
 
     delete_project = "DELETE FROM projects WHERE projectID = '{}';"
 
@@ -235,14 +237,17 @@ class _Requests:
     )
 
     delete_tasks_infos = (
-        "DELETE ti FROM tasks_infos ti INNER JOIN tasks t ON t.task_infoID = ti.task_infoID WHERE t.projectID = '{}';"
+        "DELETE ti FROM tasks_infos ti INNER JOIN tasks t ON "
+        "t.task_infoID = ti.task_infoID WHERE t.projectID = '{}';"
     )
 
     delete_tasks = "DELETE FROM tasks where projectID = '{}';"
 
     check_projects = "SELECT COUNT(*) AS project_count FROM projects WHERE name = '{}';"
 
-    delete_users_from_users_tasks_groups = "DELETE FROM users_tasks_groups WHERE task_projectID = %s;"
+    delete_users_from_users_tasks_groups = (
+        "DELETE FROM users_tasks_groups WHERE task_projectID = %s;"
+    )
 
     update_task_status = "UPDATE tasks_infos SET status = %s WHERE task_infoID = %s;"
 
@@ -257,7 +262,7 @@ class _Requests:
     update_task_priority = "UPDATE tasks_infos SET priority = %s WHERE task_infoID = %s;"
 
     update_task_date = "UPDATE tasks_infos SET dead_line = %s WHERE task_infoID = %s;"
-  
+
     get_totp_secret = "SELECT totp_secret FROM users WHERE email = %s;"
 
     set_totp_secret = "UPDATE users SET totp_secret = %s WHERE email = %s;"
@@ -265,6 +270,15 @@ class _Requests:
     get_task_info_id_by_task_id = "SELECT task_infoID FROM tasks WHERE taskID = %s;"
 
     get_user_status_by_userID = "SELECT status FROM status WHERE userID = '{}';"
+
+    update_user_status = "UPDATE status SET status = %s WHERE userID =%s;"
+
+    update_user_perm = """
+        UPDATE users_groups
+        SET permission = %s
+        WHERE projectID = %s
+          AND userID = %s;
+    """
 
 
 if __name__ == "__main__":
