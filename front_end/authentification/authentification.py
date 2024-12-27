@@ -424,6 +424,8 @@ class Ui_MainWindow(object):
                 print("Code OTP saisi :", entered_code)
 
                 if verify_totp_code(self.totp, entered_code):
+                    userID = DB_API.get_userID_by_email(email)
+                    DB_API.set_user_status(userID[0], 1)
                     self.show_success_message("Connexion réussie Bienvenue!")
                     self.open_main_window()
                 else:
@@ -496,6 +498,7 @@ class Ui_MainWindow(object):
         is_google_user = 0  # forcé à 0 pour les comptes non Google
         try:
             success = DB_API.add_user(username, password, email, is_google_user)
+            DB_API.add_user_status(success, 0)
             if success and not isinstance(success, Exception):
                 self.show_success_message(
                     "Inscription réussie Votre compte a été créé avec succès!"
