@@ -942,9 +942,50 @@ class DB_API:
         Exemple:
         >>> err = DB_API.set_invites_status(1, 1, False)
         >>> if not isinstance(err, Exception):
-        >>>     print("delete avec succes")
+        >>>     print("modifié avec succes")
         """
         return cursor.execute(_Requests.set_invites_status, (joined, project_id, user_id))
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def set_user_permission(
+        project_id: int, user_id: int, permission: int, *, cursor: MySQLCursor
+    ) -> Optional[Exception]:
+        """
+        Permet de changer les permissions d'un user dans le projet.
+        Cette fonction renvoie None ou une exception. En cas d'échec,
+        elle renverra une exc et en cas de succes, elle renverra None.
+        :param project_id: Le project_ID
+        :param user_id: ID de l'utilisateur
+        :param joined: Accepter ou pas l'invit
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        Exemple:
+        >>> err = DB_API.set_user_permission(1, 1, 2)
+        >>> if not isinstance(err, Exception):
+        >>>     print("modifié avec succes")
+        """
+        return cursor.execute(_Requests.update_user_perm, (permission, project_id, user_id))
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def set_user_status(user_id: int, status: int, *, cursor: MySQLCursor) -> Optional[Exception]:
+        """
+        Permet de modifier le status de l'utilisateur.
+        Cette fonction renvoie None ou une exception. En cas d'échec,
+        elle renverra une exc et en cas de succes, elle renverra None.
+        :param user_id: ID de l'utilisateur
+        :param status: Status de l'utilisateur
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        Exemple:
+        >>> err = DB_API.set_user_status(1, 0)
+        >>> if not isinstance(err, Exception):
+        >>>     print("delete avec succes")
+        """
+        return cursor.execute(_Requests.update_user_status, (user_id, status))
 
     @staticmethod
     @cm_cursor()
@@ -1042,7 +1083,7 @@ class DB_API:
     @cm_cursor()
     def delete_tasks(project_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
         return cursor.execute(_Requests.delete_tasks.format(project_id))
-        
+
     @staticmethod
     @cm_conn()
     @cm_cursor()
@@ -1062,7 +1103,9 @@ class DB_API:
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def delete_users_from_users_tasks_groups(task_group_id: int, *, cursor: MySQLCursor) -> Optional[Exception]:
+    def delete_users_from_users_tasks_groups(
+        task_group_id: int, *, cursor: MySQLCursor
+    ) -> Optional[Exception]:
         """
         Supprime tous les utilisateurs d'un groupe de tâches spécifique
 
@@ -1104,13 +1147,15 @@ class DB_API:
         result = cursor.fetchone()
         return result[0] if result else None
 
-
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def update_task_status_to_zero(task_info_id: int, status: int = 0, *, cursor: MySQLCursor) -> bool:
+    def update_task_status_to_zero(
+        task_info_id: int, status: int = 0, *, cursor: MySQLCursor
+    ) -> bool:
         """
-        Met à jour le statut de la tâche dans la table tasks_infos en mettant le statut à 0 (non terminé).
+        Met à jour le statut de la tâche dans la table tasks_infos en mettant
+        le statut à 0 (non terminé).
         """
         query = _Requests.update_task_status_to_zero
         cursor.execute(query, (status, task_info_id))
@@ -1134,7 +1179,9 @@ class DB_API:
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def update_task_description(description: str, task_info_id: int, *, cursor: MySQLCursor) -> bool:
+    def update_task_description(
+        description: str, task_info_id: int, *, cursor: MySQLCursor
+    ) -> bool:
         query = _Requests.update_task_description
         cursor.execute(query, (description, task_info_id))
         return cursor.rowcount > 0
@@ -1161,7 +1208,8 @@ class DB_API:
         cursor.execute(_Requests.get_user_status_by_userID.format(user_id))
         result = cursor.fetchone()
         return result
-        
+
+
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
     # t = (DB_API.add_user(username="vlad", password="trql",
