@@ -279,6 +279,8 @@ class _Requests:
         WHERE projectID = %s
           AND userID = %s;
     """
+    
+    add_user_status = "INSERT INTO status (userID, status) VALUES (%s, %s);"
 
 
 if __name__ == "__main__":
