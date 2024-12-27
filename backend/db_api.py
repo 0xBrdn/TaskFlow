@@ -1209,6 +1209,13 @@ class DB_API:
         result = cursor.fetchone()
         return result
 
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def add_user_status(user_id: int, status: int, *, cursor: MySQLCursor) -> Union[Exception, Optional[int]]:
+        cursor.execute(_Requests.add_user_status, (user_id, status))
+        return cursor.lastrowid
+        
 
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
