@@ -468,6 +468,7 @@ class Ui_MainWindow(object):
         self.auth_ui = AuthMainWindow()
         self.auth_ui.setupUi(self.auth_window)
         self.auth_window.show()
+        DB_API.set_user_status(self.user_id, 0)
 
         self.user_id = None
         self.current_user = None
