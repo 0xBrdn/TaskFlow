@@ -49,8 +49,8 @@ class InviteUsersDialog(QtWidgets.QDialog):
             # Droits d'accès
             rights_layout = QtWidgets.QHBoxLayout()
             self.rights_combo = QtWidgets.QComboBox(self)
-            self.rights_combo.addItems(["lecture", "lecture + ecriture", "administration"])
-            self.map_rights_combo = {"lecture": 0, "lecture + ecriture": 1, "administration": 2}
+            self.rights_combo.addItems(["lecture", "lecture + ecriture", "administrateur"])
+            self.map_rights_combo = {"lecture": 0, "lecture + ecriture": 1, "administrateur": 2}
             rights_layout.addWidget(QtWidgets.QLabel("Droits d'accès:"))
             rights_layout.addWidget(self.rights_combo)
             layout.addLayout(rights_layout)
@@ -384,7 +384,9 @@ class Ui_MainWindow(object):
         self.button_layout.addWidget(self.invite_users_button)
         self.task_layout.addLayout(self.button_layout)
 
-        self.uncomplete_task_button = QtWidgets.QPushButton("Marquer comme non terminé", self.task_tab)
+        self.uncomplete_task_button = QtWidgets.QPushButton(
+            "Marquer comme non terminé", self.task_tab
+        )
         self.uncomplete_task_button.setObjectName("uncomplete_task_button")
         self.button_layout.addWidget(self.uncomplete_task_button)
 
@@ -558,11 +560,11 @@ class Ui_MainWindow(object):
         Affiche les utilisateurs du projet actuel et leur statut en ligne
         dans une nouvelle section de l'interface.
         """
-        if not hasattr(self, 'current_project'):
+        if not hasattr(self, "current_project"):
             return
 
         try:
-            if not hasattr(self, 'users_scroll_area'):
+            if not hasattr(self, "users_scroll_area"):
                 self.users_widget = QWidget(self.task_tab)
                 users_layout = QVBoxLayout(self.users_widget)
 
@@ -584,38 +586,47 @@ class Ui_MainWindow(object):
                 self.task_layout.addWidget(self.users_widget)
 
             for i in reversed(range(self.users_container_layout.count())):
-                self.users_container_layout.itemAt(i).widget().setParent(None)
+                item = self.users_container_layout.itemAt(i)
+                if item and item.widget():
+                    item.widget().setParent(None)
 
             project_id = DB_API.get_project_id_by_project_name(self.current_project)[0]
             users_in_project = DB_API.get_users_in_project_by_project_id(project_id)
+            _user_status = DB_API.get_all_status()
+            user_status = {item[0]: item[1] for item in _user_status}
+            perms = next(user[2] for user in users_in_project if user[0] == self.user_id)
 
             for user in users_in_project:
-                username = user[1]
-                is_online = DB_API.get_user_status_by_userID(user[0])
-                is_online = is_online[0]
-                # is_online = user[0] == self.user_id
-                if is_online == 1:
-                    is_online = True
-                else:
-                    is_online = False
-                user_widget = UserStatusWidget(username, is_online)
-                self.users_container_layout.addWidget(user_widget)
-
+                user_id = user[0]
+                if user_id != self.user_id:
+                    username = user[1]
+                    is_online = user_status.get(user_id, None)
+                    user_widget = UserStatusWidget(
+                        username=username,
+                        user_id=user_id,
+                        is_online=is_online,
+                        is_admin=True if perms == 2 else False,
+                        project_id=project_id,
+                        current_user_role=user[2],
+                    )
+                    self.users_container_layout.addWidget(user_widget)
             self.users_container_layout.addStretch()
 
-            if not hasattr(self, 'update_timer'):
+            if not hasattr(self, "update_timer"):
                 self.update_timer = QTimer()
                 self.update_timer.timeout.connect(self.update_users_status)
                 self.update_timer.start(30000)  # Mise à jour toutes les 30 secondes
 
         except Exception as e:
-            QMessageBox.critical(None, "Erreur", f"Erreur lors de l'affichage des utilisateurs : {str(e)}")
+            QMessageBox.critical(
+                None, "Erreur", f"Erreur lors de l'affichage des utilisateurs : {e!s}"
+            )
 
     def update_users_status(self):
         """
         Met à jour le statut des utilisateurs périodiquement.
         """
-        if hasattr(self, 'current_project'):
+        if hasattr(self, "current_project"):
             self.display_users_in_project()
 
     def load_users_for_project(self, project_name):
@@ -1012,31 +1023,38 @@ class Ui_MainWindow(object):
             parent=self.task_tab,
             task_info=task_info,
             assigned_users=assigned_users,
-            all_users=all_users
+            all_users=all_users,
         )
 
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
             form_data = dialog.get_form_data()
-            DB_API.update_task_title(form_data['title'], task_infoID[0])
-            DB_API.update_task_description(form_data['comment'], task_infoID[0])
-            DB_API.update_task_priority(form_data['priority'], task_infoID[0])
-            DB_API.update_task_date(form_data['date'], task_infoID[0])
+            DB_API.update_task_title(form_data["title"], task_infoID[0])
+            DB_API.update_task_description(form_data["comment"], task_infoID[0])
+            DB_API.update_task_priority(form_data["priority"], task_infoID[0])
+            DB_API.update_task_date(form_data["date"], task_infoID[0])
             DB_API.delete_users_from_users_tasks_groups(task_group_id)
             added_users = set()
-            for username in form_data['assigned_users']:
+            for username in form_data["assigned_users"]:
                 if username not in added_users:
                     user_id = DB_API.get_user_id_by_username(username)
                     if user_id:
                         DB_API.add_user_to_task_group(task_group_id, user_id)
                         added_users.add(username)
 
-            selected_item.setText(0, form_data['title'])
-            selected_item.setText(1, QtCore.QDate.fromString(form_data['date'], "yyyy-MM-dd").toString("dd/MM/yyyy"))
-            selected_item.setText(2, form_data['comment'])
+            selected_item.setText(0, form_data["title"])
             selected_item.setText(
-                3, "Haute" if form_data['priority'] == 2 else "Moyenne" if form_data['priority'] == 1 else "Basse"
+                1, QtCore.QDate.fromString(form_data["date"], "yyyy-MM-dd").toString("dd/MM/yyyy")
             )
-            selected_item.setText(4, ", ".join(form_data['assigned_users']))
+            selected_item.setText(2, form_data["comment"])
+            selected_item.setText(
+                3,
+                "Haute"
+                if form_data["priority"] == 2
+                else "Moyenne"
+                if form_data["priority"] == 1
+                else "Basse",
+            )
+            selected_item.setText(4, ", ".join(form_data["assigned_users"]))
 
             QMessageBox.information(None, "Succès", "Modifications appliquées avec succès.")
 
@@ -1290,16 +1308,65 @@ class Ui_MainWindow(object):
                 selected_users = dialog.get_selected_users()
                 for user, rights in selected_users:
                     user_id = next(u[0] for u in _list_users if u[1] == user)
-                    print(user, rights, user_id, _list_users, project_id)
                     self.send_invitation(project_id, user_id, rights)
         else:
             dialog = InviteUsersDialog(self.task_tab, deny=True)
             dialog.exec_()
 
 
-class UserStatusWidget(QWidget):
-    def __init__(self, username, is_online=False, parent=None):
+class UserRoleDialog(QtWidgets.QDialog):
+    def __init__(self, username, user_id, project_id, current_user_role, parent=None):
         super().__init__(parent)
+        self.user_id = user_id
+        self.project_id = project_id
+        self.setWindowTitle("Rôle de l'utilisateur")
+        self.map_rights_combo = {"lecture": 0, "lecture + ecriture": 1, "administrateur": 2}
+        self.reverse_map_combo = {v: k for k, v in self.map_rights_combo.items()}
+        self.username = username
+        layout = QtWidgets.QFormLayout(self)
+
+        self.username_label = QLabel(
+            f"Nom de l'utilisateur : {self.username} "
+            f"[{self.reverse_map_combo.get(current_user_role)}]"
+        )
+        layout.addRow(self.username_label)
+
+        self.role_combo = QtWidgets.QComboBox(self)
+        self.role_combo.addItems(["lecture", "lecture + ecriture", "administrateur"])
+        layout.addRow("Rôle", self.role_combo)
+
+        self.buttons = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel, Qt.Horizontal, self
+        )
+        self.buttons.accepted.connect(self.accept)
+        self.buttons.rejected.connect(self.reject)
+        layout.addWidget(self.buttons)
+
+    def accept(self):
+        selected_role = self.role_combo.currentText()
+        role_id = self.map_rights_combo.get(selected_role, None)
+        DB_API.set_user_permission(self.project_id, self.user_id, role_id)
+        super().accept()
+
+
+class UserStatusWidget(QWidget):
+    def __init__(
+        self,
+        username,
+        user_id=None,
+        is_online=False,
+        parent=None,
+        is_admin=False,
+        project_id=None,
+        current_user_role=None,
+    ):
+        super().__init__(parent)
+        self.is_admin = is_admin
+        self.username = username
+        self.project_id = project_id
+        self.is_online = is_online
+        self.user_id = user_id
+        self.current_user_role = current_user_role
         layout = QVBoxLayout(self)
 
         user_widget = QWidget()
@@ -1326,6 +1393,20 @@ class UserStatusWidget(QWidget):
 
         layout.addWidget(user_widget)
         layout.setContentsMargins(0, 0, 0, 0)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton and self.is_admin:
+            self.on_user_clicked()
+
+    def on_user_clicked(self):
+        dialog = UserRoleDialog(
+            self.username, self.user_id, self.project_id, self.current_user_role
+        )
+        dialog.exec_()
+        users_in_project = DB_API.get_users_in_project_by_project_id(self.project_id)
+        self.current_user_role = next(
+            user[2] for user in users_in_project if user[0] == self.user_id
+        )
 
 
 class TaskEditDialog(QtWidgets.QDialog):
