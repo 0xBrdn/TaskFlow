@@ -61,7 +61,7 @@ TaskFlow est une application collaborative de gestion de projets et de tâches, 
   
   <div align="center">
   <img src="data/create_account.png" alt="Page principal">
-  <p><em>Page de crétion de compte</em></p>
+  <p><em>Page de création de compte</em></p>
 
 
   <img src="https://via.placeholder.com/800x400.png?text=Gestion+des+t%C3%A2ches" alt="Gestion des tâches">
