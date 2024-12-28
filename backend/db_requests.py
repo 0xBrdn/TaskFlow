@@ -208,10 +208,10 @@ class _Requests:
     delete_subtask = "DELETE FROM subtasks WHERE subtaskID = %s;"
 
     get_user_permission = (
-        "SELECT permission FROM users_groups WHERE projectID = '{}'" "AND userID = '{}';"
+        "SELECT permission FROM users_groups WHERE projectID = %s AND userID = %s;"
     )
 
-    delete_project = "DELETE FROM projects WHERE projectID = '{}';"
+    delete_project = "DELETE FROM projects WHERE projectID = %s;"
 
     get_task_info_by_task_id = (
         "SELECT ti.title, ti.description, ti.status, ti.priority, ti.covered,"
@@ -229,21 +229,21 @@ class _Requests:
         "WHERE s.subtaskID = %s;"
     )
 
-    delete_users_groups = "DELETE FROM users_groups WHERE projectID = '{}';"
+    delete_users_groups = "DELETE FROM users_groups WHERE projectID = %s;"
 
     delete_tasks_groups = (
         "DELETE tg FROM tasks_groups tg INNER JOIN tasks t ON t.assign = tg.task_projectID WHERE "
-        "t.projectID = '{}';"
+        "t.projectID = %s;"
     )
 
     delete_tasks_infos = (
         "DELETE ti FROM tasks_infos ti INNER JOIN tasks t ON "
-        "t.task_infoID = ti.task_infoID WHERE t.projectID = '{}';"
+        "t.task_infoID = ti.task_infoID WHERE t.projectID = %s;"
     )
 
-    delete_tasks = "DELETE FROM tasks where projectID = '{}';"
+    delete_tasks = "DELETE FROM tasks where projectID = %s;"
 
-    check_projects = "SELECT COUNT(*) AS project_count FROM projects WHERE name = '{}';"
+    check_projects = "SELECT COUNT(*) AS project_count FROM projects WHERE name = %s;"
 
     delete_users_from_users_tasks_groups = (
         "DELETE FROM users_tasks_groups WHERE task_projectID = %s;"
@@ -255,7 +255,7 @@ class _Requests:
 
     update_task_title = "UPDATE tasks_infos SET title = %s WHERE task_infoID = %s;"
 
-    get_task_infoID_by_taskID = "SELECT task_infoID FROM tasks WHERE taskID = '{}';"
+    get_task_infoID_by_taskID = "SELECT task_infoID FROM tasks WHERE taskID = %s;"
 
     update_task_description = "UPDATE tasks_infos SET description = %s WHERE task_infoID = %s;"
 
@@ -269,7 +269,7 @@ class _Requests:
 
     get_task_info_id_by_task_id = "SELECT task_infoID FROM tasks WHERE taskID = %s;"
 
-    get_user_status_by_userID = "SELECT status FROM status WHERE userID = '{}';"
+    get_user_status_by_userID = "SELECT status FROM status WHERE userID = %s;"
 
     update_user_status = "UPDATE status SET status = %s WHERE userID = %s;"
 
@@ -286,6 +286,4 @@ class _Requests:
 
 
 if __name__ == "__main__":
-    # Exemple fictif :
-    # print(_Requests.get_user_hashpass % "test_user")
     pass
