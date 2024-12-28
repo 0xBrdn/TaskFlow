@@ -566,8 +566,14 @@ class Ui_MainWindow(object):
             # Ajouter un espace flexible pour forcer l'extension
             self.users_container_layout.addStretch()
 
-            # Ajuster la hauteur de la zone des utilisateurs pour remplir l'espace vertical
-            self.users_scroll_area.setMinimumHeight(self.user_right_layout.geometry().height() - 20)
+            # Ajuster la taille de la zone des utilisateurs pour qu'elle occupe tout l'espace
+            self.users_scroll_area.setMinimumHeight(500)  # Ajustez cette valeur si nécessaire
+            self.users_scroll_area.setMaximumHeight(600)  # Facultatif
+            self.users_scroll_area.setMinimumWidth(self.user_right_layout.geometry().width() - 20)
+
+            # Ajuster les proportions entre la zone des utilisateurs et le reste de l'interface
+            self.task_layout.setStretch(0, 3)  # 3 parts pour la liste des tâches
+            self.task_layout.setStretch(1, 4)  # 4 parts pour la section des utilisateurs
 
             # Mettre à jour automatiquement le statut des utilisateurs toutes les 30 secondes
             if not hasattr(self, "update_timer"):
@@ -755,10 +761,10 @@ class Ui_MainWindow(object):
                     subtask_item.setData(0, QtCore.Qt.UserRole, subtask[0])  # ID de la sous-tâche
 
                     # Vérifier le statut en direct et appliquer la couleur verte si terminé
-                    if subtask[3] == 1:  # Statut = 1 signifie "terminé"
-                        self.set_task_background(subtask_item, "green")
-                    else:  # Statut différent de 1 signifie "non terminé"
-                        self.set_task_background(subtask_item, "white")
+                    if task[3] == 1:  # Statut = 1 signifie "terminé"
+                        self.set_task_background(task_item, "#DFF0D8", is_completed=True)
+                    else:
+                        self.set_task_background(task_item, "white")
 
             self.tree.setIndentation(20)
 
@@ -768,14 +774,28 @@ class Ui_MainWindow(object):
         except Exception as e:
             QMessageBox.critical(None, "Erreur", f"Impossible de charger les tâches : {e!s}")
 
-    def set_task_background(self, item, color):
+    def set_task_background(self, item, color, is_completed=False):
         """
-        Applique un fond coloré à un item.
+        Applique un style personnalisé à un item en fonction de son état.
         """
         try:
-            brush = QtGui.QBrush(QtGui.QColor(color))
-            for i in range(item.columnCount()):
-                item.setBackground(i, brush)
+            if is_completed:
+                # Style pour les tâches terminées
+                brush = QtGui.QBrush(QtGui.QColor("#DFF0D8"))  # Couleur de fond verte pâle
+                pen = QtGui.QPen(QtGui.QColor("#3C763D"))  # Couleur de bordure
+                font = QtGui.QFont()
+                font.setBold(True)  # Met le texte en gras
+                font.setItalic(True)  # Met le texte en italique
+
+                for i in range(item.columnCount()):
+                    item.setBackground(i, brush)
+                    item.setForeground(i, QtGui.QBrush(QtGui.QColor("#3C763D")))  # Couleur du texte
+                    item.setFont(i, font)
+            else:
+                # Style par défaut pour les tâches non terminées
+                brush = QtGui.QBrush(QtGui.QColor(color))
+                for i in range(item.columnCount()):
+                    item.setBackground(i, brush)
         except Exception as e:
             print(e)
 
@@ -1377,32 +1397,44 @@ class UserStatusWidget(QWidget):
         self.is_online = is_online
         self.user_id = user_id
         self.current_user_role = current_user_role
+
+        # Layout principal
         layout = QVBoxLayout(self)
 
+        # Conteneur utilisateur
         user_widget = QWidget()
-        user_widget.setFixedHeight(40)
+        user_widget.setFixedHeight(50)  # Réduisez ou ajustez la hauteur ici
         user_widget.setAutoFillBackground(True)
 
+        # Définition de la couleur de fond
         palette = user_widget.palette()
         bg_color = QColor("#E8F5E9") if is_online else QColor("#FFFFFF")
         palette.setColor(QPalette.Window, bg_color)
         user_widget.setPalette(palette)
 
+        # Layout pour les informations utilisateur
         user_layout = QVBoxLayout(user_widget)
+        user_layout.setContentsMargins(5, 5, 5, 5)  # Ajout de marges internes
+        user_layout.setSpacing(0)  # Réduisez l'espacement interne
 
+        # Nom de l'utilisateur
         username_label = QLabel(username)
         username_label.setStyleSheet("font-size: 14px; font-weight: bold;")
 
+        # Statut en ligne / hors ligne
         status_text = "En ligne" if is_online else "Hors ligne"
         status_color = "#4CAF50" if is_online else "#757575"
         status_label = QLabel(status_text)
         status_label.setStyleSheet(f"color: {status_color}; font-size: 12px;")
 
+        # Ajout des éléments au layout utilisateur
         user_layout.addWidget(username_label)
         user_layout.addWidget(status_label)
 
+        # Ajout du widget utilisateur au layout principal
         layout.addWidget(user_widget)
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(5)  # Réduisez l'espacement entre chaque widget utilisateur
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton and self.is_admin:
@@ -1417,7 +1449,6 @@ class UserStatusWidget(QWidget):
         self.current_user_role = next(
             user[2] for user in users_in_project if user[0] == self.user_id
         )
-
 
 class TaskDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, users=[]):  # noqa
