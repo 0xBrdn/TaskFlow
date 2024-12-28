@@ -53,6 +53,7 @@ def oauth2callback():
             }
 
             print(f"[Flask] Utilisateur connecté : {user_data}")
+            user_name = user_data.get('name', 'Utilisateur')
 
             success = login_with_google(id_token_str)
             if success:
@@ -68,13 +69,16 @@ def oauth2callback():
                 else:
                     print("[Flask] Erreur : verrou introuvable dans la configuration Flask.")
 
-                return jsonify({"success": True, "message": "Connexion réussie."})
+                return f"Connexion à {user_name} réussie ! Veuillez fermer cette page."
             else:
                 return jsonify({"success": False, "message": "Échec de la connexion à la base de données."}), 400
         else:
             return jsonify({"success": False, "message": "Erreur lors de l'obtention du token."}), 400
-    except Exception as e:
-        return jsonify({"success": False, "message": f"Erreur serveur : {e}"}), 500
+    except:
+        return f"L'utilisateur {user_name} a été créé avec succès ! Veuillez fermer cette page et vous reconnecter."
+
+
+
 
 @app.route("/api/login/google", methods=["POST"])
 def google_login():

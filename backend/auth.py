@@ -102,7 +102,7 @@ def login_with_google(id_token_str):
             stored_email = result[3]
             if stored_email == email:
                 print("L'utilisateur correspond bien.")
-            print(f"Utilisateur existant : {result}")  # Log si l'utilisateur existe
+            print(f"Utilisateur existant : {result}")
             return True
         else:
             print(f"Utilisateur inexistant, création de : {google_name}, {email}")
