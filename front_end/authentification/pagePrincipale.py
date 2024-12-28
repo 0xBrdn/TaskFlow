@@ -18,6 +18,22 @@ from typing import Optional
 
 
 class InviteUsersDialog(QtWidgets.QDialog):
+    """
+    Cette classe gère le dialogue d'invitation des utilisateurs dans un projet.
+
+    Cette classe renvoie une boîte de dialogue permettant de sélectionner des
+    utilisateurs et de leur attribuer des droits.
+
+    :param parent: Widget parent (optionnel)
+    :param deny: Bool indiquant si l'accès doit être refusé
+    :return: Boîte de dialogue d'invitation
+    :raise: Exception si l'initialisation échoue
+
+    Exemple:
+    >>> dialog = InviteUsersDialog(parent=None)
+    >>> if dialog.exec_():
+    >>>     users = dialog.get_selected_users()
+    """
     def __init__(self, parent=None, deny=False):
         super().__init__(parent)
         self.deny = deny
@@ -26,6 +42,20 @@ class InviteUsersDialog(QtWidgets.QDialog):
         self.setup_ui()
 
     def setup_ui(self):
+        """
+        Configure l'interface utilisateur du dialogue d'invitation.
+
+        Cette fonction initialise tous les éléments de l'interface du dialogue
+        d'invitation des utilisateurs.
+
+        :param self: Instance de la classe
+        :return: None
+        :raise: Exception si l'initialisation des composants échoue
+
+        Exemple:
+        >>> dialog = InviteUsersDialog()
+        >>> dialog.setup_ui()
+        """
         layout = QVBoxLayout(self)
         if self.deny:
             error_label = QLabel(
@@ -79,6 +109,20 @@ class InviteUsersDialog(QtWidgets.QDialog):
             self.cancel_button.clicked.connect(self.reject)
 
     def load_users(self, users):
+        """
+        Charge la liste des utilisateurs disponibles dans le dialogue.
+
+        Cette fonction met à jour la liste des utilisateurs pouvant être invités
+        dans le projet.
+
+        :param users: Liste des utilisateurs à afficher
+        :return: None
+        :raise: Exception si le chargement échoue
+
+        Exemple:
+        >>> dialog = InviteUsersDialog()
+        >>> dialog.load_users(['user1@email.com', 'user2@email.com'])
+        """
         self.user_list.clear()
         for user in users:
             item = QListWidgetItem(f"{user}")
@@ -86,6 +130,21 @@ class InviteUsersDialog(QtWidgets.QDialog):
             self.user_list.addItem(item)
 
     def get_selected_users(self):
+        """
+        Récupère la liste des utilisateurs sélectionnés avec leurs droits.
+
+        Cette fonction renvoie un tuple contenant les utilisateurs sélectionnés
+        et les droits qui leur ont été attribués.
+
+        :return: Liste de tuples (user, permission)
+        :raise: Exception si la récupération échoue
+
+        Exemple:
+        >>> dialog = InviteUsersDialog()
+        >>> selected = dialog.get_selected_users()
+        >>> if selected:
+        >>>     print(f"Users selected: {selected}")
+        """
         selected_items = self.user_list.selectedItems()
         users = []
         rights = self.rights_combo.currentText()
@@ -97,10 +156,25 @@ class InviteUsersDialog(QtWidgets.QDialog):
 
 class Ui_MainWindow(object):
     def __init__(self):
+        """
+        Initialise la classe Ui_MainWindow.
+
+        Cette méthode initialise les valeurs de l'utilisateur actuel et de l'ID utilisateur.
+        """
         self.current_user = None
         self.user_id = None
 
     def _setup_account_tab(self):
+        """
+        Configure l'onglet du compte utilisateur.
+
+        Cette méthode initialise et configure tous les éléments de l'interface utilisateur
+        pour l'onglet de gestion du compte, y compris les informations de l'utilisateur
+        et les boutons d'action.
+
+        :param self: Instance de la classe
+        :return: None
+        """
         layout = QtWidgets.QVBoxLayout(self.account_tab)
 
         # Groupe pour les informations du compte
@@ -153,6 +227,14 @@ class Ui_MainWindow(object):
         layout.addWidget(account_group)
 
     def setupUi(self, MainWindow):
+        """
+        Configure l'interface utilisateur de la fenêtre principale.
+
+        Cette méthode configure la fenêtre principale, y compris sa taille, son icône,
+        le widget central, la mise en page, les onglets et les connexions pour divers boutons et widgets.
+
+        :param MainWindow: L'objet de la fenêtre principale à configurer.
+        """
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1200, 800)
         icon = QtGui.QIcon()
@@ -213,6 +295,15 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
     def _setup_project_tab(self):
+        """
+        Configure l'onglet de gestion des projets.
+
+        Met en place :
+        - Liste des projets actifs
+        - Liste des projets en attente
+        - Boutons d'action (Ajouter, Supprimer, etc.)
+        - Mise en page et style
+        """
         self.main_project_layout = QtWidgets.QHBoxLayout(self.project_tab)
 
         # Partie gauche - Projets actifs
@@ -264,6 +355,15 @@ class Ui_MainWindow(object):
         self.main_project_layout.addWidget(self.right_widget)
 
     def _setup_task_tab(self):
+        """
+        Configure l'onglet des tâches.
+
+        Cette méthode initialise et configure tous les éléments de l'interface utilisateur
+        pour l'onglet de gestion des tâches, y compris les étiquettes, les listes et les boutons.
+
+        :param self: Instance de la classe
+        :return: None
+        """
         # Layout principal pour l'onglet des tâches
         self.task_layout = QtWidgets.QHBoxLayout(self.task_tab)
 
@@ -363,6 +463,15 @@ class Ui_MainWindow(object):
         self.task_layout.setStretch(1, 2)  # 2 parts pour les utilisateurs
 
     def set_current_user(self, email):
+        """
+        Définit l'utilisateur actuel en fonction de l'email fourni et met à jour l'interface utilisateur en conséquence.
+
+        Cette méthode met à jour les informations de l'utilisateur actuel, telles que l'email, le nom d'utilisateur et le rôle,
+        et charge les projets associés à cet utilisateur.
+
+        :param email: L'email de l'utilisateur actuel.
+        :return: None
+        """
         self.current_user = email
         self.user_id = DB_API.get_userID_by_email(email)[0]
         self.email_label.setText(f"Email: {email}")
@@ -381,6 +490,14 @@ class Ui_MainWindow(object):
         self.load_projects()
 
     def deconnexion(self):
+        """
+        Déconnecte l'utilisateur actuel et retourne à la fenêtre d'authentification.
+
+        Cette méthode ferme toutes les fenêtres ouvertes, met à jour le statut de l'utilisateur dans la base de données
+        et affiche la fenêtre d'authentification.
+
+        :return: None
+        """
         from authentification import Ui_MainWindow as AuthMainWindow
 
         try:
@@ -399,6 +516,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def delete_account(self):
+        """
+        Supprime le compte de l'utilisateur actuel après confirmation.
+
+        Cette méthode demande une confirmation à l'utilisateur avant de supprimer son compte de la base de données.
+        Si la suppression est réussie, l'utilisateur est déconnecté et la fenêtre d'authentification est affichée.
+
+        :return: None
+        """
         try:
             # Demander confirmation avant de supprimer le compte
             reponse = QMessageBox.question(
@@ -444,6 +569,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def add_project(self):
+        """
+        Ajoute un nouveau projet après avoir obtenu le nom du projet de l'utilisateur.
+
+        Cette méthode affiche une boîte de dialogue pour que l'utilisateur entre le nom du projet.
+        Si le projet n'existe pas déjà, il est ajouté à la base de données et l'utilisateur est ajouté au projet.
+
+        :return: None
+        """
         try:
             project_name, ok = QInputDialog.getText(None, "Nouveau Projet", "Nom du projet :")
             if not ok or not project_name.strip():
@@ -460,6 +593,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def load_projects(self):
+        """
+        Charge les projets associés à l'utilisateur actuel et met à jour l'interface utilisateur.
+
+        Cette méthode récupère les projets actifs et en attente de l'utilisateur depuis la base de données
+        et les affiche dans les listes correspondantes.
+
+        :return: None
+        """
         self.project_list_widget.clear()
         self.pending_project.clear()
         try:
@@ -479,6 +620,14 @@ class Ui_MainWindow(object):
             QMessageBox.warning(None, "Erreur", f"Impossible de charger les projets : {e!s}")
 
     def project_clicked(self):
+        """
+        Gère l'événement lorsqu'un projet est cliqué dans la liste des projets.
+
+        Cette méthode met à jour l'interface utilisateur pour afficher les tâches et les utilisateurs
+        associés au projet sélectionné.
+
+        :return: None
+        """
         project_index = self.project_list_widget.currentRow()
         try:
             if project_index >= 0:
@@ -495,8 +644,13 @@ class Ui_MainWindow(object):
 
     def display_users_in_project(self):
         """
-        Affiche les utilisateurs du projet actuel et leur statut en ligne
-        dans une nouvelle section de l'interface.
+        Affiche les utilisateurs du projet actuel et leur statut en ligne dans une nouvelle section de l'interface.
+
+        Cette méthode crée une section dans l'onglet des tâches pour afficher les utilisateurs du projet actuel,
+        ainsi que leur statut en ligne. Elle met également en place un minuteur pour mettre à jour périodiquement
+        le statut des utilisateurs.
+
+        :return: None
         """
         if not hasattr(self, "current_project") or not self.current_project:
             return
@@ -589,6 +743,11 @@ class Ui_MainWindow(object):
     def update_users_status(self):
         """
         Met à jour le statut des utilisateurs périodiquement.
+
+        Cette méthode est appelée périodiquement pour mettre à jour le statut en ligne des utilisateurs
+        du projet actuel.
+
+        :return: None
         """
         try:
             if hasattr(self, "current_project"):
@@ -597,8 +756,15 @@ class Ui_MainWindow(object):
             print(f"Erreur lors de la mise à jour des statuts : {e}")
 
     def load_users_for_project(self, project_name):
-        # self.assign_user_dropdown.clear()
-        # self.assigned_users_list.clear()
+       """
+        Charge les utilisateurs associés au projet spécifié.
+
+        Cette méthode récupère les utilisateurs assignés au projet et les affiche dans les listes
+        de l'interface utilisateur.
+
+        :param project_name: Le nom du projet pour lequel charger les utilisateurs.
+        :return: None
+        """
 
         try:
             project_id = DB_API.get_project_id_by_project_name(project_name)
@@ -611,6 +777,14 @@ class Ui_MainWindow(object):
             )
 
     def add_selected_user(self):
+        """
+        Ajoute l'utilisateur sélectionné à la liste des utilisateurs assignés.
+
+        Cette méthode ajoute l'utilisateur sélectionné dans le menu déroulant à la liste des utilisateurs
+        assignés à la tâche ou au projet.
+
+        :return: None
+        """
         selected_user = self.assign_user_dropdown.currentText().strip()
         try:
             if selected_user and not self.is_user_already_assigned(selected_user):
@@ -619,6 +793,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def remove_selected_user_from_list(self):
+        """
+        Supprime l'utilisateur sélectionné de la liste des utilisateurs assignés.
+
+        Cette méthode supprime l'utilisateur sélectionné dans la liste des utilisateurs assignés
+        à la tâche ou au projet.
+
+        :return: None
+        """
         items = self.assigned_users_list.selectedItems()
         try:
             if items:
@@ -628,6 +810,15 @@ class Ui_MainWindow(object):
             print(e)
 
     def is_user_already_assigned(self, username: str) -> bool:
+        """
+        Vérifie si un utilisateur est déjà assigné.
+
+        Cette méthode vérifie si l'utilisateur spécifié est déjà présent dans la liste des utilisateurs
+        assignés à la tâche ou au projet.
+
+        :param username: Le nom d'utilisateur à vérifier.
+        :return: True si l'utilisateur est déjà assigné, False sinon.
+        """
         try:
             for i in range(self.assigned_users_list.count()):
                 if self.assigned_users_list.item(i).text() == username:
@@ -637,6 +828,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def add_task(self):
+        """
+        Ajoute une nouvelle tâche au projet actuel.
+
+        Cette méthode affiche une boîte de dialogue pour que l'utilisateur entre les détails de la tâche.
+        Si la tâche est validée, elle est ajoutée à la base de données et à l'interface utilisateur.
+
+        :return: None
+        """
         try:
             if not self.current_project:
                 QMessageBox.warning(None, "Erreur", "Veuillez sélectionner un projet.")
@@ -711,6 +910,15 @@ class Ui_MainWindow(object):
                 )
 
     def load_tasks_for_project(self, project_name):
+        """
+        Charge les tâches associées au projet spécifié.
+
+        Cette méthode récupère les tâches du projet depuis la base de données et les affiche
+        dans l'interface utilisateur.
+
+        :param project_name: Le nom du projet pour lequel charger les tâches.
+        :return: None
+        """
         self.tree.clear()
         try:
             project_id = DB_API.get_project_id_by_project_name(project_name)
@@ -776,7 +984,14 @@ class Ui_MainWindow(object):
 
     def set_task_background(self, item, color, is_completed=False):
         """
-        Applique un style personnalisé à un item en fonction de son état.
+        Applique un fond coloré à un item.
+
+        Cette méthode applique une couleur de fond à un item de la liste des tâches
+        en fonction de son statut.
+
+        :param item: L'item à colorer.
+        :param color: La couleur à appliquer.
+        :return: None
         """
         try:
             if is_completed:
@@ -802,6 +1017,12 @@ class Ui_MainWindow(object):
     def refresh_task_status(self, project_id):
         """
         Rafraîchit périodiquement le statut des tâches et met à jour la couleur.
+
+        Cette méthode est appelée périodiquement pour mettre à jour le statut des tâches
+        et leur couleur de fond en fonction de leur statut.
+
+        :param project_id: L'ID du projet pour lequel rafraîchir les tâches.
+        :return: None
         """
         tasks = DB_API.get_tasks_by_project_id(project_id)
         try:
@@ -821,6 +1042,14 @@ class Ui_MainWindow(object):
         QtCore.QTimer.singleShot(2000, lambda: self.refresh_task_status(project_id))
 
     def add_subtask(self):
+        """
+        Ajoute une sous-tâche à la tâche sélectionnée.
+
+        Cette méthode affiche une boîte de dialogue pour que l'utilisateur entre les détails de la sous-tâche.
+        Si la sous-tâche est validée, elle est ajoutée à la base de données et à l'interface utilisateur.
+
+        :return: None
+        """
         selected_items = self.tree.selectedItems()
         try:
             if not selected_items:
@@ -900,6 +1129,14 @@ class Ui_MainWindow(object):
                 )
 
     def delete_task(self):
+        """
+        Supprime la tâche sélectionnée.
+
+        Cette méthode demande une confirmation à l'utilisateur avant de supprimer la tâche
+        sélectionnée de la base de données et de l'interface utilisateur.
+
+        :return: None
+        """
         selected_items = self.tree.selectedItems()
         project_id = DB_API.get_project_id_by_project_name(self.current_project)
         userID = DB_API.get_userID_by_email(self.current_user)
@@ -928,6 +1165,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def delete_project(self):
+        """
+        Supprime le projet sélectionné.
+
+        Cette méthode demande une confirmation à l'utilisateur avant de supprimer le projet
+        sélectionné de la base de données et de l'interface utilisateur.
+
+        :return: None
+        """
         current_item = self.project_list_widget.currentItem()
         try:
             if not current_item:
@@ -982,6 +1227,14 @@ class Ui_MainWindow(object):
             QMessageBox.information(None, "Succès", "Le projet a été supprimé avec succès.")
 
     def modify_task(self):
+        """
+        Modifie la tâche sélectionnée.
+
+        Cette méthode affiche une boîte de dialogue pour que l'utilisateur modifie les détails de la tâche.
+        Si la modification est validée, elle est mise à jour dans la base de données et dans l'interface utilisateur.
+
+        :return: None
+        """
         selected_items = self.tree.selectedItems()
         try:
             if not selected_items:
@@ -1064,6 +1317,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def mark_completed(self):
+        """
+        Marque la tâche sélectionnée comme terminée.
+
+        Cette méthode met à jour le statut de la tâche sélectionnée dans la base de données
+        et dans l'interface utilisateur pour indiquer qu'elle est terminée.
+
+        :return: None
+        """
         selected_items = self.tree.selectedItems()
         try:
             if not selected_items:
@@ -1123,6 +1384,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def mark_uncompleted(self):
+        """
+        Marque la tâche sélectionnée comme non terminée.
+
+        Cette méthode met à jour le statut de la tâche sélectionnée dans la base de données
+        et dans l'interface utilisateur pour indiquer qu'elle n'est pas terminée.
+
+        :return: None
+        """
         selected_items = self.tree.selectedItems()
         try:
             if not selected_items:
@@ -1188,6 +1457,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def update_subtask_availability(self):
+        """
+        Met à jour la disponibilité des boutons de sous-tâche en fonction de la sélection actuelle.
+
+        Cette méthode active ou désactive les boutons de sous-tâche en fonction de la sélection
+        actuelle dans la liste des tâches.
+
+        :return: None
+        """
         selected_items = self.tree.selectedItems()
         try:
             if selected_items:
@@ -1198,12 +1475,29 @@ class Ui_MainWindow(object):
             print(e)
 
     def retranslateUi(self, MainWindow):
+        """
+        Retraduit l'interface utilisateur.
+
+        Cette méthode met à jour les textes de l'interface utilisateur en fonction de la langue
+        sélectionnée.
+
+        :param MainWindow: L'objet de la fenêtre principale à retraduire.
+        :return: None
+        """
         try:
             MainWindow.setWindowTitle("TaskFlow")
         except Exception as e:
             print(e)
 
     def accept_project(self):
+        """
+        Accepte le projet sélectionné dans la liste des projets en attente.
+
+        Cette méthode met à jour le statut du projet sélectionné pour indiquer que l'utilisateur
+        a accepté l'invitation à rejoindre le projet.
+
+        :return: None
+        """
         selected_item = self.pending_project.currentItem()
         try:
             if selected_item:
@@ -1216,6 +1510,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def refuse_project(self):
+        """
+        Refuse le projet sélectionné dans la liste des projets en attente.
+
+        Cette méthode met à jour le statut du projet sélectionné pour indiquer que l'utilisateur
+        a refusé l'invitation à rejoindre le projet.
+
+        :return: None
+        """
         selected_item = self.pending_project.currentItem()
         try:
             if selected_item:
@@ -1299,7 +1601,14 @@ class Ui_MainWindow(object):
 
     def set_invite(self, project_id: int, user_id: int, joined: bool):
         """
-        Permet d'accepter ou refuser une invitation a un projet
+        Met à jour le statut d'une invitation de projet.
+
+        Cette méthode met à jour le statut de l'invitation pour l'utilisateur spécifié dans la base de données.
+
+        :param project_id: L'ID du projet.
+        :param user_id: L'ID de l'utilisateur.
+        :param joined: Booléen indiquant si l'invitation est acceptée (True) ou refusée (False).
+        :return: None
         """
         try:
             if joined:
@@ -1314,6 +1623,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def get_user_to_invite(self, _list_users: list, _list_users_in_projects: list):
+        """
+        Affiche le dialogue d'invitation des utilisateurs.
+
+        Cette méthode affiche une boîte de dialogue permettant d'inviter des utilisateurs
+        au projet actuel.
+
+        :return: None
+        """
         try:
             list_users = [user[1] for user in _list_users]
             list_users_in_projects = [user[1] for user in _list_users_in_projects]
@@ -1322,6 +1639,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def show_invite_dialog(self):
+        """
+        Affiche le dialogue d'invitation des utilisateurs.
+
+        Cette méthode affiche une boîte de dialogue permettant d'inviter des utilisateurs
+        au projet actuel.
+
+        :return: None
+        """
         project_id = DB_API.get_project_id_by_project_name(self.current_project)[0]
         _list_users = DB_API.get_all_users()
         _list_users_in_projects = DB_API.get_users_in_project_by_project_id(project_id)
@@ -1345,6 +1670,15 @@ class Ui_MainWindow(object):
 
 
 class UserRoleDialog(QtWidgets.QDialog):
+    """
+    Boîte de dialogue pour modifier le rôle d'un utilisateur dans un projet.
+
+    :param username: Le nom d'utilisateur.
+    :param user_id: L'ID de l'utilisateur.
+    :param project_id: L'ID du projet.
+    :param current_user_role: Le rôle actuel de l'utilisateur.
+    :param parent: Le parent de la boîte de dialogue (optionnel).
+    """
     def __init__(self, username, user_id, project_id, current_user_role, parent=None):
         super().__init__(parent)
         self.user_id = user_id
@@ -1373,6 +1707,11 @@ class UserRoleDialog(QtWidgets.QDialog):
         layout.addWidget(self.buttons)
 
     def accept(self):
+        """
+        Accepte les modifications et met à jour le rôle de l'utilisateur dans la base de données.
+
+        :return: None
+        """
         selected_role = self.role_combo.currentText()
         role_id = self.map_rights_combo.get(selected_role, None)
         DB_API.set_user_permission(self.project_id, self.user_id, role_id)
@@ -1380,6 +1719,17 @@ class UserRoleDialog(QtWidgets.QDialog):
 
 
 class UserStatusWidget(QWidget):
+    """
+    Widget pour afficher le statut d'un utilisateur.
+
+    :param username: Le nom d'utilisateur.
+    :param user_id: L'ID de l'utilisateur (optionnel).
+    :param is_online: Booléen indiquant si l'utilisateur est en ligne.
+    :param parent: Le parent du widget (optionnel).
+    :param is_admin: Booléen indiquant si l'utilisateur est administrateur.
+    :param project_id: L'ID du projet (optionnel).
+    :param current_user_role: Le rôle actuel de l'utilisateur (optionnel).
+    """
     def __init__(
         self,
         username,
@@ -1437,10 +1787,21 @@ class UserStatusWidget(QWidget):
         layout.setSpacing(5)  # Réduisez l'espacement entre chaque widget utilisateur
 
     def mousePressEvent(self, event):
+        """
+        Gère l'événement de clic de la souris.
+
+        :param event: L'événement de clic de la souris.
+        :return: None
+        """
         if event.button() == Qt.LeftButton and self.is_admin:
             self.on_user_clicked()
 
     def on_user_clicked(self):
+        """
+        Affiche la boîte de dialogue pour modifier le rôle de l'utilisateur.
+
+        :return: None
+        """
         dialog = UserRoleDialog(
             self.username, self.user_id, self.project_id, self.current_user_role
         )
@@ -1451,6 +1812,12 @@ class UserStatusWidget(QWidget):
         )
 
 class TaskDialog(QtWidgets.QDialog):
+    """
+    Boîte de dialogue pour ajouter une nouvelle tâche.
+
+    :param parent: Le parent de la boîte de dialogue (optionnel).
+    :param users: Liste des utilisateurs disponibles pour l'assignation.
+    """
     def __init__(self, parent=None, users=[]):  # noqa
         super().__init__(parent)
         self.setWindowTitle("Nouvelle Tâche")
@@ -1459,6 +1826,11 @@ class TaskDialog(QtWidgets.QDialog):
         self.load_users(users)
 
     def setup_ui(self):
+        """
+        Configure l'interface utilisateur de la boîte de dialogue.
+
+        :return: None
+        """
         layout = QtWidgets.QVBoxLayout(self)
         form_layout = QtWidgets.QFormLayout()
 
@@ -1522,26 +1894,53 @@ class TaskDialog(QtWidgets.QDialog):
         layout.addWidget(button_box)
 
     def load_users(self, users):
+        """
+        Charge la liste des utilisateurs dans le menu déroulant.
+
+        :param users: Liste des utilisateurs.
+        :return: None
+        """
         self.assign_user_dropdown.clear()
         self.assign_user_dropdown.addItems(users)
 
     def add_selected_user(self):
+        """
+        Ajoute l'utilisateur sélectionné à la liste des utilisateurs assignés.
+
+        :return: None
+        """
         selected_user = self.assign_user_dropdown.currentText()
         if selected_user and not self.is_user_already_assigned(selected_user):
             self.assigned_users_list.addItem(selected_user)
 
     def remove_selected_user(self):
+        """
+        Retire l'utilisateur sélectionné de la liste des utilisateurs assignés.
+
+        :return: None
+        """
         current_item = self.assigned_users_list.currentItem()
         if current_item:
             self.assigned_users_list.takeItem(self.assigned_users_list.row(current_item))
 
     def is_user_already_assigned(self, username):
+        """
+        Vérifie si l'utilisateur est déjà assigné.
+
+        :param username: Le nom d'utilisateur.
+        :return: Booléen indiquant si l'utilisateur est déjà assigné.
+        """
         for i in range(self.assigned_users_list.count()):
             if self.assigned_users_list.item(i).text() == username:
                 return True
         return False
 
     def get_form_data(self):
+        """
+        Récupère les données du formulaire.
+
+        :return: Dictionnaire contenant les données du formulaire.
+        """
         return {
             "title": self.task_input.text().strip(),
             "date": self.date_input.date().toString("yyyy-MM-dd"),
@@ -1555,6 +1954,12 @@ class TaskDialog(QtWidgets.QDialog):
 
 
 class SubtaskDialog(QtWidgets.QDialog):
+    """
+    Boîte de dialogue pour ajouter une sous-tâche.
+
+    :param parent: Le parent de la boîte de dialogue (optionnel).
+    :param users: Liste des utilisateurs disponibles pour l'assignation (optionnel).
+    """
     def __init__(self, parent=None, users=None):
         super().__init__(parent)
         self.users = users or []
@@ -1563,6 +1968,11 @@ class SubtaskDialog(QtWidgets.QDialog):
         self.load_users()
 
     def setup_ui(self):
+        """
+        Configure l'interface utilisateur de la boîte de dialogue.
+
+        :return: None
+        """
         layout = QtWidgets.QVBoxLayout(self)
         form_layout = QtWidgets.QFormLayout()
 
@@ -1626,7 +2036,11 @@ class SubtaskDialog(QtWidgets.QDialog):
         layout.addWidget(button_box)
 
     def load_users(self):
-        """Charge la liste des utilisateurs dans le dropdown"""
+        """
+        Charge la liste des utilisateurs dans le menu déroulant.
+
+        :return: None
+        """        
         self.assign_user_dropdown.clear()
         for user in self.users:
             if isinstance(user, tuple):
@@ -1635,26 +2049,43 @@ class SubtaskDialog(QtWidgets.QDialog):
                 self.assign_user_dropdown.addItem(user)
 
     def add_selected_user(self):
-        """Ajoute l'utilisateur sélectionné à la liste des utilisateurs assignés"""
+        """
+        Ajoute l'utilisateur sélectionné à la liste des utilisateurs assignés.
+
+        :return: None
+        """
         current_user = self.assign_user_dropdown.currentText()
         if current_user and not self.is_user_already_assigned(current_user):
             self.assigned_users_list.addItem(current_user)
 
     def remove_selected_user(self):
-        """Retire l'utilisateur sélectionné de la liste des utilisateurs assignés"""
+        """
+        Retire l'utilisateur sélectionné de la liste des utilisateurs assignés.
+
+        :return: None
+        """
         current_item = self.assigned_users_list.currentItem()
         if current_item:
             self.assigned_users_list.takeItem(self.assigned_users_list.row(current_item))
 
     def is_user_already_assigned(self, username):
-        """Vérifie si l'utilisateur est déjà assigné"""
+        """
+        Vérifie si l'utilisateur est déjà assigné.
+
+        :param username: Le nom d'utilisateur.
+        :return: Booléen indiquant si l'utilisateur est déjà assigné.
+        """
         for i in range(self.assigned_users_list.count()):
             if self.assigned_users_list.item(i).text() == username:
                 return True
         return False
 
     def get_form_data(self):
-        """Récupère les données du formulaire"""
+        """
+        Récupère les données du formulaire.
+
+        :return: Dictionnaire contenant les données du formulaire.
+        """
         return {
             "title": self.task_input.text(),
             "date": self.date_input.date().toString("yyyy-MM-dd"),
@@ -1668,6 +2099,14 @@ class SubtaskDialog(QtWidgets.QDialog):
 
 
 class TaskEditDialog(QtWidgets.QDialog):
+    """
+    Boîte de dialogue pour modifier une tâche existante.
+
+    :param parent: Le parent de la boîte de dialogue (optionnel).
+    :param task_info: Informations sur la tâche à modifier.
+    :param assigned_users: Liste des utilisateurs assignés à la tâche.
+    :param all_users: Liste de tous les utilisateurs disponibles pour l'assignation.
+    """
     def __init__(self, parent=None, task_info=None, assigned_users=None, all_users=None):
         super().__init__(parent)
         self.setWindowTitle("Modifier la tâche")
@@ -1754,22 +2193,43 @@ class TaskEditDialog(QtWidgets.QDialog):
         self.remove_user_button.clicked.connect(self.remove_selected_user)
 
     def add_selected_user(self):
+        """
+        Ajoute l'utilisateur sélectionné à la liste des utilisateurs assignés.
+
+        :return: None
+        """
         selected_user = self.assign_user_dropdown.currentText()
         if selected_user and not self.is_user_already_assigned(selected_user):
             self.assigned_users_list.addItem(selected_user)
 
     def remove_selected_user(self):
+        """
+        Retire l'utilisateur sélectionné de la liste des utilisateurs assignés.
+
+        :return: None
+        """
         current_item = self.assigned_users_list.currentItem()
         if current_item:
             self.assigned_users_list.takeItem(self.assigned_users_list.row(current_item))
 
     def is_user_already_assigned(self, username):
+        """
+        Vérifie si l'utilisateur est déjà assigné.
+
+        :param username: Le nom d'utilisateur.
+        :return: Booléen indiquant si l'utilisateur est déjà assigné.
+        """
         for i in range(self.assigned_users_list.count()):
             if self.assigned_users_list.item(i).text() == username:
                 return True
         return False
 
     def get_form_data(self):
+        """
+        Récupère les données du formulaire.
+
+        :return: Dictionnaire contenant les données du formulaire.
+        """
         return {
             "title": self.title_input.text().strip(),
             "date": self.date_input.date().toString("yyyy-MM-dd"),
