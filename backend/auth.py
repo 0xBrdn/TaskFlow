@@ -74,26 +74,23 @@ def close_db_connection(connection):
 
 
 def login_with_google(id_token_str):
-    """
-    Authentifie un utilisateur avec un compte Google en validant le jeton.
-    """
     cursor = None
     connection = None
 
     try:
-        CLIENT_ID = "428963010703-44ievtu901l6r9g8dhs2jjmf11mphidg.apps.googleusercontent.com"
+        CLIENT_ID = "428963010703-4ehn75nf048kk43mmjpqksvva1d01qk8.apps.googleusercontent.com"
         print(f"Vérification du token ID : {id_token_str}")  # Log du token ID reçu
 
         idinfo = id_token.verify_oauth2_token(id_token_str, google_requests.Request(), CLIENT_ID)
-        print(f"IDinfo reçu : {idinfo}")  # Log de l'information extraite du token
+        print(f"IDinfo reçu : {idinfo}")
 
         email = idinfo.get("email")
         google_name = idinfo.get("name")
-        print(f"Utilisateur trouvé : {google_name}, Email : {email}")  # Log de l'email et du nom
+        print(f"Utilisateur trouvé : {google_name}, Email : {email}")
 
         connection = connect_to_db()
         if connection is None:
-            print("Erreur de connexion à la base de données.")  # Log si la connexion DB échoue
+            print("Erreur de connexion à la base de données.")
             return False
 
         cursor = connection.cursor()
@@ -102,18 +99,21 @@ def login_with_google(id_token_str):
         result = cursor.fetchone()
 
         if result:
-            print(f"Utilisateur existant : {result}")  # Log si l'utilisateur existe
+            stored_email = result[3]
+            if stored_email == email:
+                print("L'utilisateur correspond bien.")
+            print(f"Utilisateur existant : {result}")
             return True
         else:
-            print(f"Utilisateur inexistant, création de : {google_name}, {email}")  # Log de la création de l'utilisateur
+            print(f"Utilisateur inexistant, création de : {google_name}, {email}")
             create_user_google(google_name, email)
             return True
 
     except ValueError as e:
-        print(f"Erreur de vérification du token : {e}")  # Log de l'erreur de validation du token
+        print(f"Erreur de vérification du token : {e}")
         return False
     except Error as e:
-        print(f"Erreur base de données : {e}")  # Log d'erreur dans la base de données
+        print(f"Erreur base de données : {e}")
         return False
     finally:
         if cursor:
