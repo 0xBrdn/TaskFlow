@@ -385,6 +385,22 @@ class Ui_MainWindow(object):
         self.update_form_state()
 
     def update_form_state(self):
+        """
+        Met à jour l'état de l'interface selon le mode actif (connexion ou inscription).
+        Gère la visibilité des champs, les textes affichés et les connexions des signaux.
+
+        Cette méthode:
+        - Déconnecte les anciens signaux
+        - Met à jour les textes et placeholders
+        - Configure la visibilité des widgets
+        - Reconnecte les nouveaux signaux appropriés
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(window)
+        >>> ui.is_login_form = False
+        >>> ui.update_form_state()  # L'interface passe en mode inscription
+        """
         _translate = QtCore.QCoreApplication.translate
         try:
             self.boutonValider.clicked.disconnect()
@@ -537,7 +553,19 @@ class Ui_MainWindow(object):
         self.show_success_message(f"Bienvenue {name} !")
         self.open_main_window_google(email)
 
-    def open_main_window_google(self, email):
+    def open_main_window_google(self, email: str):
+        """
+        Ouvre la fenêtre principale après une connexion réussie via Google.
+        Configure l'utilisateur actif avec l'email Google.
+
+        :param email: Email de l'utilisateur Google
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(window)
+        >>> ui.open_main_window_google("user@gmail.com")
+        >>> # La fenêtre principale s'ouvre avec l'utilisateur configuré
+        """
         if not email:
             print("[PyQt] Erreur : email invalide.")
             self.show_error_message("Erreur : email non valide.")
@@ -702,6 +730,15 @@ class Ui_MainWindow(object):
         QtCore.QTimer.singleShot(3000, self.clear_error_message)
 
     def clear_error_message(self):
+        """
+        Efface le message d'erreur actuellement affiché dans l'interface.
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(window)
+        >>> ui.show_error_message("Une erreur")
+        >>> ui.clear_error_message()  # Le message disparaît
+        """
         self.labelErreur.clear()
 
     def show_success_message(self, message: str):
@@ -722,6 +759,18 @@ class Ui_MainWindow(object):
         QtCore.QTimer.singleShot(3000, lambda: self.labelErreur.setStyleSheet("color: red;"))
 
     def open_main_window(self):
+        """
+        Ferme la fenêtre d'authentification et ouvre la fenêtre principale
+        après une connexion réussie via email/mot de passe.
+        Configure l'utilisateur actif avec l'email utilisé pour la connexion.
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(window)
+        >>> ui.inputMail.setText("user@example.com")
+        >>> ui.open_main_window()
+        >>> # La fenêtre principale s'ouvre avec l'utilisateur configuré
+        """
         self.main_window.close()
         self.main_window_instance = QtWidgets.QMainWindow()
         self.main_window_ui = MainWindowUI()
@@ -731,6 +780,25 @@ class Ui_MainWindow(object):
         self.main_window_instance.show()
 
     def retranslateUi(self, MainWindow):
+        """
+        Configure les textes de l'interface utilisateur.
+        Utilise QCoreApplication.translate pour la gestion des traductions.
+
+        :param MainWindow: Instance de QMainWindow dont les textes doivent être traduits
+
+        Cette méthode définit:
+        - Le titre de la fenêtre
+        - Les labels des champs de saisie
+        - Le texte des boutons
+        - Les autres éléments textuels de l'interface
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> window = QtWidgets.QMainWindow()
+        >>> ui.setupUi(window)
+        >>> ui.retranslateUi(window)
+        >>> print(window.windowTitle())  # "TaskFlow - Login"
+        """
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "TaskFlow - Login"))
         self.titreUser.setText(_translate("MainWindow", "Nom d'Utilisateur"))
