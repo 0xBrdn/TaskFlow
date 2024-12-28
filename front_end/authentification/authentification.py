@@ -23,8 +23,6 @@ accounts = [
     {"email": "taskflowreminder2@gmail.com", "password": "lkya wtsu opzy pnse"},
     {"email": "taskflowreminder3@gmail.com", "password": "jjnw nuhq eopy azfw"},
 ]
-
-
 def send_otp_email(recipient_email: str, otp_code: str):
     """
     Envoie l'OTP (code TOTP) par email au user.
@@ -45,7 +43,6 @@ def send_otp_email(recipient_email: str, otp_code: str):
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
         server.send_message(message)
 
-
 def send_totp_to_user(totp, user_email: str):
     """
     Génère le code TOTP et l'envoie par mail.
@@ -54,7 +51,6 @@ def send_totp_to_user(totp, user_email: str):
     print(current_otp, "sayez")
     send_otp_email(user_email, current_otp)
 
-
 def verify_totp_code(totp, user_input_code: str) -> bool:
     """
     Vérifie si le code TOTP entré par l'utilisateur est correct
@@ -62,12 +58,10 @@ def verify_totp_code(totp, user_input_code: str) -> bool:
     """
     return totp.verify(user_input_code)  # True si code correct, False sinon.
 
-
 # Identifiants Google
 CLIENT_ID = "428963010703-4ehn75nf048kk43mmjpqksvva1d01qk8.apps.googleusercontent.com"
 REDIRECT_URI = "http://localhost:5001/oauth2callback"
 AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id={}&redirect_uri={}&scope=email+profile+openid"
-
 
 # -----------------------------------------------
 # Dialog pour la saisie du code TOTP
@@ -111,11 +105,20 @@ class OtpDialog(QtWidgets.QDialog):
     def get_code(self):
         return self.codeEdit.text().strip()
 
-
 class Ui_MainWindow(object):
+    """
+        Classe gérant l'interface utilisateur de la fenêtre d'authentification.
+        Permet la connexion via email/mot de passe ou Google, ainsi que l'inscription de nouveaux utilisateurs.
+
+        Exemple:
+        >>> app = QtWidgets.QApplication(sys.argv)
+        >>> MainWindow = QtWidgets.QMainWindow()
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(MainWindow)
+        >>> MainWindow.show()
+        """
     def __init__(self):
         self.totp = None
-
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1035, 774)
@@ -550,9 +553,6 @@ class Ui_MainWindow(object):
         pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.match(pattern, email) is not None
 
-    # ==========================
-    # get_or_create_user_secret
-    # ==========================
     def get_or_create_user_secret(self, email: str) -> str:
         """
         Récupère la clé secrète TOTP stockée en DB ou la crée si inexistante.
