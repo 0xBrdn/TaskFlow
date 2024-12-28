@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QInputDialog,
     QGroupBox,
-    QHBoxLayout,
     QListWidgetItem,
     QScrollArea,
     QWidget,
@@ -16,6 +15,7 @@ from PyQt5.QtWidgets import (
 from backend.db_api import DB_API
 import datetime
 from typing import Optional
+
 
 class InviteUsersDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, deny=False):
@@ -93,6 +93,7 @@ class InviteUsersDialog(QtWidgets.QDialog):
             user = item.data(QtCore.Qt.UserRole)
             users.append((user, self.map_rights_combo.get(rights)))
         return users
+
 
 class Ui_MainWindow(object):
     def __init__(self):
@@ -290,7 +291,9 @@ class Ui_MainWindow(object):
         self.add_subtask_button = QtWidgets.QPushButton("Ajouter Sous-Tâche", self.task_tab)
         self.delete_task_button = QtWidgets.QPushButton("Supprimer", self.task_tab)
         self.complete_task_button = QtWidgets.QPushButton("Marquer comme terminé", self.task_tab)
-        self.uncomplete_task_button = QtWidgets.QPushButton("Marquer comme non terminé", self.task_tab)
+        self.uncomplete_task_button = QtWidgets.QPushButton(
+            "Marquer comme non terminé", self.task_tab
+        )
         self.invite_users_button = QtWidgets.QPushButton("Inviter des utilisateurs", self.task_tab)
         self.modify_task_button = QtWidgets.QPushButton("Modifier", self.task_tab)
 
@@ -426,7 +429,9 @@ class Ui_MainWindow(object):
                     self.current_user = None
                 else:
                     # Gérer les erreurs de suppression
-                    QMessageBox.warning(None, "Erreur", f"Impossible de supprimer le compte : {err}")
+                    QMessageBox.warning(
+                        None, "Erreur", f"Impossible de supprimer le compte : {err}"
+                    )
         except Exception as e:
             print(e)
 
@@ -563,7 +568,7 @@ class Ui_MainWindow(object):
 
         try:
             project_id = DB_API.get_project_id_by_project_name(project_name)
-            users_in_project = DB_API.get_users_in_project_by_project_id(project_id[0])
+            users_in_project = DB_API.get_users_in_project_by_project_id(project_id[0])  # noqa
             # for user in users_in_project:
             #     self.assign_user_dropdown.addItem(user[1])
         except Exception as e:
@@ -653,9 +658,7 @@ class Ui_MainWindow(object):
                 )
 
                 DB_API.add_task(
-                    project_id=project_id[0],
-                    task_info_id=task_info_id,
-                    user_id=self.user_id
+                    project_id=project_id[0], task_info_id=task_info_id, user_id=self.user_id
                 )
 
                 for username in form_data["assigned_users"]:
@@ -668,7 +671,9 @@ class Ui_MainWindow(object):
 
             except Exception as e:
                 QMessageBox.critical(
-                    None, "Erreur", f"Une erreur s'est produite lors de l'ajout de la tâche : {e!s}"
+                    None,
+                    "Erreur",
+                    f"Une erreur s'est produite lors de l'ajout de la tâche : {e!s}",
                 )
 
     def load_tasks_for_project(self, project_name):
@@ -955,7 +960,7 @@ class Ui_MainWindow(object):
             if is_subtask:
                 task_info = DB_API.get_subtask_info_by_subtask_id(task_id)
                 task_info = task_info[0]
-                task_infoID = DB_API.get_task_infoID_by_userID(task_id)
+                task_infoID = DB_API.get_task_infoID_by_taskID(task_id)
             else:
                 task_info = DB_API.get_task_info_by_task_id(task_id)
                 task_info = task_info[0]
@@ -990,7 +995,10 @@ class Ui_MainWindow(object):
 
                 selected_item.setText(0, form_data["title"])
                 selected_item.setText(
-                    1, QtCore.QDate.fromString(form_data["date"], "yyyy-MM-dd").toString("dd/MM/yyyy")
+                    1,
+                    QtCore.QDate.fromString(form_data["date"], "yyyy-MM-dd").toString(
+                        "dd/MM/yyyy"
+                    ),
                 )
                 selected_item.setText(2, form_data["comment"])
                 selected_item.setText(
@@ -1114,7 +1122,9 @@ class Ui_MainWindow(object):
             success = DB_API.update_task_status(int(task_info_id[0]), 0)
 
             if success:
-                QMessageBox.information(None, "Succès", "La tâche a été marquée comme non terminée.")
+                QMessageBox.information(
+                    None, "Succès", "La tâche a été marquée comme non terminée."
+                )
 
                 self.set_task_background(selected_items[0], "white")
 
@@ -1285,6 +1295,7 @@ class Ui_MainWindow(object):
         except Exception as e:
             print(e)
 
+
 class UserRoleDialog(QtWidgets.QDialog):
     def __init__(self, username, user_id, project_id, current_user_role, parent=None):
         super().__init__(parent)
@@ -1318,6 +1329,7 @@ class UserRoleDialog(QtWidgets.QDialog):
         role_id = self.map_rights_combo.get(selected_role, None)
         DB_API.set_user_permission(self.project_id, self.user_id, role_id)
         super().accept()
+
 
 class UserStatusWidget(QWidget):
     def __init__(
@@ -1378,8 +1390,9 @@ class UserStatusWidget(QWidget):
             user[2] for user in users_in_project if user[0] == self.user_id
         )
 
+
 class TaskDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None, users=[]):
+    def __init__(self, parent=None, users=[]):  # noqa
         super().__init__(parent)
         self.setWindowTitle("Nouvelle Tâche")
         self.setModal(True)
@@ -1480,6 +1493,7 @@ class TaskDialog(QtWidgets.QDialog):
                 for i in range(self.assigned_users_list.count())
             ],
         }
+
 
 class SubtaskDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, users=None):
@@ -1590,8 +1604,9 @@ class SubtaskDialog(QtWidgets.QDialog):
             "assigned_users": [
                 self.assigned_users_list.item(i).text()
                 for i in range(self.assigned_users_list.count())
-            ]
+            ],
         }
+
 
 class TaskEditDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, task_info=None, assigned_users=None, all_users=None):
@@ -1706,6 +1721,7 @@ class TaskEditDialog(QtWidgets.QDialog):
                 for i in range(self.assigned_users_list.count())
             ],
         }
+
 
 if __name__ == "__main__":
     # u = Ui_MainWindow()
