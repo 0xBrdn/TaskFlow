@@ -255,7 +255,7 @@ class _Requests:
 
     update_task_title = "UPDATE tasks_infos SET title = %s WHERE task_infoID = %s;"
 
-    get_task_infoID_by_title = "SELECT task_infoID FROM tasks_infos WHERE title = '{}';"
+    get_task_infoID_by_taskID = "SELECT task_infoID FROM tasks WHERE taskID = '{}';"
 
     update_task_description = "UPDATE tasks_infos SET description = %s WHERE task_infoID = %s;"
 
@@ -271,7 +271,7 @@ class _Requests:
 
     get_user_status_by_userID = "SELECT status FROM status WHERE userID = '{}';"
 
-    update_user_status = "UPDATE status SET status = %s WHERE userID =%s;"
+    update_user_status = "UPDATE status SET status = %s WHERE userID = %s;"
 
     update_user_perm = """
         UPDATE users_groups
@@ -279,8 +279,10 @@ class _Requests:
         WHERE projectID = %s
           AND userID = %s;
     """
-    
+
     add_user_status = "INSERT INTO status (userID, status) VALUES (%s, %s);"
+
+    delete_user_status = "DELETE * FROM status WHERE userID = %s;"
 
 
 if __name__ == "__main__":
