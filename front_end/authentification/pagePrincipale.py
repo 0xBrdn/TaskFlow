@@ -100,6 +100,58 @@ class Ui_MainWindow(object):
         self.current_user = None
         self.user_id = None
 
+    def _setup_account_tab(self):
+        layout = QtWidgets.QVBoxLayout(self.account_tab)
+
+        # Groupe pour les informations du compte
+        account_group = QtWidgets.QGroupBox("Informations du Compte")
+        account_group.setStyleSheet("font-size: 16px;")
+        account_layout = QtWidgets.QVBoxLayout(account_group)
+
+        # Affichage du logo (si disponible)
+        logo_label = QtWidgets.QLabel()
+        try:
+            pixmap = QtGui.QPixmap("images/authentification/logo_alternatif.png")
+            pixmap = pixmap.scaledToWidth(150, QtCore.Qt.SmoothTransformation)
+            logo_label.setPixmap(pixmap)
+            logo_label.setAlignment(QtCore.Qt.AlignCenter)
+        except Exception as e:
+            print(f"Impossible de charger le logo : {e}")
+        account_layout.addWidget(logo_label)
+
+        # Étiquettes pour les informations de l'utilisateur
+        self.email_label = QtWidgets.QLabel("Email: ")
+        self.email_label.setObjectName("email_label")
+        self.email_label.setStyleSheet("font-size: 14px;")
+        account_layout.addWidget(self.email_label)
+
+        self.username_label = QtWidgets.QLabel("Nom d'utilisateur : Inconnu")
+        self.username_label.setStyleSheet("font-size: 14px;")
+        account_layout.addWidget(self.username_label)
+
+        self.role_label = QtWidgets.QLabel("Rôle : Inconnu")
+        self.role_label.setStyleSheet("font-size: 14px;")
+        account_layout.addWidget(self.role_label)
+
+        # Bouton de déconnexion
+        deconnexion_button = QtWidgets.QPushButton("Se déconnecter")
+        deconnexion_button.setObjectName("deconnexion_button")
+        deconnexion_button.setStyleSheet(
+            "background-color: red; color: white; font-weight: bold; font-size:14px;"
+        )
+        deconnexion_button.clicked.connect(self.deconnexion)
+        account_layout.addWidget(deconnexion_button)
+
+        # Bouton pour supprimer le compte
+        self.delete_account_button = QtWidgets.QPushButton("Supprimer mon compte")
+        self.delete_account_button.setStyleSheet(
+            "background-color: #a40000; color: white; font-weight: bold; font-size:14px;"
+        )
+        account_layout.addWidget(self.delete_account_button)
+
+        account_layout.addStretch(1)
+        layout.addWidget(account_group)
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1200, 800)
@@ -161,7 +213,6 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
     def _setup_project_tab(self):
-        # Layout principal horizontal pour diviser l'écran en deux
         self.main_project_layout = QtWidgets.QHBoxLayout(self.project_tab)
 
         # Partie gauche - Projets actifs
@@ -169,7 +220,6 @@ class Ui_MainWindow(object):
         self.left_layout = QtWidgets.QVBoxLayout(self.left_widget)
 
         self.project_label = QtWidgets.QLabel("Projets Actifs")
-        self.project_label.setObjectName("project_label")
         self.project_label.setStyleSheet("font-size: 16px;")
         self.left_layout.addWidget(self.project_label)
 
@@ -178,26 +228,13 @@ class Ui_MainWindow(object):
         self.left_layout.addWidget(self.project_list_widget)
 
         self.project_buttons_frame = QtWidgets.QFrame()
-        self.project_buttons_frame.setObjectName("project_buttons_frame")
         self.project_buttons_layout = QtWidgets.QHBoxLayout(self.project_buttons_frame)
 
         self.add_project_button = QtWidgets.QPushButton("Ajouter un Projet")
-        self.add_project_button.setObjectName("add_project_button")
-
         self.delete_project_button = QtWidgets.QPushButton("Supprimer le Projet")
-        self.delete_project_button.setObjectName("delete_project_button")
-        self.delete_project_button.setStyleSheet("""
-            QPushButton#delete_project_button {
-                background-color: #a40000;
-                color: white;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton#delete_project_button:hover {
-                background-color: #cc0000;
-            }
-        """)
-
+        self.delete_project_button.setStyleSheet(
+            "background-color: #a40000; color: white; font-size: 14px;"
+        )
         self.project_buttons_layout.addWidget(self.add_project_button)
         self.project_buttons_layout.addWidget(self.delete_project_button)
         self.left_layout.addWidget(self.project_buttons_frame)
@@ -207,7 +244,6 @@ class Ui_MainWindow(object):
         self.right_layout = QtWidgets.QVBoxLayout(self.right_widget)
 
         self.pending_label = QtWidgets.QLabel("Projets en Attente")
-        self.pending_label.setObjectName("pending_label")
         self.pending_label.setStyleSheet("font-size: 16px;")
         self.right_layout.addWidget(self.pending_label)
 
@@ -215,64 +251,37 @@ class Ui_MainWindow(object):
         self.pending_project.setStyleSheet("font-size: 14px;")
         self.right_layout.addWidget(self.pending_project)
 
-        # Frame pour les boutons de projets en attente
         self.pending_buttons_frame = QtWidgets.QFrame()
-        self.pending_buttons_frame.setObjectName("pending_buttons_frame")
         self.pending_buttons_layout = QtWidgets.QHBoxLayout(self.pending_buttons_frame)
 
-        # Bouton Accepter (bleu)
         self.accept_project_button = QtWidgets.QPushButton("Accepter Projet")
-        self.accept_project_button.setObjectName("accept_project_button")
-        self.accept_project_button.setStyleSheet("""
-            QPushButton#accept_project_button {
-                background-color: #0066cc;
-                color: white;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton#accept_project_button:hover {
-                background-color: #0080ff;
-            }
-        """)
-
-        # Bouton Refuser (rouge)
         self.refuse_project_button = QtWidgets.QPushButton("Refuser Projet")
-        self.refuse_project_button.setObjectName("refuse_project_button")
-        self.refuse_project_button.setStyleSheet("""
-            QPushButton#refuse_project_button {
-                background-color: #a40000;
-                color: white;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton#refuse_project_button:hover {
-                background-color: #cc0000;
-            }
-        """)
-
         self.pending_buttons_layout.addWidget(self.accept_project_button)
         self.pending_buttons_layout.addWidget(self.refuse_project_button)
         self.right_layout.addWidget(self.pending_buttons_frame)
 
-        # Ajout des widgets gauche et droit au layout principal
         self.main_project_layout.addWidget(self.left_widget)
         self.main_project_layout.addWidget(self.right_widget)
 
     def _setup_task_tab(self):
-        self.task_layout = QtWidgets.QVBoxLayout(self.task_tab)
+        # Layout principal pour l'onglet des tâches
+        self.task_layout = QtWidgets.QHBoxLayout(self.task_tab)
+
+        # Partie gauche : Liste des tâches
+        self.task_left_layout = QtWidgets.QVBoxLayout()
 
         self.title_label = QtWidgets.QLabel(self.task_tab)
         self.title_label.setText("Gestionnaire de Tâches")
         self.title_label.setAlignment(QtCore.Qt.AlignCenter)
         self.title_label.setObjectName("title_label")
         self.title_label.setStyleSheet("font-size: 18px;")
-        self.task_layout.addWidget(self.title_label)
+        self.task_left_layout.addWidget(self.title_label)
 
         self.current_project_label = QtWidgets.QLabel(self.task_tab)
         self.current_project_label.setAlignment(QtCore.Qt.AlignCenter)
         self.current_project_label.setObjectName("current_project_label")
         self.current_project_label.setStyleSheet("font-size: 16px;")
-        self.task_layout.addWidget(self.current_project_label)
+        self.task_left_layout.addWidget(self.current_project_label)
 
         self.tree = QtWidgets.QTreeWidget(self.task_tab)
         self.tree.setColumnCount(5)
@@ -280,7 +289,7 @@ class Ui_MainWindow(object):
             ["Tâche", "Date", "Commentaire", "Importance", "Utilisateurs assignés"]
         )
         self.tree.setStyleSheet("font-size: 14px;")
-        self.task_layout.addWidget(self.tree)
+        self.task_left_layout.addWidget(self.tree)
 
         for i in range(4):
             self.tree.header().setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
@@ -288,15 +297,29 @@ class Ui_MainWindow(object):
         # Boutons de gestion des tâches
         self.button_layout = QtWidgets.QHBoxLayout()
         self.add_task_button = QtWidgets.QPushButton("Ajouter une Tâche", self.task_tab)
+        self.add_task_button.setObjectName("add_task_button")  # Important
+
         self.add_subtask_button = QtWidgets.QPushButton("Ajouter Sous-Tâche", self.task_tab)
+        self.add_subtask_button.setObjectName("add_subtask_button")  # Important
+
         self.delete_task_button = QtWidgets.QPushButton("Supprimer", self.task_tab)
+        self.delete_task_button.setObjectName("delete_task_button")  # Important
+
         self.complete_task_button = QtWidgets.QPushButton("Marquer comme terminé", self.task_tab)
+        self.complete_task_button.setObjectName("complete_task_button")  # Important
+
         self.uncomplete_task_button = QtWidgets.QPushButton(
             "Marquer comme non terminé", self.task_tab
         )
-        self.invite_users_button = QtWidgets.QPushButton("Inviter des utilisateurs", self.task_tab)
-        self.modify_task_button = QtWidgets.QPushButton("Modifier", self.task_tab)
+        self.uncomplete_task_button.setObjectName("uncomplete_task_button")  # Important
 
+        self.invite_users_button = QtWidgets.QPushButton("Inviter des utilisateurs", self.task_tab)
+        self.invite_users_button.setObjectName("invite_users_button")  # Important
+
+        self.modify_task_button = QtWidgets.QPushButton("Modifier", self.task_tab)
+        self.modify_task_button.setObjectName("modify_task_button")  # Important
+
+        # Ajouter les boutons au layout
         self.button_layout.addWidget(self.add_task_button)
         self.button_layout.addWidget(self.add_subtask_button)
         self.button_layout.addWidget(self.delete_task_button)
@@ -305,54 +328,39 @@ class Ui_MainWindow(object):
         self.button_layout.addWidget(self.invite_users_button)
         self.button_layout.addWidget(self.modify_task_button)
 
-        self.task_layout.addLayout(self.button_layout)
+        self.task_left_layout.addLayout(self.button_layout)
 
-    def _setup_account_tab(self):
-        layout = QVBoxLayout(self.account_tab)
+        # Ajout de la partie gauche dans le layout principal
+        self.task_layout.addLayout(self.task_left_layout)
 
-        account_group = QGroupBox("Informations du Compte")
-        account_group.setStyleSheet("font-size: 16px;")
-        account_layout = QVBoxLayout(account_group)
+        # Partie droite : Liste des utilisateurs assignés
+        self.user_right_layout = QtWidgets.QVBoxLayout()
 
-        logo_label = QLabel()
-        try:
-            pixmap = QtGui.QPixmap("images/logo_alternatif.png")
-            pixmap = pixmap.scaledToWidth(150, QtCore.Qt.SmoothTransformation)
-            logo_label.setPixmap(pixmap)
-            logo_label.setAlignment(QtCore.Qt.AlignCenter)
-        except Exception as e:
-            print(f"Impossible de charger le logo : {e}")
-        account_layout.addWidget(logo_label)
+        self.user_title_label = QtWidgets.QLabel("Utilisateurs dans le projet")
+        self.user_title_label.setStyleSheet("font-size: 16px; font-weight: bold; margin: 10px;")
+        self.user_right_layout.addWidget(self.user_title_label)
 
-        self.email_label = QLabel("Email: ")
-        self.email_label.setObjectName("email_label")
-        self.email_label.setStyleSheet("font-size: 14px;")
-        account_layout.addWidget(self.email_label)
+        # Création de la QScrollArea pour afficher les utilisateurs
+        self.users_scroll_area = QScrollArea(self.task_tab)
+        self.users_scroll_area.setWidgetResizable(True)
+        self.users_scroll_area.setStyleSheet("background-color: #f9f9f9; border: none;")
 
-        self.username_label = QLabel("Nom d'utilisateur : Inconnu")
-        self.username_label.setStyleSheet("font-size: 14px;")
-        account_layout.addWidget(self.username_label)
+        # Widget contenant les utilisateurs
+        self.users_container = QWidget()
+        self.users_container_layout = QVBoxLayout(self.users_container)
+        self.users_container_layout.setContentsMargins(0, 0, 0, 0)
+        self.users_container_layout.setSpacing(10)
 
-        self.role_label = QLabel("Rôle : Inconnu")
-        self.role_label.setStyleSheet("font-size: 14px;")
-        account_layout.addWidget(self.role_label)
+        # Étendre la zone des utilisateurs
+        self.users_scroll_area.setWidget(self.users_container)
+        self.user_right_layout.addWidget(self.users_scroll_area)
 
-        deconnexion_button = QPushButton("Se déconnecter")
-        deconnexion_button.setObjectName("deconnexion_button")
-        deconnexion_button.setStyleSheet(
-            "background-color: red; color: white; font-weight: bold; font-size:14px;"
-        )
-        deconnexion_button.clicked.connect(self.deconnexion)
-        account_layout.addWidget(deconnexion_button)
+        # Ajout de la partie droite dans le layout principal
+        self.task_layout.addLayout(self.user_right_layout)
 
-        self.delete_account_button = QPushButton("Supprimer mon compte")
-        self.delete_account_button.setStyleSheet(
-            "background-color: #a40000; color: white; font-weight: bold; font-size:14px;"
-        )
-        account_layout.addWidget(self.delete_account_button)
-
-        account_layout.addStretch(1)
-        layout.addWidget(account_group)
+        # Ajuster les proportions entre gauche et droite
+        self.task_layout.setStretch(0, 3)  # 3 parts pour la liste des tâches
+        self.task_layout.setStretch(1, 2)  # 2 parts pour les utilisateurs
 
     def set_current_user(self, email):
         self.current_user = email
@@ -490,58 +498,84 @@ class Ui_MainWindow(object):
         Affiche les utilisateurs du projet actuel et leur statut en ligne
         dans une nouvelle section de l'interface.
         """
-        if not hasattr(self, "current_project"):
+        if not hasattr(self, "current_project") or not self.current_project:
             return
 
         try:
+            # Vérifiez si la zone de défilement pour les utilisateurs existe déjà
             if not hasattr(self, "users_scroll_area"):
+                # Widget principal pour la section des utilisateurs
                 self.users_widget = QWidget(self.task_tab)
+                self.users_widget.setStyleSheet("background-color: #f9f9f9;")
                 users_layout = QVBoxLayout(self.users_widget)
 
-                title_label = QLabel("Utilisateurs du projet")
-                title_label.setStyleSheet("font-size: 16px; font-weight: bold; margin: 10px;")
+                # Titre pour la liste des utilisateurs
+                title_label = QLabel("Utilisateurs dans le projet")
+                title_label.setStyleSheet(
+                    "font-size: 16px; font-weight: bold; margin: 10px; color: #333;"
+                )
                 users_layout.addWidget(title_label)
 
+                # Création de la zone de défilement pour afficher les utilisateurs
                 self.users_scroll_area = QScrollArea(self.task_tab)
                 self.users_scroll_area.setWidgetResizable(True)
-                self.users_scroll_area.setFixedHeight(200)
+                self.users_scroll_area.setStyleSheet("background-color: #ffffff; border: none;")
                 self.users_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
+                # Widget conteneur pour les utilisateurs
                 self.users_container = QWidget()
                 self.users_container_layout = QVBoxLayout(self.users_container)
+                self.users_container_layout.setContentsMargins(0, 0, 0, 0)
+                self.users_container_layout.setSpacing(10)
                 self.users_scroll_area.setWidget(self.users_container)
 
+                # Étendre la zone de défilement
                 users_layout.addWidget(self.users_scroll_area)
+                self.user_right_layout.addWidget(self.users_widget)
 
-                self.task_layout.addWidget(self.users_widget)
-
+            # Effacer les widgets existants avant de recharger
             for i in reversed(range(self.users_container_layout.count())):
                 item = self.users_container_layout.itemAt(i)
                 if item and item.widget():
                     item.widget().setParent(None)
 
+            # Récupérer les utilisateurs et leurs statuts
             project_id = DB_API.get_project_id_by_project_name(self.current_project)[0]
             users_in_project = DB_API.get_users_in_project_by_project_id(project_id)
             _user_status = DB_API.get_all_status()
             user_status = {item[0]: item[1] for item in _user_status}
+
+            # Permissions actuelles de l'utilisateur
             perms = next(user[2] for user in users_in_project if user[0] == self.user_id)
 
+            # Ajouter chaque utilisateur à la liste
             for user in users_in_project:
                 user_id = user[0]
-                if user_id != self.user_id:
-                    username = user[1]
-                    is_online = user_status.get(user_id, None)
-                    user_widget = UserStatusWidget(
-                        username=username,
-                        user_id=user_id,
-                        is_online=is_online,
-                        is_admin=True if perms == 2 else False,
-                        project_id=project_id,
-                        current_user_role=user[2],
-                    )
-                    self.users_container_layout.addWidget(user_widget)
+                username = user[1]
+                is_online = user_status.get(user_id, False)
+                user_widget = UserStatusWidget(
+                    username=username,
+                    user_id=user_id,
+                    is_online=is_online,
+                    is_admin=True if perms == 2 else False,
+                    project_id=project_id,
+                    current_user_role=user[2],
+                )
+                self.users_container_layout.addWidget(user_widget)
+
+            # Ajouter un espace flexible pour forcer l'extension
             self.users_container_layout.addStretch()
 
+            # Ajuster la taille de la zone des utilisateurs pour qu'elle occupe tout l'espace
+            self.users_scroll_area.setMinimumHeight(500)  # Ajustez cette valeur si nécessaire
+            self.users_scroll_area.setMaximumHeight(600)  # Facultatif
+            self.users_scroll_area.setMinimumWidth(self.user_right_layout.geometry().width() - 20)
+
+            # Ajuster les proportions entre la zone des utilisateurs et le reste de l'interface
+            self.task_layout.setStretch(0, 3)  # 3 parts pour la liste des tâches
+            self.task_layout.setStretch(1, 4)  # 4 parts pour la section des utilisateurs
+
+            # Mettre à jour automatiquement le statut des utilisateurs toutes les 30 secondes
             if not hasattr(self, "update_timer"):
                 self.update_timer = QTimer()
                 self.update_timer.timeout.connect(self.update_users_status)
@@ -560,7 +594,7 @@ class Ui_MainWindow(object):
             if hasattr(self, "current_project"):
                 self.display_users_in_project()
         except Exception as e:
-            print(e)
+            print(f"Erreur lors de la mise à jour des statuts : {e}")
 
     def load_users_for_project(self, project_name):
         # self.assign_user_dropdown.clear()
@@ -727,10 +761,10 @@ class Ui_MainWindow(object):
                     subtask_item.setData(0, QtCore.Qt.UserRole, subtask[0])  # ID de la sous-tâche
 
                     # Vérifier le statut en direct et appliquer la couleur verte si terminé
-                    if subtask[3] == 1:  # Statut = 1 signifie "terminé"
-                        self.set_task_background(subtask_item, "green")
-                    else:  # Statut différent de 1 signifie "non terminé"
-                        self.set_task_background(subtask_item, "white")
+                    if task[3] == 1:  # Statut = 1 signifie "terminé"
+                        self.set_task_background(task_item, "#DFF0D8", is_completed=True)
+                    else:
+                        self.set_task_background(task_item, "white")
 
             self.tree.setIndentation(20)
 
@@ -740,14 +774,28 @@ class Ui_MainWindow(object):
         except Exception as e:
             QMessageBox.critical(None, "Erreur", f"Impossible de charger les tâches : {e!s}")
 
-    def set_task_background(self, item, color):
+    def set_task_background(self, item, color, is_completed=False):
         """
-        Applique un fond coloré à un item.
+        Applique un style personnalisé à un item en fonction de son état.
         """
         try:
-            brush = QtGui.QBrush(QtGui.QColor(color))
-            for i in range(item.columnCount()):
-                item.setBackground(i, brush)
+            if is_completed:
+                # Style pour les tâches terminées
+                brush = QtGui.QBrush(QtGui.QColor("#DFF0D8"))  # Couleur de fond verte pâle
+                pen = QtGui.QPen(QtGui.QColor("#3C763D"))  # Couleur de bordure
+                font = QtGui.QFont()
+                font.setBold(True)  # Met le texte en gras
+                font.setItalic(True)  # Met le texte en italique
+
+                for i in range(item.columnCount()):
+                    item.setBackground(i, brush)
+                    item.setForeground(i, QtGui.QBrush(QtGui.QColor("#3C763D")))  # Couleur du texte
+                    item.setFont(i, font)
+            else:
+                # Style par défaut pour les tâches non terminées
+                brush = QtGui.QBrush(QtGui.QColor(color))
+                for i in range(item.columnCount()):
+                    item.setBackground(i, brush)
         except Exception as e:
             print(e)
 
@@ -1349,32 +1397,44 @@ class UserStatusWidget(QWidget):
         self.is_online = is_online
         self.user_id = user_id
         self.current_user_role = current_user_role
+
+        # Layout principal
         layout = QVBoxLayout(self)
 
+        # Conteneur utilisateur
         user_widget = QWidget()
-        user_widget.setFixedHeight(40)
+        user_widget.setFixedHeight(50)  # Réduisez ou ajustez la hauteur ici
         user_widget.setAutoFillBackground(True)
 
+        # Définition de la couleur de fond
         palette = user_widget.palette()
         bg_color = QColor("#E8F5E9") if is_online else QColor("#FFFFFF")
         palette.setColor(QPalette.Window, bg_color)
         user_widget.setPalette(palette)
 
+        # Layout pour les informations utilisateur
         user_layout = QVBoxLayout(user_widget)
+        user_layout.setContentsMargins(5, 5, 5, 5)  # Ajout de marges internes
+        user_layout.setSpacing(0)  # Réduisez l'espacement interne
 
+        # Nom de l'utilisateur
         username_label = QLabel(username)
         username_label.setStyleSheet("font-size: 14px; font-weight: bold;")
 
+        # Statut en ligne / hors ligne
         status_text = "En ligne" if is_online else "Hors ligne"
         status_color = "#4CAF50" if is_online else "#757575"
         status_label = QLabel(status_text)
         status_label.setStyleSheet(f"color: {status_color}; font-size: 12px;")
 
+        # Ajout des éléments au layout utilisateur
         user_layout.addWidget(username_label)
         user_layout.addWidget(status_label)
 
+        # Ajout du widget utilisateur au layout principal
         layout.addWidget(user_widget)
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(5)  # Réduisez l'espacement entre chaque widget utilisateur
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton and self.is_admin:
@@ -1389,7 +1449,6 @@ class UserStatusWidget(QWidget):
         self.current_user_role = next(
             user[2] for user in users_in_project if user[0] == self.user_id
         )
-
 
 class TaskDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, users=[]):  # noqa
