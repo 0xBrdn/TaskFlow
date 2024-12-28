@@ -78,7 +78,7 @@ def test_get_project_id_success(mock_cursor):
 
         assert result == test_project_id
         mock_cursor.execute.assert_called_once_with(
-            _Requests.get_project_id_by_project_name.format(test_project_name)
+            _Requests.get_project_id_by_project_name, (test_project_name,)
         )
 
 
@@ -95,7 +95,7 @@ def test_get_project_id_not_found(mock_cursor):
 
         assert result is None
         mock_cursor.execute.assert_called_once_with(
-            _Requests.get_project_id_by_project_name.format(test_project_name)
+            _Requests.get_project_id_by_project_name, (test_project_name,)
         )
 
 
@@ -119,35 +119,6 @@ def test_get_all_users_integration():
         pytest.fail(f"Échec de la connexion à la base de données ou de la requête: {e}")
 
 
-def test_get_user_hashpass_success(mock_cursor):
-    """
-    Tester la méthode get_user_hashpass dans un scénario réussi.
-    """
-
-    test_hashpass = ("hashed_password",)
-
-    mock_cursor.fetchone.return_value = test_hashpass
-
-    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
-        result = DB_API.get_user_hashpass(1, cursor=mock_cursor)
-
-        assert result == test_hashpass
-        mock_cursor.execute.assert_called_once_with(_Requests.get_user_hashpass.format(1))
-
-
-def test_get_user_hashpass_not_found(mock_cursor):
-    """
-    Tester la méthode get_user_hashpass lorsqu'aucun mot de passe n'est trouvé.
-    """
-    mock_cursor.fetchone.return_value = None
-
-    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
-        result = DB_API.get_user_hashpass(1, cursor=mock_cursor)
-
-        assert result is None
-        mock_cursor.execute.assert_called_once_with(_Requests.get_user_hashpass.format(1))
-
-
 def test_get_projects_by_user_id_success(mock_cursor):
     """
     Tester la méthode get_projects_by_user_id dans un scénario réussi.
@@ -160,7 +131,7 @@ def test_get_projects_by_user_id_success(mock_cursor):
         result = DB_API.get_projects_by_user_id(1, cursor=mock_cursor)
 
         assert result == test_projects
-        mock_cursor.execute.assert_called_once_with(_Requests.get_projects_by_user_id.format(1))
+        mock_cursor.execute.assert_called_once_with(_Requests.get_projects_by_user_id, (1,))
 
 
 def test_get_projects_by_user_id_empty(mock_cursor):
@@ -173,7 +144,7 @@ def test_get_projects_by_user_id_empty(mock_cursor):
         result = DB_API.get_projects_by_user_id(1, cursor=mock_cursor)
 
         assert result == []
-        mock_cursor.execute.assert_called_once_with(_Requests.get_projects_by_user_id.format(1))
+        mock_cursor.execute.assert_called_once_with(_Requests.get_projects_by_user_id, (1,))
 
 
 def test_get_tasks_by_project_id_success(mock_cursor):
@@ -191,7 +162,7 @@ def test_get_tasks_by_project_id_success(mock_cursor):
         result = DB_API.get_tasks_by_project_id(1, cursor=mock_cursor)
 
         assert result == test_tasks
-        mock_cursor.execute.assert_called_once_with(_Requests.get_tasks_by_project_id.format(1))
+        mock_cursor.execute.assert_called_once_with(_Requests.get_tasks_by_project_id, (1,))
 
 
 def test_get_subtasks_by_task_id_success(mock_cursor):
@@ -209,25 +180,7 @@ def test_get_subtasks_by_task_id_success(mock_cursor):
         result = DB_API.get_subtasks_by_task_id(1, cursor=mock_cursor)
 
         assert result == test_subtasks
-        mock_cursor.execute.assert_called_once_with(_Requests.get_subtasks_by_task_id.format(1))
-
-
-def test_get_user_logs_by_id_success(mock_cursor):
-    """
-    Tester la méthode get_user_logs_by_id dans un scénario réussi.
-    """
-    test_logs = [
-        (1, "Login", "2024-12-16 10:00:00", "Connexion réussie"),
-        (2, "Logout", "2024-12-16 18:00:00", "Déconnexion réussie"),
-    ]
-
-    mock_cursor.fetchall.return_value = test_logs
-
-    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
-        result = DB_API.get_user_logs_by_id(1, cursor=mock_cursor)
-
-        assert result == test_logs
-        mock_cursor.execute.assert_called_once_with(_Requests.get_user_logs_by_id.format(1))
+        mock_cursor.execute.assert_called_once_with(_Requests.get_subtasks_by_task_id, (1,))
 
 
 def test_get_users_in_project_by_project_id_success(mock_cursor):
@@ -246,26 +199,8 @@ def test_get_users_in_project_by_project_id_success(mock_cursor):
 
         assert result == test_users
         mock_cursor.execute.assert_called_once_with(
-            _Requests.get_users_in_project_by_project_id.format(1)
+            _Requests.get_users_in_project_by_project_id, (1,)
         )
-
-
-def test_get_tasks_by_user_id_success(mock_cursor):
-    """
-    Tester la méthode get_tasks_by_user_id dans un scénario réussi.
-    """
-    test_tasks = [
-        (1, "Task 1", "Description 1", "Open", "High", "No", "User 1", "2024-12-31"),
-        (2, "Task 2", "Description 2", "Closed", "Low", "Yes", "User 2", "2024-12-31"),
-    ]
-
-    mock_cursor.fetchall.return_value = test_tasks
-
-    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
-        result = DB_API.get_tasks_by_user_id(1, cursor=mock_cursor)
-
-        assert result == test_tasks
-        mock_cursor.execute.assert_called_once_with(_Requests.get_tasks_by_user_id.format(1))
 
 
 def test_get_users_in_tasks_group_by_group_id_success(mock_cursor):
@@ -285,7 +220,7 @@ def test_get_users_in_tasks_group_by_group_id_success(mock_cursor):
 
         assert result == expected_users
         mock_cursor.execute.assert_called_once_with(
-            _Requests.get_users_in_tasks_group_by_group_id.format(group_id)
+            _Requests.get_users_in_tasks_group_by_group_id, (group_id,)
         )
 
 
@@ -301,7 +236,7 @@ def test_get_users_in_tasks_group_by_group_id_empty(mock_cursor):
 
         assert result == []
         mock_cursor.execute.assert_called_once_with(
-            _Requests.get_users_in_tasks_group_by_group_id.format(group_id)
+            _Requests.get_users_in_tasks_group_by_group_id, (group_id,)
         )
 
 
@@ -372,17 +307,18 @@ def test_add_user_success(mock_cursor):
     email = "test@example.com"
     is_google_user = False
     expected_user_id = 123
+    hashed_password = "hashed_password"
 
     mock_cursor.lastrowid = expected_user_id
 
     with patch("backend.db_helper.cm_cursor", return_value=lambda func: func), patch(
         "backend.db_helper.cm_conn", return_value=lambda func: func
-    ):
+    ), patch("argon2.PasswordHasher.hash", return_value=hashed_password):
         result = DB_API.add_user(username, password, email, is_google_user, cursor=mock_cursor)
 
         assert result == expected_user_id
         mock_cursor.execute.assert_called_once_with(
-            _Requests.add_user.format(username, password, email, is_google_user)
+            _Requests.add_user, (username, hashed_password, email, is_google_user)
         )
 
 
@@ -406,43 +342,6 @@ def test_add_user_exception(mock_cursor):
         assert str(result) == "Erreur d'insertion"
 
 
-def test_add_status_success(mock_cursor):
-    """
-    Tester add_status avec une insertion réussie
-    """
-    user_id = 1
-    status = 0
-    expected_status_id = 123
-
-    mock_cursor.lastrowid = expected_status_id
-
-    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func), patch(
-        "backend.db_helper.cm_conn", return_value=lambda func: func
-    ):
-        result = DB_API.add_status(user_id, status, cursor=mock_cursor)
-
-        assert result == expected_status_id
-        mock_cursor.execute.assert_called_once_with(_Requests.add_status.format(user_id, status))
-
-
-def test_add_status_exception(mock_cursor):
-    """
-    Tester add_status lorsqu'une exception se produit
-    """
-    user_id = 1
-    status = 0
-
-    mock_cursor.execute.side_effect = Exception("Erreur d'insertion")
-
-    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func), patch(
-        "backend.db_helper.cm_conn", return_value=lambda func: func
-    ):
-        result = DB_API.add_status(user_id, status, cursor=mock_cursor)
-
-        assert isinstance(result, Exception)
-        assert str(result) == "Erreur d'insertion"
-
-
 def test_add_project_success(mock_cursor):
     """
     Tester add_project avec une insertion réussie
@@ -458,7 +357,7 @@ def test_add_project_success(mock_cursor):
         result = DB_API.add_project(name, cursor=mock_cursor)
 
         assert result == expected_project_id
-        mock_cursor.execute.assert_called_once_with(_Requests.add_project.format(name))
+        mock_cursor.execute.assert_called_once_with(_Requests.add_project, (name,))
 
 
 def test_add_project_exception(mock_cursor):
@@ -499,7 +398,7 @@ def test_add_user_to_group_success(mock_cursor):
 
         assert result == expected_user_group_id
         mock_cursor.execute.assert_called_once_with(
-            _Requests.add_user_to_group.format(project_id, user_id, permission, joined)
+            _Requests.add_user_to_group, (project_id, user_id, permission, joined)
         )
 
 
@@ -549,9 +448,8 @@ def test_add_task_info_success(mock_cursor):
 
         assert result == expected_task_info_id
         mock_cursor.execute.assert_called_once_with(
-            _Requests.add_task_info.format(
-                status, priority, title, description, dead_line, covered, assign
-            )
+            _Requests.add_task_info,
+            (status, priority, title, description, dead_line, covered, assign),
         )
 
 
@@ -598,7 +496,7 @@ def test_add_task_success(mock_cursor):
 
         assert result == expected_task_id
         mock_cursor.execute.assert_called_once_with(
-            _Requests.add_task.format(project_id, task_info_id, user_id)
+            _Requests.add_task, (project_id, task_info_id, user_id)
         )
 
 
@@ -636,9 +534,7 @@ def test_add_subtask_success(mock_cursor):
         subtask_id = DB_API.add_subtask(task_id, task_info_id, cursor=mock_cursor)
 
         assert subtask_id == expected_subtask_id
-        mock_cursor.execute.assert_called_once_with(
-            _Requests.add_subtask.format(task_id, task_info_id)
-        )
+        mock_cursor.execute.assert_called_once_with(_Requests.add_subtask, (task_id, task_info_id))
 
 
 def test_add_subtask_exception(mock_cursor):
@@ -673,7 +569,7 @@ def test_add_user_to_task_group_success(mock_cursor):
 
         assert group_id == expected_group_id
         mock_cursor.execute.assert_called_once_with(
-            _Requests.add_user_to_task_group.format(task_project_id, user_id)
+            _Requests.add_user_to_task_group, (task_project_id, user_id)
         )
 
 
@@ -693,44 +589,6 @@ def test_add_user_to_task_group_exception(mock_cursor):
         assert str(result) == "Database error"
 
 
-def test_add_user_log_success(mock_cursor):
-    """
-    Test de la méthode add_user_log avec un scénario réussi
-    """
-
-    user_id = 1
-    action = "affect"
-    details = "user to task"
-    expected_log_id = 789
-
-    mock_cursor.lastrowid = expected_log_id
-
-    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
-        log_id = DB_API.add_user_log(user_id, action, details, cursor=mock_cursor)
-
-        assert log_id == expected_log_id
-        mock_cursor.execute.assert_called_once_with(
-            _Requests.add_user_log.format(user_id, action, details)
-        )
-
-
-def test_add_user_log_exception(mock_cursor):
-    """
-    Test de la méthode add_user_log lorsqu'une exception se produit
-    """
-    user_id = 1
-    action = "affect"
-    details = "user to task"
-
-    mock_cursor.execute.side_effect = Exception("Database error")
-
-    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
-        result = DB_API.add_user_log(user_id, action, details, cursor=mock_cursor)
-
-        assert isinstance(result, Exception)
-        assert str(result) == "Database error"
-
-
 def test_get_user_id_by_username_success(mock_cursor):
     """
     Test de la méthode get_user_id_by_username avec un scénario réussi
@@ -745,9 +603,7 @@ def test_get_user_id_by_username_success(mock_cursor):
         user_id = DB_API.get_user_id_by_username(username, cursor=mock_cursor)
 
         assert user_id == expected_user_id
-        mock_cursor.execute.assert_called_once_with(
-            _Requests.get_userID_by_username.format(username)
-        )
+        mock_cursor.execute.assert_called_once_with(_Requests.get_userID_by_username, (username,))
 
 
 def test_get_user_id_by_username_not_found(mock_cursor):
@@ -763,9 +619,7 @@ def test_get_user_id_by_username_not_found(mock_cursor):
         assert isinstance(user_id, Exception)
         assert str(user_id) == "'NoneType' object is not subscriptable"
 
-        mock_cursor.execute.assert_called_once_with(
-            _Requests.get_userID_by_username.format(username)
-        )
+        mock_cursor.execute.assert_called_once_with(_Requests.get_userID_by_username, (username,))
 
 
 def test_get_all_projects_success(mock_cursor):
@@ -843,7 +697,7 @@ def test_get_user_email_success(mock_cursor):
         result = DB_API.get_user_email(test_user_id, cursor=mock_cursor)
 
         assert result == test_email
-        mock_cursor.execute.assert_called_once_with(_Requests.get_user_email.format(test_user_id))
+        mock_cursor.execute.assert_called_once_with(_Requests.get_user_email, (test_user_id,))
 
 
 def test_get_user_email_not_found(mock_cursor):
@@ -858,25 +712,7 @@ def test_get_user_email_not_found(mock_cursor):
         result = DB_API.get_user_email(test_user_id, cursor=mock_cursor)
 
         assert result is None
-        mock_cursor.execute.assert_called_once_with(_Requests.get_user_email.format(test_user_id))
-
-
-def test_get_emails_by_task_project_id_success(mock_cursor):
-    """
-    Test de la méthode get_emails_by_task_project_id avec un scénario réussi
-    """
-    test_task_project_id = 1
-    test_emails = [("user1@example.com",), ("user2@example.com",)]
-
-    mock_cursor.fetchall.return_value = test_emails
-
-    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
-        result = DB_API.get_emails_by_task_project_id(test_task_project_id, cursor=mock_cursor)
-
-        assert result == ["user1@example.com", "user2@example.com"]
-        mock_cursor.execute.assert_called_once_with(
-            _Requests.get_emails_by_task_projectID.format(test_task_project_id)
-        )
+        mock_cursor.execute.assert_called_once_with(_Requests.get_user_email, (test_user_id,))
 
 
 def test_add_task_group_success(mock_cursor):
@@ -903,27 +739,7 @@ def test_delete_user_success(mock_cursor):
         result = DB_API.delete_user(test_user_id, cursor=mock_cursor)
 
         assert result is None
-        mock_cursor.execute.assert_called_once_with(_Requests.delete_user.format(test_user_id))
-
-
-def test_update_task_infos_success(mock_cursor):
-    """
-    Test de la méthode update_task_infos avec un scénario réussi
-    """
-    test_taskinfos_id = 2
-    update_fields = ["status", "title"]
-    values = [3, "Updated Task Title"]
-    mock_cursor.execute.return_value = None
-
-    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
-        result = DB_API.update_task_infos(
-            test_taskinfos_id, update_fields, values, cursor=mock_cursor
-        )
-
-        assert result is None
-        mock_cursor.execute.assert_called_once_with(
-            _Requests.update_task_infos.format(", ".join(update_fields), test_taskinfos_id), values
-        )
+        mock_cursor.execute.assert_called_once_with(_Requests.delete_user, (test_user_id,))
 
 
 def test_delete_task_success(mock_cursor):
@@ -937,18 +753,1028 @@ def test_delete_task_success(mock_cursor):
         result = DB_API.delete_task(test_task_id, cursor=mock_cursor)
 
         assert result is None
-        mock_cursor.execute.assert_called_once_with(_Requests.delete_task.format(test_task_id))
+        mock_cursor.execute.assert_called_once_with(_Requests.delete_task, (test_task_id,))
 
 
-def test_delete_subtask_success(mock_cursor):
+def test_update_task_title_success(mock_cursor):
     """
-    Test de la méthode delete_subtask avec un scénario réussi
+    Tester la méthode update_task_title dans un scénario réussi
     """
-    test_subtask_id = 1
+    task_info_id = 1
+    title = "Nouveau Titre"
+
+    mock_cursor.rowcount = 1
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func), patch(
+        "backend.db_helper.cm_conn", return_value=lambda func: func
+    ):
+        result = DB_API.update_task_title(title, task_info_id, cursor=mock_cursor)
+
+        assert result is True
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.update_task_title, (title, task_info_id)
+        )
+
+
+def test_update_task_description_success(mock_cursor):
+    """
+    Tester la méthode update_task_description dans un scénario réussi
+    """
+    task_info_id = 1
+    description = "Nouvelle description"
+
+    mock_cursor.rowcount = 1
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func), patch(
+        "backend.db_helper.cm_conn", return_value=lambda func: func
+    ):
+        result = DB_API.update_task_description(description, task_info_id, cursor=mock_cursor)
+
+        assert result is True
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.update_task_description, (description, task_info_id)
+        )
+
+
+def test_update_task_priority_success(mock_cursor):
+    """
+    Tester la méthode update_task_priority dans un scénario réussi
+    """
+    task_info_id = 1
+    priority = 2
+
+    mock_cursor.rowcount = 1
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func), patch(
+        "backend.db_helper.cm_conn", return_value=lambda func: func
+    ):
+        result = DB_API.update_task_priority(priority, task_info_id, cursor=mock_cursor)
+
+        assert result is True
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.update_task_priority, (priority, task_info_id)
+        )
+
+
+def test_update_task_date_success(mock_cursor):
+    """
+    Tester la méthode update_task_date dans un scénario réussi
+    """
+    task_info_id = 1
+    date = datetime.datetime(2024, 12, 31)
+
+    mock_cursor.rowcount = 1
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func), patch(
+        "backend.db_helper.cm_conn", return_value=lambda func: func
+    ):
+        result = DB_API.update_task_date(date, task_info_id, cursor=mock_cursor)
+
+        assert result is True
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.update_task_date, (date, task_info_id)
+        )
+
+
+def test_get_task_infoID_by_taskID_success(mock_cursor):
+    """
+    Tester la méthode get_task_infoID_by_taskID dans un scénario réussi
+    """
+    task_id = 1
+    expected_task_info_id = 42
+
+    mock_cursor.fetchone.return_value = expected_task_info_id
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_task_infoID_by_taskID(task_id, cursor=mock_cursor)
+
+        assert result == expected_task_info_id
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.get_task_infoID_by_taskID, (task_id,)
+        )
+
+
+def test_get_task_infoID_by_taskID_not_found(mock_cursor):
+    """
+    Tester la méthode get_task_infoID_by_taskID lorsqu'aucune information de tâche n'est trouvée
+    """
+    task_id = 9999
+
+    mock_cursor.fetchone.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_task_infoID_by_taskID(task_id, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.get_task_infoID_by_taskID, (task_id,)
+        )
+
+
+def test_delete_user_status_success(mock_cursor):
+    """
+    Tester la méthode delete_user_status avec un scénario réussi
+    """
+    user_id = 1
+
     mock_cursor.execute.return_value = None
 
     with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
-        result = DB_API.delete_subtask(test_subtask_id, cursor=mock_cursor)
+        result = DB_API.delete_user_status(user_id, cursor=mock_cursor)
 
         assert result is None
-        mock_cursor.execute.assert_called_once_with(_Requests.delete_task.format(test_subtask_id))
+        mock_cursor.execute.assert_called_once_with(_Requests.delete_user_status, (user_id,))
+
+
+def test_delete_user_status_exception(mock_cursor):
+    """
+    Tester la méthode delete_user_status lorsqu'une exception se produit
+    """
+    user_id = 1
+
+    mock_cursor.execute.side_effect = Exception("Database error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_user_status(user_id, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Database error"
+
+
+def test_get_tasks_by_project_id_empty(mock_cursor):
+    """
+    Tester la méthode get_tasks_by_project_id lorsqu'aucune tâche n'est trouvée
+    """
+    project_id = 1
+
+    mock_cursor.fetchall.return_value = []
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_tasks_by_project_id(project_id, cursor=mock_cursor)
+
+        assert result == []
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.get_tasks_by_project_id, (project_id,)
+        )
+
+
+def test_get_subtasks_by_task_id_empty(mock_cursor):
+    """
+    Tester la méthode get_subtasks_by_task_id lorsqu'aucune sous-tâche n'est trouvée
+    """
+    task_id = 1
+
+    mock_cursor.fetchall.return_value = []
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_subtasks_by_task_id(task_id, cursor=mock_cursor)
+
+        assert result == []
+        mock_cursor.execute.assert_called_once_with(_Requests.get_subtasks_by_task_id, (task_id,))
+
+
+def test_get_users_in_project_by_project_id_empty(mock_cursor):
+    """
+    Tester la méthode get_users_in_project_by_project_id lorsqu'aucun utilisateur n'est trouvé
+    """
+    project_id = 1
+
+    mock_cursor.fetchall.return_value = []
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_users_in_project_by_project_id(project_id, cursor=mock_cursor)
+
+        assert result == []
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.get_users_in_project_by_project_id, (project_id,)
+        )
+
+
+def test_get_email_success(mock_cursor):
+    """
+    Tester la méthode get_email dans un scénario réussi
+    """
+    email = "miaw@redgally.xyz"
+    expected_email = ("miaw@redgally.xyz",)
+
+    mock_cursor.fetchone.return_value = expected_email
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_email(email, cursor=mock_cursor)
+
+        assert result == expected_email
+        mock_cursor.execute.assert_called_once_with(_Requests.get_email, (email,))
+
+
+def test_get_email_not_found(mock_cursor):
+    """
+    Tester la méthode get_email lorsqu'aucun email n'est trouvé
+    """
+    email = "random_email@test.com"
+
+    mock_cursor.fetchone.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_email(email, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(_Requests.get_email, (email,))
+
+
+def test_get_user_success(mock_cursor):
+    """
+    Tester la méthode get_user dans un scénario réussi
+    """
+    username = "miaw"
+    expected_user = (1, "miaw", "miaw@redgally.xyz")
+
+    mock_cursor.fetchone.return_value = expected_user
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_user(username, cursor=mock_cursor)
+
+        assert result == expected_user
+        mock_cursor.execute.assert_called_once_with(_Requests.get_user, (username,))
+
+
+def test_get_user_not_found(mock_cursor):
+    """
+    Tester la méthode get_user lorsqu'aucun utilisateur n'est trouvé
+    """
+    username = "random_username"
+
+    mock_cursor.fetchone.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_user(username, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(_Requests.get_user, (username,))
+
+
+def test_get_userID_by_email_success(mock_cursor):
+    """
+    Tester la méthode get_userID_by_email dans un scénario réussi
+    """
+    email = "user1@example.com"
+    expected_user_id = (1,)
+
+    mock_cursor.fetchone.return_value = expected_user_id
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_userID_by_email(email, cursor=mock_cursor)
+
+        assert result == expected_user_id
+        mock_cursor.execute.assert_called_once_with(_Requests.get_userID_by_email, (email,))
+
+
+def test_get_userID_by_email_not_found(mock_cursor):
+    """
+    Tester la méthode get_userID_by_email lorsqu'aucun utilisateur n'est trouvé
+    """
+    email = "user1@example.com"
+
+    mock_cursor.fetchone.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_userID_by_email(email, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(_Requests.get_userID_by_email, (email,))
+
+
+def test_add_user_status_success(mock_cursor):
+    """
+    Tester la méthode add_user_status dans un scénario réussi
+    """
+    user_id = 1
+    status = 0
+    expected_status_id = 123
+
+    mock_cursor.lastrowid = expected_status_id
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func), patch(
+        "backend.db_helper.cm_conn", return_value=lambda func: func
+    ):
+        result = DB_API.add_user_status(user_id, status, cursor=mock_cursor)
+
+        assert result == expected_status_id
+        mock_cursor.execute.assert_called_once_with(_Requests.add_user_status, (user_id, status))
+
+
+def test_add_user_status_exception(mock_cursor):
+    """
+    Tester la méthode add_user_status lorsqu'une exception se produit
+    """
+    user_id = 1
+    status = 0
+
+    mock_cursor.execute.side_effect = Exception("Erreur d'insertion")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func), patch(
+        "backend.db_helper.cm_conn", return_value=lambda func: func
+    ):
+        result = DB_API.add_user_status(user_id, status, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Erreur d'insertion"
+
+
+def test_set_invites_status_success(mock_cursor):
+    """
+    Test the set_invites_status method in a successful scenario
+    """
+    project_id = 1
+    user_id = 1
+    joined = True
+
+    mock_cursor.execute.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.set_invites_status(joined, project_id, user_id, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.set_invites_status, (joined, project_id, user_id)
+        )
+
+
+def test_set_invites_status_exception(mock_cursor):
+    """
+    Test the set_invites_status method when an exception occurs
+    """
+    project_id = 1
+    user_id = 1
+    joined = True
+
+    mock_cursor.execute.side_effect = Exception("Update error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.set_invites_status(joined, project_id, user_id, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Update error"
+
+
+def test_set_user_permission_success(mock_cursor):
+    """
+    Test the set_user_permission method in a successful scenario
+    """
+    project_id = 1
+    user_id = 1
+    permission = 1
+
+    mock_cursor.execute.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.set_user_permission(project_id, user_id, permission, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.update_user_perm, (project_id, user_id, permission)
+        )
+
+
+def test_set_user_permission_exception(mock_cursor):
+    """
+    Test the set_user_permission method when an exception occurs
+    """
+    project_id = 1
+    user_id = 1
+    permission = 1
+
+    mock_cursor.execute.side_effect = Exception("Update error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.set_user_permission(project_id, user_id, permission, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Update error"
+
+
+def test_set_user_status_success(mock_cursor):
+    """
+    Test the set_user_status method in a successful scenario
+    """
+    user_id = 1
+    status = 1
+
+    mock_cursor.execute.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.set_user_status(user_id, status, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.update_user_status, (status, user_id)
+        )
+
+
+def test_set_user_status_exception(mock_cursor):
+    """
+    Test the set_user_status method when an exception occurs
+    """
+    user_id = 1
+    status = 1
+
+    mock_cursor.execute.side_effect = Exception("Update error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.set_user_status(user_id, status, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Update error"
+
+
+def test_get_totp_secret_success(mock_cursor):
+    """
+    Test the get_totp_secret method in a successful scenario
+    """
+    email = "user@example.com"
+    expected_secret = "secret"
+
+    mock_cursor.fetchone.return_value = (expected_secret,)
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_totp_secret(email, cursor=mock_cursor)
+
+        assert result == expected_secret
+        mock_cursor.execute.assert_called_once_with(_Requests.get_totp_secret, (email,))
+
+
+def test_get_totp_secret_not_found(mock_cursor):
+    """
+    Test the get_totp_secret method when no secret is found
+    """
+    email = "user@example.com"
+
+    mock_cursor.fetchone.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_totp_secret(email, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(_Requests.get_totp_secret, (email,))
+
+
+def test_get_user_permission_success(mock_cursor):
+    """
+    Test the get_user_permission method in a successful scenario
+    """
+    project_id = 1
+    user_id = 1
+    expected_permission = "read"
+
+    mock_cursor.fetchone.return_value = expected_permission
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_user_permission(project_id, user_id, cursor=mock_cursor)
+
+        assert result == expected_permission
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.get_user_permission, (project_id, user_id)
+        )
+
+
+def test_get_user_permission_not_found(mock_cursor):
+    """
+    Test the get_user_permission method when no permission is found
+    """
+    project_id = 1
+    user_id = 1
+
+    mock_cursor.fetchone.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_user_permission(project_id, user_id, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.get_user_permission, (project_id, user_id)
+        )
+
+
+def test_set_totp_secret_success(mock_cursor):
+    """
+    Test the set_totp_secret method in a successful scenario
+    """
+    email = "user@example.com"
+    secret = "new_secret"
+
+    mock_cursor.execute.return_value = True
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.set_totp_secret(email, secret, cursor=mock_cursor)
+
+        assert result is True
+        mock_cursor.execute.assert_called_once_with(_Requests.set_totp_secret, (secret, email))
+
+
+def test_set_totp_secret_exception(mock_cursor):
+    """
+    Test the set_totp_secret method when an exception occurs
+    """
+    email = "user@example.com"
+    secret = "new_secret"
+
+    mock_cursor.execute.side_effect = Exception("Update error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.set_totp_secret(secret, email, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Update error"
+
+
+def test_delete_project_success(mock_cursor):
+    """
+    Test the delete_project method in a successful scenario
+    """
+    project_id = 1
+
+    mock_cursor.execute.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_project(project_id, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(_Requests.delete_project, (project_id,))
+
+
+def test_delete_project_exception(mock_cursor):
+    """
+    Test the delete_project method when an exception occurs
+    """
+    project_id = 1
+
+    mock_cursor.execute.side_effect = Exception("Delete error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_project(project_id, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Delete error"
+
+
+def test_get_task_info_by_task_id_success(mock_cursor):
+    """
+    Test the get_task_info_by_task_id method in a successful scenario
+    """
+    task_id = 1
+    expected_info = ("Task Title", "Description", "Open", "High", "No", "User 1", "2024-12-31")
+
+    mock_cursor.fetchall.return_value = expected_info
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_task_info_by_task_id(task_id, cursor=mock_cursor)
+
+        assert result == expected_info
+        mock_cursor.execute.assert_called_once_with(_Requests.get_task_info_by_task_id, (task_id,))
+
+
+def test_get_task_info_by_task_id_not_found(mock_cursor):
+    """
+    Test the get_task_info_by_task_id method when no task info is found
+    """
+    task_id = 1
+
+    mock_cursor.fetchall.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_task_info_by_task_id(task_id, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(_Requests.get_task_info_by_task_id, (task_id,))
+
+
+def test_get_subtask_info_by_subtask_id_success(mock_cursor):
+    """
+    Test the get_subtask_info_by_subtask_id method in a successful scenario
+    """
+    subtask_id = 1
+    expected_info = ("Subtask Title", "Description", "Open", "High", "No", "User 1", "2024-12-31")
+
+    mock_cursor.fetchall.return_value = expected_info
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_subtask_info_by_subtask_id(subtask_id, cursor=mock_cursor)
+
+        assert result == expected_info
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.get_subtask_info_by_subtask_id, (subtask_id,)
+        )
+
+
+def test_get_subtask_info_by_subtask_id_not_found(mock_cursor):
+    """
+    Test the get_subtask_info_by_subtask_id method when no subtask info is found
+    """
+    subtask_id = 1
+
+    mock_cursor.fetchall.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_subtask_info_by_subtask_id(subtask_id, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.get_subtask_info_by_subtask_id, (subtask_id,)
+        )
+
+
+def test_delete_user_group_success(mock_cursor):
+    """
+    Test the delete_user_group method in a successful scenario
+    """
+    user_group_id = 1
+
+    mock_cursor.execute.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_user_group(user_group_id, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.delete_users_groups, (user_group_id,)
+        )
+
+
+def test_delete_user_group_exception(mock_cursor):
+    """
+    Test the delete_user_group method when an exception occurs
+    """
+    user_group_id = 1
+
+    mock_cursor.execute.side_effect = Exception("Delete error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_user_group(user_group_id, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Delete error"
+
+
+def test_delete_tasks_groups_success(mock_cursor):
+    """
+    Test the delete_tasks_groups method in a successful scenario
+    """
+    task_group_id = 1
+
+    mock_cursor.execute.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_tasks_groups(task_group_id, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.delete_tasks_groups, (task_group_id,)
+        )
+
+
+def test_delete_tasks_groups_exception(mock_cursor):
+    """
+    Test the delete_tasks_groups method when an exception occurs
+    """
+    task_group_id = 1
+
+    mock_cursor.execute.side_effect = Exception("Delete error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_tasks_groups(task_group_id, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Delete error"
+
+
+def test_delete_tasks_infos_success(mock_cursor):
+    """
+    Test the delete_tasks_infos method in a successful scenario
+    """
+    task_info_id = 1
+
+    mock_cursor.execute.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_tasks_infos(task_info_id, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(_Requests.delete_tasks_infos, (task_info_id,))
+
+
+def test_delete_tasks_infos_exception(mock_cursor):
+    """
+    Test the delete_tasks_infos method when an exception occurs
+    """
+    task_info_id = 1
+
+    mock_cursor.execute.side_effect = Exception("Delete error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_tasks_infos(task_info_id, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Delete error"
+
+
+def test_delete_tasks_success(mock_cursor):
+    """
+    Test the delete_tasks method in a successful scenario
+    """
+    task_id = 1
+
+    mock_cursor.execute.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_tasks(task_id, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(_Requests.delete_tasks, (task_id,))
+
+
+def test_delete_tasks_exception(mock_cursor):
+    """
+    Test the delete_tasks method when an exception occurs
+    """
+    task_id = 1
+
+    mock_cursor.execute.side_effect = Exception("Delete error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_tasks(task_id, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Delete error"
+
+
+def test_check_projects_success(mock_cursor):
+    """
+    Test the check_projects method in a successful scenario
+    """
+    project_name = "Project Gamma"
+    expected_result = True
+
+    mock_cursor.fetchone.return_value = (expected_result,)
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.check_projects(project_name, cursor=mock_cursor)
+
+        assert result == expected_result
+        mock_cursor.execute.assert_called_once_with(_Requests.check_projects, (project_name,))
+
+
+def test_check_projects_not_found(mock_cursor):
+    """
+    Test the check_projects method when no project is found
+    """
+    project_name = "Project Gamma"
+
+    mock_cursor.fetchone.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.check_projects(project_name, cursor=mock_cursor)
+
+        assert result is False
+        mock_cursor.execute.assert_called_once_with(_Requests.check_projects, (project_name,))
+
+
+def test_delete_users_from_users_tasks_groups_success(mock_cursor):
+    """
+    Test the delete_users_from_users_tasks_groups method in a successful scenario
+    """
+    task_group_id = 1
+
+    mock_cursor.execute.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_users_from_users_tasks_groups(task_group_id, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.delete_users_from_users_tasks_groups,
+            (task_group_id,),
+        )
+
+
+def test_delete_users_from_users_tasks_groups_exception(mock_cursor):
+    """
+    Test the delete_users_from_users_tasks_groups method when an exception occurs
+    """
+    task_group_id = 1
+
+    mock_cursor.execute.side_effect = Exception("Delete error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_users_from_users_tasks_groups(task_group_id, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Delete error"
+
+
+def test_update_task_status_success(mock_cursor):
+    """
+    Test the update_task_status method in a successful scenario
+    """
+    task_id = 1
+    status = 1
+
+    mock_cursor.execute.return_value = None
+    mock_cursor.rowcount = 1
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.update_task_status(task_id, status, cursor=mock_cursor)
+
+        assert result is True
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.update_task_status,
+            (
+                status,
+                task_id,
+            ),
+        )
+
+
+def test_update_task_status_exception(mock_cursor):
+    """
+    Test the update_task_status method when an exception occurs
+    """
+    task_id = 1
+    status = 1
+
+    mock_cursor.execute.side_effect = Exception("Update error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.update_task_status(task_id, status, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Update error"
+
+
+def test_update_task_title_failure(mock_cursor):
+    """
+    Test the update_task_title method when the update fails
+    """
+    task_info_id = 1
+    title = "New Title"
+
+    mock_cursor.rowcount = 0
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.update_task_title(title, task_info_id, cursor=mock_cursor)
+
+        assert result is False
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.update_task_title,
+            (
+                title,
+                task_info_id,
+            ),
+        )
+
+
+def test_update_task_description_failure(mock_cursor):
+    """
+    Test the update_task_description method when the update fails
+    """
+    task_info_id = 1
+    description = "New Description"
+
+    mock_cursor.rowcount = 0
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.update_task_description(description, task_info_id, cursor=mock_cursor)
+
+        assert result is False
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.update_task_description,
+            (
+                description,
+                task_info_id,
+            ),
+        )
+
+
+def test_update_task_priority_failure(mock_cursor):
+    """
+    Test the update_task_priority method when the update fails
+    """
+    task_info_id = 1
+    priority = 2
+
+    mock_cursor.rowcount = 0
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.update_task_priority(priority, task_info_id, cursor=mock_cursor)
+
+        assert result is False
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.update_task_priority,
+            (
+                priority,
+                task_info_id,
+            ),
+        )
+
+
+def test_update_task_date_failure(mock_cursor):
+    """
+    Test the update_task_date method when the update fails
+    """
+    task_info_id = 1
+    date = datetime.datetime(2024, 12, 31)
+
+    mock_cursor.rowcount = 0
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.update_task_date(date, task_info_id, cursor=mock_cursor)
+
+        assert result is False
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.update_task_date,
+            (
+                date,
+                task_info_id,
+            ),
+        )
+
+
+def test_delete_task_exception(mock_cursor):
+    """
+    Test the delete_task method when an exception occurs
+    """
+    task_id = 1
+
+    mock_cursor.execute.side_effect = Exception("Delete error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_task(task_id, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Delete error"
+
+
+def test_delete_user_exception(mock_cursor):
+    """
+    Test the delete_user method when an exception occurs
+    """
+    user_id = 1
+
+    mock_cursor.execute.side_effect = Exception("Delete error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.delete_user(user_id, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Delete error"
+
+
+def test_add_task_group_exception(mock_cursor):
+    """
+    Test the add_task_group method when an exception occurs
+    """
+    mock_cursor.execute.side_effect = Exception("Insert error")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func), patch(
+        "backend.db_helper.cm_conn", return_value=lambda func: func
+    ):
+        result = DB_API.add_task_group(cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Insert error"
+
+
+def test_get_project_in_users_groups_userid_success(mock_cursor):
+    """
+    Test the get_project_in_users_groups_userid method in a successful scenario
+    """
+    user_id = 1
+    expected_projects = [
+        (1, "Project 1", "read", True),
+        (2, "Project 2", "write", False),
+    ]
+
+    mock_cursor.fetchall.return_value = expected_projects
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_project_in_users_groups_userid(user_id, cursor=mock_cursor)
+
+        assert result == expected_projects
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.get_project_in_users_groups, (user_id,)
+        )
+
+
+def test_get_project_in_users_groups_userid_empty(mock_cursor):
+    """
+    Test the get_project_in_users_groups_userid method when no projects are found
+    """
+    user_id = 1
+
+    mock_cursor.fetchall.return_value = []
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_project_in_users_groups_userid(user_id, cursor=mock_cursor)
+
+        assert result == []
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.get_project_in_users_groups, (user_id,)
+        )
