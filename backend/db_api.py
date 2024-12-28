@@ -985,7 +985,7 @@ class DB_API:
         >>> if not isinstance(err, Exception):
         >>>     print("delete avec succes")
         """
-        return cursor.execute(_Requests.update_user_status, (user_id, status))
+        return cursor.execute(_Requests.update_user_status, (status, user_id))
 
     @staticmethod
     @cm_cursor()
@@ -1171,8 +1171,8 @@ class DB_API:
 
     @staticmethod
     @cm_cursor()
-    def get_task_infoID_by_title(title: str, *, cursor: MySQLCursor) -> ResultType:
-        cursor.execute(_Requests.get_task_infoID_by_title.format(title))
+    def get_task_infoID_by_taskID(task_id: int, *, cursor: MySQLCursor) -> ResultType:
+        cursor.execute(_Requests.get_task_infoID_by_taskID.format(task_id))
         result = cursor.fetchone()
         return result
 
@@ -1215,7 +1215,13 @@ class DB_API:
     def add_user_status(user_id: int, status: int, *, cursor: MySQLCursor) -> Union[Exception, Optional[int]]:
         cursor.execute(_Requests.add_user_status, (user_id, status))
         return cursor.lastrowid
-        
+
+    @staticmethod
+    @cm_conn()
+    @cm_cursor()
+    def delete_user_status(userID: int, *, cursor: MySQLCursor) -> Optional[Exception]:
+        return cursor.execute(_Requests.delete_user_status.format(userID))
+
 
 if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
