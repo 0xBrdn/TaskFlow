@@ -120,7 +120,7 @@ class DB_API:
         >>> if task_info_id and not isinstance(task_info_id, Exception):
         >>>     print(task_info_id)
         """
-        cursor.execute(_Requests.get_task_infoID_by_taskID.format(task_id))
+        cursor.execute(_Requests.get_task_infoID_by_taskID, (task_id,))
         result = cursor.fetchone()
         return result
 
@@ -145,7 +145,7 @@ class DB_API:
         >>> if not isinstance(err, Exception):
         >>>     print("Statut de l'utilisateur supprimé avec succès")
         """
-        return cursor.execute(_Requests.delete_user_status.format(userID))
+        return cursor.execute(_Requests.delete_user_status, (userID,))
 
     @staticmethod
     @cm_cursor()
@@ -1187,7 +1187,7 @@ class DB_API:
 
     @staticmethod
     @cm_cursor()
-    def get_task_info_by_task_id(taskID: str, *, cursor: MySQLCursor) -> ResultType:
+    def get_task_info_by_task_id(taskID: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récupérer les informations d'une tâche en fonction de son ID.
 
@@ -1211,7 +1211,7 @@ class DB_API:
 
     @staticmethod
     @cm_cursor()
-    def get_subtask_info_by_subtask_id(subtaskID: str, *, cursor: MySQLCursor) -> ResultType:
+    def get_subtask_info_by_subtask_id(subtaskID: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récupérer les informations d'une sous-tâche en fonction de son ID.
 
