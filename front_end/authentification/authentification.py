@@ -118,8 +118,37 @@ class Ui_MainWindow(object):
         >>> MainWindow.show()
         """
     def __init__(self):
+        """
+        Initialise une nouvelle instance de Ui_MainWindow.
+        Configure l'attribut totp à None pour une potentielle utilisation ultérieure.
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> print(ui.totp)  # None
+        """
         self.totp = None
+
     def setupUi(self, MainWindow):
+        """
+        Configure l'interface utilisateur complète de la fenêtre d'authentification.
+        Crée et positionne tous les widgets nécessaires.
+
+        :param MainWindow: Instance de QMainWindow à configurer
+
+        Le setup inclut:
+        - Configuration de la fenêtre principal*
+        - Chargement du fichier de style QSS
+        - Création des champs de saisie (nom d'utilisateur, email, mot de passe)
+        - Mise en place des boutons (connexion Google, validation)
+        - Configuration des messages d'erreur
+        - Mise en place du lien de création de compte
+
+        Exemple:
+        >>> window = QtWidgets.QMainWindow()
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(window)
+        >>> window.show()
+        """
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1035, 774)
         icon = QtGui.QIcon()
@@ -342,6 +371,16 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def show_signup_form(self):
+        """
+        Bascule entre le formulaire de connexion et le formulaire d'inscription.
+        Met à jour l'interface en conséquence via update_form_state().
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(window)
+        >>> ui.show_signup_form()  # Bascule vers le formulaire d'inscription
+        >>> print(ui.is_login_form)  # False
+        """
         self.is_login_form = not self.is_login_form
         self.update_form_state()
 
@@ -391,8 +430,22 @@ class Ui_MainWindow(object):
 
     def handle_login(self):
         """
-        Connexion via Argon2
-        Puis envoi OTP TOTP si OK.
+        Gère le processus de connexion utilisateur.
+        Vérifie les identifiants via Argon2 puis met en place l'authentification TOTP.
+
+        Le processus comprend:
+        1. Validation des identifiants utilisateur
+        2. Récupération/création de la clé secrète TOTP
+        3. Envoi du code TOTP par email
+        4. Vérification du code saisi
+        5. Ouverture de la fenêtre principale si authentification réussie
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(window)
+        >>> ui.inputMail.setText("user@example.com")
+        >>> ui.inputPassword.setText("password123")
+        >>> ui.handle_login()  # Lance le processus de connexion
         """
         self.clear_error_message()
 
@@ -443,11 +496,36 @@ class Ui_MainWindow(object):
             self.show_error_message("Erreur critique Une erreur est survenue : {e}")
 
     def login_with_google(self):
+        """
+        Initie le processus de connexion via Google.
+        Ouvre le navigateur sur la page d'authentification Google.
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(window)
+        >>> ui.google_login_button.click()  # ou ui.login_with_google()
+        >>> # Ouvre le navigateur sur la page de connexion Google
+        """
         print("Ouverture de la page de connexion Google...")
         webbrowser.open(AUTH_URL.format(CLIENT_ID, REDIRECT_URI))
         print("Navigateur ouvert. En attente du callback Google...")
 
-    def connect_google_user(self, user_data):
+    def connect_google_user(self, user_data: dict):
+        """
+        Finalise la connexion d'un utilisateur via Google.
+
+        :param user_data: Dictionnaire contenant les informations de l'utilisateur Google
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(window)
+        >>> user_data = {
+        >>>     "name": "John Doe",
+        >>>     "email": "john.doe@gmail.com"
+        >>> }
+        >>> ui.connect_google_user(user_data)
+        >>> # L'utilisateur est connecté et la fenêtre principale s'ouvre
+        """
         if not isinstance(user_data, dict):
             print("[PyQt] Erreur : données utilisateur invalides.")
             return
@@ -474,7 +552,29 @@ class Ui_MainWindow(object):
         self.main_window_ui.main_window = self.main_window_instance
         self.main_window_instance.show()
 
-    def handle_signup(self):
+    def handle_signup(self) -> bool:
+        """
+        Gère le processus d'inscription d'un nouvel utilisateur.
+
+        Effectue les validations suivantes:
+        - Vérifie que l'email n'est pas une adresse Gmail
+        - Valide le format de l'email
+        - Vérifie la force du mot de passe via zxcvbn
+        - Contrôle l'unicité de l'email et du nom d'utilisateur
+
+        :return: True si l'inscription est réussie, False sinon
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(window)
+        >>> ui.show_signup_form()  # Passage en mode inscription
+        >>> ui.inputUser.setText("john_doe")
+        >>> ui.inputMail.setText("john@example.com")
+        >>> ui.inputPassword.setText("StrongP@ssw0rd")
+        >>> success = ui.handle_signup()
+        >>> if success:
+        >>>     print("Inscription réussie!")
+        """
         self.clear_error_message()
         username = self.inputUser.text().strip()
         email = self.inputMail.text().strip()
@@ -547,7 +647,18 @@ class Ui_MainWindow(object):
             self.show_error_message("Erreur d'inscription Une erreur est survenue: {e!s}")
             return False
 
-    def validate_email(self, email):
+    def validate_email(self, email: str) -> bool:
+        """
+        Valide le format d'une adresse email.
+
+        :param email: Adresse email à valider
+        :return: True si le format est valide, False sinon
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> print(ui.validate_email("user@example.com"))  # True
+        >>> print(ui.validate_email("invalid.email"))  # False
+        """
         import re
 
         pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
@@ -555,8 +666,15 @@ class Ui_MainWindow(object):
 
     def get_or_create_user_secret(self, email: str) -> str:
         """
-        Récupère la clé secrète TOTP stockée en DB ou la crée si inexistante.
-        (Exemple fictif : DB_API peut gérer un champ 'totp_secret' dans 'users')
+        Récupère la clé secrète TOTP d'un utilisateur ou en crée une nouvelle.
+
+        :param email: Email de l'utilisateur
+        :return: Clé secrète TOTP
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> secret = ui.get_or_create_user_secret("user@example.com")
+        >>> print(len(secret))  # 32 (longueur typique d'une clé TOTP)
         """
         # Exemple: On imagine que DB_API.get_totp_secret(email) renvoie la clé ou None
         existing_secret = DB_API.get_totp_secret(email)
@@ -568,14 +686,36 @@ class Ui_MainWindow(object):
         DB_API.set_totp_secret(email, new_secret)
         return new_secret
 
-    def show_error_message(self, message):
+    def show_error_message(self, message: str):
+        """
+        Affiche un message d'erreur temporaire dans l'interface.
+
+        :param message: Message d'erreur à afficher
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(window)
+        >>> ui.show_error_message("Email invalide!")
+        >>> # Le message s'affiche en rouge et disparaît après 3 secondes
+        """
         self.labelErreur.setText(message)
         QtCore.QTimer.singleShot(3000, self.clear_error_message)
 
     def clear_error_message(self):
         self.labelErreur.clear()
 
-    def show_success_message(self, message):
+    def show_success_message(self, message: str):
+        """
+        Affiche un message de succès temporaire dans l'interface.
+
+        :param message: Message de succès à afficher
+
+        Exemple:
+        >>> ui = Ui_MainWindow()
+        >>> ui.setupUi(window)
+        >>> ui.show_success_message("Connexion réussie!")
+        >>> # Le message s'affiche en blanc et disparaît après 3 secondes
+        """
         self.labelErreur.setStyleSheet("color: white;")
         self.labelErreur.setText(message)
         QtCore.QTimer.singleShot(3000, self.clear_error_message)
