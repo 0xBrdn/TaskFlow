@@ -4,6 +4,8 @@ class _Requests:
         FROM users;
     """
 
+    get_all_infos_from_email = """SELECT * FROM users WHERE email = %s;"""
+
     get_password_from_email = """SELECT password FROM users WHERE email = %s;"""
 
     update_user_password = """UPDATE users SET password = %s WHERE email = %s;"""
