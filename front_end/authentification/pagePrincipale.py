@@ -449,9 +449,11 @@ class Ui_MainWindow(object):
         # Ajout de la partie droite dans le layout principal
         self.task_layout.addLayout(self.user_right_layout)
 
-        # Ajuster les proportions entre gauche et droite
-        self.task_layout.setStretch(0, 3)  # 3 parts pour la liste des tâches
-        self.task_layout.setStretch(1, 2)  # 2 parts pour les utilisateurs
+        # Ajouter un stretch qui poussera les widgets vers le haut
+        self.user_right_layout.addStretch()
+
+        # Ajout de la partie droite dans le layout principal
+        self.task_layout.addLayout(self.user_right_layout)
 
     def set_current_user(self, email):
         """
