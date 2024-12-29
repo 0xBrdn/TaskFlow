@@ -202,10 +202,6 @@ class Ui_MainWindow(object):
         self.username_label.setStyleSheet("font-size: 14px;")
         account_layout.addWidget(self.username_label)
 
-        self.role_label = QtWidgets.QLabel("Rôle : Inconnu")
-        self.role_label.setStyleSheet("font-size: 14px;")
-        account_layout.addWidget(self.role_label)
-
         # Bouton de déconnexion
         deconnexion_button = QtWidgets.QPushButton("Se déconnecter")
         deconnexion_button.setObjectName("deconnexion_button")
@@ -480,14 +476,20 @@ class Ui_MainWindow(object):
         # Récupération du username et du rôle depuis la DB
         try:
             # Vérifiez que la méthode get_user_info existe dans db_api.
-            user_info = DB_API.get_user_info(email)
+            _user_info = DB_API.get_all_infos_from_email(email)
+            user_info = {
+                "userid": _user_info[0],
+                "username": _user_info[1],
+                "password": _user_info[2],
+                "email": _user_info[3],
+                "is_google_user": _user_info[4],
+                "2fa": _user_info[5],
+            }
             self.username_label.setText(
                 f"Nom d'utilisateur : {user_info.get('username', 'Inconnu')}"
             )
-            self.role_label.setText(f"Rôle : {user_info.get('role', 'Inconnu')}")
         except Exception:
             self.username_label.setText("Nom d'utilisateur : Inconnu")
-            self.role_label.setText("Rôle : Inconnu")
 
         self.load_projects()
 
