@@ -13,9 +13,11 @@
   <p align="center">
     Une application collaborative de gestion de projets et de tâches.
     <br />
-    <a href="https://github.com/zzendor/SAE502-TaskFlow/tree/main/docs/pdf"><strong>Explorez les documents d'installation et d'utilisation »</strong></a>
+    <a href="https://github.com/zzendor/SAE502-TaskFlow/tree/main/docs/pdf"><strong>Explorez les documents d'installation et d'utilisation </strong></a>
     <br />
-    <a href="https://github.com/zzendor/SAE502-TaskFlow/tree/main/docs/sphinx/build/html"><strong>Documentation du code »</strong></a>
+    <a href="https://github.com/zzendor/SAE502-TaskFlow/tree/main/docs/sphinx/build/html"><strong>Documentation du code </strong></a>
+    Pour consulter la documentation du code, clonez ce dépôt sur votre poste local, puis ouvrez le fichier suivant dans votre navigateur :
+    `SAE502-TaskFlow/docs/sphinx/build/html/index.html`. Cela vous permettra d'explorer en détail les classes, fonctions et modules utilisés dans le projet.
     <br />
   </p>
 </div>
@@ -31,11 +33,9 @@ TaskFlow est une application collaborative de gestion de projets et de tâches, 
 
 - **Gestion des projets** : Créez et gérez vos projets facilement.
 - **Suivi des tâches** : Attribuez des tâches et sous tâches aux membres de l'équipe .
-- **Rappels automatisés** : Notifications par e-mail pour les deadlines proches ou dépassées.
 - **Interface utilisateur intuitive** : Une expérience fluide pour tous les utilisateurs.
 
 ### Captures d'écran
-
 
 ## Remerciements
 
