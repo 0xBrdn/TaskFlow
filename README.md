@@ -36,8 +36,6 @@ TaskFlow est une application collaborative de gestion de projets et de tâches, 
 - **Suivi des tâches** : Attribuez des tâches et sous tâches aux membres de l'équipe .
 - **Interface utilisateur intuitive** : Une expérience fluide pour tous les utilisateurs.
 
-### Captures d'écran
-
 ## Remerciements
 
 Merci à tous les contributeurs et utilisateurs pour leur soutien continu à TaskFlow !
