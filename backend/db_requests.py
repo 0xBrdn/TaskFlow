@@ -4,6 +4,8 @@ class _Requests:
         FROM users;
     """
 
+    get_all_infos_from_email = """SELECT * FROM users WHERE email = %s;"""
+
     get_email_hashpass = """
         SELECT password
         FROM users

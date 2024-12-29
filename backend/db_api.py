@@ -163,6 +163,31 @@ class DB_API:
 
     @staticmethod
     @cm_cursor()
+    def get_all_infos_from_email(email: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récupérer toutes les informations d'un utilisateur en fonction
+        de son email dans la DB.
+
+        Cette fonction renvoie un tuple comprenant toutes les informations liées
+        à un utilisateur.
+        Si une erreur survient, la fonction renvoie un objet de type Exception.
+
+        :param email: Email de l'utilisateur
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: Résultat de la commande ou exception
+
+        Exemple:
+        >>> user_info = DB_API.get_all_infos_from_email("test@example.com")
+        >>> if user_info and not isinstance(user_info, Exception):
+        >>>     print(user_info)
+        """
+        cursor.execute(_Requests.get_all_infos_from_email, (email,))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
     def get_user_hashpass(user_id: int, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récuperer le mdp hash d'un user dans la DB.
@@ -1212,7 +1237,9 @@ class DB_API:
     @staticmethod
     @cm_conn()
     @cm_cursor()
-    def add_user_status(user_id: int, status: int, *, cursor: MySQLCursor) -> Union[Exception, Optional[int]]:
+    def add_user_status(
+        user_id: int, status: int, *, cursor: MySQLCursor
+    ) -> Union[Exception, Optional[int]]:
         cursor.execute(_Requests.add_user_status, (user_id, status))
         return cursor.lastrowid
 
@@ -1227,7 +1254,8 @@ if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
     # t = (DB_API.add_user(username="vlad", password="trql",
     # email="email@vlad.com", is_google_user=False))
-    t = DB_API.get_all_tasks()
+    t = DB_API.get_all_infos_from_email("drive.cours67@gmail.com")
+
     print(type(t), t)
     pass
 
