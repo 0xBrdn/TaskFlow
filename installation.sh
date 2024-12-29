@@ -13,33 +13,29 @@ sudo apt-get update && sudo apt-get install -y \
 echo "Ajout de l'utilisateur actuel au groupe docker..."
 sudo usermod -aG docker $USER
 
-# Configuration de l'affichage pour X11
-echo "Configuration de l'affichage pour X11..."
-xhost +local:docker
-
 # Préparer l'environnement Docker
 echo "Configuration de Docker..."
 docker-compose down --remove-orphans
 docker-compose build --no-cache
 
-# Obtenir le chemin absolu du projet
+# Obtenir le chemin absolu du projet en évitant les problèmes liés aux espaces
 PROJECT_DIR="$(pwd)"
 
-# Création du raccourci pour l'application
+# Création du raccourci pour l'application avec sudo tee
 echo "Création du raccourci pour l'application..."
-cat <<EOF | sudo tee /usr/share/applications/TaskFlow.desktop > /dev/null
+sudo tee /usr/share/applications/TaskFlow.desktop > /dev/null <<EOF
 [Desktop Entry]
 Type=Application
 Name=TaskFlow
 Comment=Gestionnaire de tâches TaskFlow
-Exec=gnome-terminal -- bash -c "xhost +local:docker && cd \"${PROJECT_DIR}\" && docker-compose up; bash"
+Exec=gnome-terminal -- bash -c "xhost +local: && cd \"${PROJECT_DIR}\" && docker-compose up; bash"
 Icon=${PROJECT_DIR}/front_end/authentification/images/authentification/logo.png
 Terminal=false
 EOF
 
-# Appliquer les permissions nécessaires au raccourci
+# Donner les bonnes permissions au raccourci
+echo "Application des permissions au raccourci..."
 sudo chmod +x /usr/share/applications/TaskFlow.desktop
 
-# Instructions finales
+# Message de fin d'installation
 echo "Installation terminée. Vous pouvez lancer TaskFlow depuis le menu Applications."
-echo "Note: Vous devrez vous déconnecter ou redémarrer pour que les changements de groupe Docker prennent effet."
