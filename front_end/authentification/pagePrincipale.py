@@ -2020,7 +2020,7 @@ class SubtaskDialog(QtWidgets.QDialog):
         self.task_input = QtWidgets.QLineEdit()
         self.date_input = QtWidgets.QDateEdit()
         self.date_input.setCalendarPopup(True)
-        self.date_input.setDate(QtCore.QDate(2025, 1, 1))
+        self.date_input.setDate(QtCore.QDate().currentDate())
         self.comment_input = QtWidgets.QLineEdit()
         self.importance_input = QtWidgets.QComboBox()
         self.importance_input.addItems(["Faible", "Moyenne", "Haute"])
