@@ -58,60 +58,7 @@ TaskFlow est une application collaborative de gestion de projets et de tâches, 
 <div align="center">
   <img src="data/login.png" alt="Page principal">
   <p><em>Page d'accueil</em></p>
-  
-  <div align="center">
-  <img src="data/create_account.png" alt="Page principal">
-  <p><em>Page de création de compte</em></p>
-
-
-  <img src="https://via.placeholder.com/800x400.png?text=Gestion+des+t%C3%A2ches" alt="Gestion des tâches">
-  <p><em>Interface de gestion des tâches</em></p>
-</div>
-
-<!-- INSTALLATION -->
-## Installation
-
-### Prérequis
-
-- Python 3.9+
-- Miniconda
-- 
-  
-
-### Installation des dépendances
-
-1. Clonez ce dépôt :
-   ```bash
-   git clone https://github.com/zzendor/SAE502-TaskFlow.git
-   ```
-
-2. Installez les dépendances :
-   ```bash
-  conda install --file requirements.txt
-   ```
-
-etc..... a vous de remplir
-
-
-
-5. Lancez l'application :
-   ```bash
-   python manage.py runserver
-   ```
-
-<!-- USAGE -->
-## Utilisation
-
-1. **Connexion** : Créez un compte ou connectez-vous.
-2. **Création de projet** : Ajoutez un projet et invitez des membres de votre équipe.
-3. **Gestion des tâches** : Créez des tâches, attribuez-les et fixez des deadlines.
-4. **Rappels automatisés** : Les utilisateurs reçoivent des rappels par e-mail pour les tâches proches de leur échéance ou en retard.
-
-<!-- CONTRIBUTING -->
-
-
-
-
+ 
 
 
 ## Remerciements
