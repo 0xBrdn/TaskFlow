@@ -1,12 +1,11 @@
-
+# TaskFlow
 
 <div align="center">
   <img src="data/logo.png" alt="Logo TaskFlow" width="400">
 </div>
 <br />
 <div align="center">
-  <a href="https://github.com/votre-utilisateur/taskflow">
-  
+  <a href="https://github.com/zzendor/SAE502-TaskFlow">
   </a>
 
   <h3 align="center">TaskFlow</h3>
@@ -14,18 +13,22 @@
   <p align="center">
     Une application collaborative de gestion de projets et de tâches.
     <br />
-    <a href=https://github.com/zzendor/SAE502-TaskFlow/tree/main/docs><strong>Explorez les docs »</strong></a>
+    <a href="https://github.com/zzendor/SAE502-TaskFlow/tree/main/docs/pdf"><strong>Explorez les documents d'installation et d'utilisation »</strong></a>
     <br />
+    <a href="https://github.com/zzendor/SAE502-TaskFlow/tree/main/docs/sphinx/build/html"><strong>Documentation du code »</strong></a>
     <br />
   </p>
 </div>
 
-<!-- TABLE OF CONTENTS -->
+---
+
+## Table des matières
+
 <details>
   <summary>Table des matières</summary>
   <ol>
     <li>
-      <a>À propos du projet</a>
+      <a href="#à-propos-du-projet">À propos du projet</a>
       <ul>
         <li><a href="#fonctionnalités-principales">Fonctionnalités principales</a></li>
       </ul>
@@ -42,6 +45,7 @@
   </ol>
 </details>
 
+---
 <!-- ABOUT THE PROJECT -->
 ## À propos du projet
 TaskFlow est une application collaborative de gestion de projets et de tâches, développée en Python. Elle a été créée dans le cadre d'une **SAE** (Situation d'Apprentissage et d'Évaluation) par un groupe de 8 étudiants, dans le but de fournir une solution simple et efficace pour la gestion de projets en équipe. L'application permet de créer et de gérer des projets, d'attribuer des tâches, de suivre les progrès et de recevoir des rappels pour ne jamais manquer une échéance. Grâce à son interface conviviale et à ses fonctionnalités intelligentes, TaskFlow facilite l'organisation et la collaboration au sein des équipes de travail.
@@ -54,11 +58,6 @@ TaskFlow est une application collaborative de gestion de projets et de tâches, 
 - **Interface utilisateur intuitive** : Une expérience fluide pour tous les utilisateurs.
 
 ### Captures d'écran
-
-<div align="center">
-  <img src="data/login.png" alt="Page principal">
-  <p><em>Page d'accueil</em></p>
- 
 
 
 ## Remerciements
