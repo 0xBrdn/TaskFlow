@@ -204,6 +204,8 @@ class _Requests:
 
     get_task_infoID_by_taskID = "SELECT task_infoID FROM tasks WHERE taskID = %s;"
 
+    get_task_infoID_by_subtaskID = "SELECT task_infoID FROM subtasks WHERE subtaskID = %s;"
+
     update_task_description = "UPDATE tasks_infos SET description = %s WHERE task_infoID = %s;"
 
     update_task_priority = "UPDATE tasks_infos SET priority = %s WHERE task_infoID = %s;"
