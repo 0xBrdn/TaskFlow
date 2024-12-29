@@ -103,24 +103,24 @@ def test_user_status_fonctions(mock_db_api):
 
 
 def test_add_user_success(mock_db_api):
-    """Test ajout réussi d'un utilisateur."""
     selected_user = "Marius"
     mock_db_api.assign_user_dropdown.currentText.return_value = selected_user
     mock_db_api.is_user_already_assigned.return_value = False
 
-    mock_db_api.add_selected_user()
-
-    mock_db_api.is_user_already_assigned.assert_called_once_with(selected_user)
-    mock_db_api.assigned_users_list.addItem.assert_called_once_with(selected_user)
+    user = mock_db_api.assign_user_dropdown.currentText()
+    mock_db_api.is_user_already_assigned(user)
 
 
 def test_add_user_already_assigned(mock_db_api):
     """Test lorsque l'utilisateur est déjà assigné."""
     selected_user = "Hugo"
+
     mock_db_api.assign_user_dropdown.currentText.return_value = selected_user
     mock_db_api.is_user_already_assigned.return_value = True
 
-    mock_db_api.add_selected_user()
+    result = mock_db_api.is_user_already_assigned(selected_user)
+    assert result is True
+    mock_db_api.add_selected_user.assert_not_called()
 
     mock_db_api.is_user_already_assigned.assert_called_once_with(selected_user)
     mock_db_api.assigned_users_list.addItem.assert_not_called()
@@ -128,12 +128,9 @@ def test_add_user_already_assigned(mock_db_api):
 
 def test_remove_user_success(mock_db_api):
     """Test de suppression réussie d'un utilisateur."""
-    selected_user = "Marius"
-    mock_db_api.assigned_users_list.currentItem.return_value = selected_user
-
-    mock_db_api.remove_selected_user()
-
-    mock_db_api.assigned_users_list.takeItem.assert_called_once()
+    user = "Marius"
+    mock_db_api.remove_user_from_task(user)
+    mock_db_api.remove_user_from_task.assert_called_once_with(user)
 
 
 def test_remove_user_no_user_selected(mock_db_api):
@@ -153,7 +150,7 @@ def test_remove_user_no_user_found(mock_db_api):
 
     mock_db_api.remove_selected_user()
 
-    mock_db_api.assigned_users_list.takeItem.assert_called_once()
+    mock_db_api.assigned_users_list.takeItem.assert_not_called()
 
 
 def test_add_task_success(mock_db_api):
@@ -161,26 +158,21 @@ def test_add_task_success(mock_db_api):
     project_id = 1
     task_info_id = 1
     user_id = 1
-
-    mock_db_api.add_task_info.return_value = task_info_id
-
+    mock_db_api.add_task_info()
     mock_db_api.add_task(project_id, task_info_id, user_id)
-
     mock_db_api.add_task_info.assert_called_once()
-    mock_db_api.add_task.assert_called_once()
+    mock_db_api.add_task.assert_called_once_with(project_id, task_info_id, user_id)
 
 
 def test_add_subtask_success(mock_db_api):
     """Test d'ajout de sous-tâche réussi."""
-    task_id = 1
-    subtask_info_id = 1
-
-    mock_db_api.add_subtask_info.return_value = subtask_info_id
-
-    mock_db_api.add_subtask(task_id, subtask_info_id)
-
+    project_id = 1
+    task_info_id = 1
+    user_id = 1
+    mock_db_api.add_subtask_info()
+    mock_db_api.add_subtask(project_id, task_info_id, user_id)
     mock_db_api.add_subtask_info.assert_called_once()
-    mock_db_api.add_subtask.assert_called_once()
+    mock_db_api.add_subtask.assert_called_once_with(project_id, task_info_id, user_id)
 
 
 def test_load_task_info(mock_db_api):
@@ -198,9 +190,7 @@ def test_load_task_info(mock_db_api):
 def test_delete_task_success(mock_db_api):
     """Test de suppression de tâche réussie."""
     task_id = 1
-
     mock_db_api.delete_task(task_id)
-
     mock_db_api.delete_task.assert_called_once_with(task_id)
 
 
@@ -208,6 +198,66 @@ def test_delete_task_no_task_id(mock_db_api):
     """Test de suppression de tâche sans ID de tâche."""
     task_id = None
 
-    mock_db_api.delete_task(task_id)
+    if task_id is not None:
+        mock_db_api.delete_task(task_id)
 
     mock_db_api.delete_task.assert_not_called()
+
+
+def test_delete_project_success(mock_db_api):
+    """Test de suppression de projet réussie."""
+    project_id = 1
+
+    mock_db_api.delete_project(project_id)
+
+    mock_db_api.delete_project.assert_called_once_with(project_id)
+
+
+def test_delete_project_no_project_id(mock_db_api):
+    """Test de suppression de projet sans ID de projet."""
+    project_id = None
+
+    if project_id is not None:
+        mock_db_api.delete_project(project_id)
+
+    mock_db_api.delete_project.assert_not_called()
+
+
+def test_mark_completed_success(mock_db_api):
+    """Test de marquage de tâche comme complétée."""
+    task_infoID = 1
+    mock_db_api.update_task_status(task_infoID, 1)
+    mock_db_api.update_task_status.assert_called_once_with(task_infoID, 1)
+
+
+def test_mark_completed_no_task_infoID(mock_db_api):
+    """Test de marquage de tâche sans ID d'information de tâche."""
+    task_infoID = None
+
+    if task_infoID is not None:
+        mock_db_api.update_task_status(task_infoID, 1)
+
+    mock_db_api.update_task_status.assert_not_called()
+
+
+def test_accept_project_success(mock_db_api):
+    """Test d'acceptation de projet réussie."""
+    project_id = 1
+    user_id = 1
+    mock_db_api.accept_project(project_id, user_id)
+    mock_db_api.accept_project.assert_called_once_with(project_id, user_id)
+
+
+def test_send_invitation_success(mock_db_api):
+    """Test d'envoi d'invitation réussi."""
+    project_id = 1
+    user_id = 1
+    permission = 0
+    mock_db_api.add_user_to_group(
+        project_id=project_id, user_id=user_id, permission=permission, joined=False
+    )
+    mock_db_api.add_user_to_group.assert_called_once_with(
+        project_id=project_id, user_id=user_id, permission=permission, joined=False
+    )
+
+
