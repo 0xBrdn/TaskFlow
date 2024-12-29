@@ -25,17 +25,46 @@
 
 ---
 
----
-<!-- ABOUT THE PROJECT -->
 ## À propos du projet
+
 TaskFlow est une application collaborative de gestion de projets et de tâches, développée en Python. Elle a été créée dans le cadre d'une **SAE** (Situation d'Apprentissage et d'Évaluation) par un groupe de 8 étudiants, dans le but de fournir une solution simple et efficace pour la gestion de projets en équipe. L'application permet de créer et de gérer des projets, d'attribuer des tâches, de suivre les progrès et de recevoir des rappels pour ne jamais manquer une échéance. Grâce à son interface conviviale et à ses fonctionnalités intelligentes, TaskFlow facilite l'organisation et la collaboration au sein des équipes de travail.
 
 ### Fonctionnalités principales
 
 - **Gestion des projets** : Créez et gérez vos projets facilement.
-- **Suivi des tâches** : Attribuez des tâches et sous tâches aux membres de l'équipe .
+- **Suivi des tâches** : Attribuez des tâches et sous-tâches aux membres de l'équipe.
 - **Interface utilisateur intuitive** : Une expérience fluide pour tous les utilisateurs.
+
+---
+
+## Équipe et Rôles
+
+Voici la liste des membres de l'équipe ayant contribué au projet et leurs rôles respectifs :
+
+- **Hugo Grigord** : Chef de Projet
+- **Kevin Lang** : SCRUM Master
+- **Swann Marcuzzi** : Développeur
+- **Haris UKA** : Développeur
+- **Jules Goetz** : Développeur
+- **Zacharie Assens** : Développeur
+- **Maxime Brodin** : Développeur
+- **Marius Breinlen** : Développeur
+
+---
+
+## Outils utilisés
+
+Les outils suivants ont été utilisés dans le cadre de ce projet :
+
+- **GitHub** : Gestion des versions et collaboration.
+- **Trello** : Gestion des tâches et organisation du projet.
+- **PyTest** : Tests unitaires pour garantir la qualité du code.
+- **Sphinx** : Génération de la documentation technique.
+- **Docker** : Conteneurisation de l'application pour simplifier son déploiement.
+- **Conda** : Gestionnaire d'environnements pour les dépendances Python.
+
+---
 
 ## Remerciements
 
-Merci à tous les contributeurs et utilisateurs pour leur soutien continu à TaskFlow !
+Merci à tous les contributeurs et utilisateurs pour leur soutien continu à TaskFlow !
