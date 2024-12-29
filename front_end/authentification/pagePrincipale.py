@@ -873,7 +873,6 @@ class Ui_MainWindow(object):
             print(e)
 
         # Récupération des utilisateurs du projet
-        users = []
         try:
             users_in_project = DB_API.get_users_in_project_by_project_id(project_id[0])
             users = [user[1] for user in users_in_project]
@@ -1866,7 +1865,7 @@ class TaskDialog(QtWidgets.QDialog):
         self.task_input = QtWidgets.QLineEdit()
         self.date_input = QtWidgets.QDateEdit()
         self.date_input.setCalendarPopup(True)
-        self.date_input.setDate(QtCore.QDate(2025, 1, 1))
+        self.date_input.setDate(QtCore.QDate().currentDate())
         self.comment_input = QtWidgets.QLineEdit()
         self.importance_input = QtWidgets.QComboBox()
         self.importance_input.addItems(["Faible", "Moyenne", "Haute"])
