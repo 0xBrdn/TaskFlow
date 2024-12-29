@@ -1,10 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from backend.db_api import DB_API
-from pagePrincipale import Ui_MainWindow as MainWindowUI
+from pagePrincipale import MainWindow as MainWindowUI
 import webbrowser
-from PyQt5.QtCore import Qt
-import requests
-from io import BytesIO
 import pyotp
 import smtplib
 from email.mime.text import MIMEText
@@ -23,6 +20,8 @@ accounts = [
     {"email": "taskflowreminder2@gmail.com", "password": "lkya wtsu opzy pnse"},
     {"email": "taskflowreminder3@gmail.com", "password": "jjnw nuhq eopy azfw"},
 ]
+
+
 def send_otp_email(recipient_email: str, otp_code: str):
     """
     Envoie l'OTP (code TOTP) par email au user.
@@ -43,6 +42,7 @@ def send_otp_email(recipient_email: str, otp_code: str):
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
         server.send_message(message)
 
+
 def send_totp_to_user(totp, user_email: str):
     """
     Génère le code TOTP et l'envoie par mail.
@@ -51,6 +51,7 @@ def send_totp_to_user(totp, user_email: str):
     print(current_otp, "sayez")
     send_otp_email(user_email, current_otp)
 
+
 def verify_totp_code(totp, user_input_code: str) -> bool:
     """
     Vérifie si le code TOTP entré par l'utilisateur est correct
@@ -58,10 +59,12 @@ def verify_totp_code(totp, user_input_code: str) -> bool:
     """
     return totp.verify(user_input_code)  # True si code correct, False sinon.
 
+
 # Identifiants Google
 CLIENT_ID = "428963010703-4ehn75nf048kk43mmjpqksvva1d01qk8.apps.googleusercontent.com"
 REDIRECT_URI = "http://localhost:5001/oauth2callback"
 AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id={}&redirect_uri={}&scope=email+profile+openid"
+
 
 # -----------------------------------------------
 # Dialog pour la saisie du code TOTP
@@ -105,18 +108,21 @@ class OtpDialog(QtWidgets.QDialog):
     def get_code(self):
         return self.codeEdit.text().strip()
 
+
 class Ui_MainWindow(object):
     """
-        Classe gérant l'interface utilisateur de la fenêtre d'authentification.
-        Permet la connexion via email/mot de passe ou Google, ainsi que l'inscription de nouveaux utilisateurs.
+    Classe gérant l'interface utilisateur de la fenêtre d'authentification.
+    Permet la connexion via email/mot de passe ou Google,
+    ainsi que l'inscription de nouveaux utilisateurs.
 
-        Exemple:
-        >>> app = QtWidgets.QApplication(sys.argv)
-        >>> MainWindow = QtWidgets.QMainWindow()
-        >>> ui = Ui_MainWindow()
-        >>> ui.setupUi(MainWindow)
-        >>> MainWindow.show()
-        """
+    Exemple:
+    >>> app = QtWidgets.QApplication(sys.argv)
+    >>> MainWindow = QtWidgets.QMainWindow()
+    >>> ui = Ui_MainWindow()
+    >>> ui.setupUi(MainWindow)
+    >>> MainWindow.show()
+    """
+
     def __init__(self):
         """
         Initialise une nouvelle instance de Ui_MainWindow.
@@ -573,12 +579,11 @@ class Ui_MainWindow(object):
 
         print(f"[PyQt] Ouverture de la fenêtre principale avec l'utilisateur {email}.")
         self.main_window.close()
-        self.main_window_instance = QtWidgets.QMainWindow()
         self.main_window_ui = MainWindowUI()
-        self.main_window_ui.setupUi(self.main_window_instance)
-        self.main_window_ui.set_current_user(email)  # Configure l'utilisateur avec l'email récupéré
-        self.main_window_ui.main_window = self.main_window_instance
-        self.main_window_instance.show()
+        self.main_window_ui.set_current_user(
+            email
+        )  # Configure l'utilisateur avec l'email récupéré
+        self.main_window_ui.show()
 
     def handle_signup(self) -> bool:
         """
@@ -772,12 +777,9 @@ class Ui_MainWindow(object):
         >>> # La fenêtre principale s'ouvre avec l'utilisateur configuré
         """
         self.main_window.close()
-        self.main_window_instance = QtWidgets.QMainWindow()
         self.main_window_ui = MainWindowUI()
-        self.main_window_ui.setupUi(self.main_window_instance)
         self.main_window_ui.set_current_user(self.inputMail.text())
-        self.main_window_ui.main_window = self.main_window_instance
-        self.main_window_instance.show()
+        self.main_window_ui.show()
 
     def retranslateUi(self, MainWindow):
         """
@@ -806,3 +808,18 @@ class Ui_MainWindow(object):
         self.titreMail.setText(_translate("MainWindow", "E-Mail"))
         self.titrePassword.setText(_translate("MainWindow", "Mot de passe"))
         self.boutonValider.setText(_translate("MainWindow", "Valider"))
+
+
+class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+    def __init__(self, *args, **kwargs):
+        """
+        Initialise la classe Ui_MainWindow.
+
+        Cette méthode initialise les valeurs de l'utilisateur actuel et de l'ID utilisateur.
+        """
+        super(MainWindow, self).__init__(*args, **kwargs)
+        self.setupUi(self)
+
+    def closeEvent(self, event):
+        print("Close clicked authentif")
+        event.accept()
