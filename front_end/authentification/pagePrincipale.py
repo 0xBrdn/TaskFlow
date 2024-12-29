@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QInputDialog,
     QGroupBox,
-    QHBoxLayout,
     QListWidgetItem,
     QScrollArea,
     QWidget,
@@ -17,7 +16,24 @@ from backend.db_api import DB_API
 import datetime
 from typing import Optional
 
+
 class InviteUsersDialog(QtWidgets.QDialog):
+    """
+    Cette classe gère le dialogue d'invitation des utilisateurs dans un projet.
+
+    Cette classe renvoie une boîte de dialogue permettant de sélectionner des
+    utilisateurs et de leur attribuer des droits.
+
+    :param parent: Widget parent (optionnel)
+    :param deny: Bool indiquant si l'accès doit être refusé
+    :return: Boîte de dialogue d'invitation
+    :raise: Exception si l'initialisation échoue
+
+    Exemple:
+    >>> dialog = InviteUsersDialog(parent=None)
+    >>> if dialog.exec_():
+    >>>     users = dialog.get_selected_users()
+    """
     def __init__(self, parent=None, deny=False):
         super().__init__(parent)
         self.deny = deny
@@ -26,6 +42,20 @@ class InviteUsersDialog(QtWidgets.QDialog):
         self.setup_ui()
 
     def setup_ui(self):
+        """
+        Configure l'interface utilisateur du dialogue d'invitation.
+
+        Cette fonction initialise tous les éléments de l'interface du dialogue
+        d'invitation des utilisateurs.
+
+        :param self: Instance de la classe
+        :return: None
+        :raise: Exception si l'initialisation des composants échoue
+
+        Exemple:
+        >>> dialog = InviteUsersDialog()
+        >>> dialog.setup_ui()
+        """
         layout = QVBoxLayout(self)
         if self.deny:
             error_label = QLabel(
@@ -79,6 +109,20 @@ class InviteUsersDialog(QtWidgets.QDialog):
             self.cancel_button.clicked.connect(self.reject)
 
     def load_users(self, users):
+        """
+        Charge la liste des utilisateurs disponibles dans le dialogue.
+
+        Cette fonction met à jour la liste des utilisateurs pouvant être invités
+        dans le projet.
+
+        :param users: Liste des utilisateurs à afficher
+        :return: None
+        :raise: Exception si le chargement échoue
+
+        Exemple:
+        >>> dialog = InviteUsersDialog()
+        >>> dialog.load_users(['user1@email.com', 'user2@email.com'])
+        """
         self.user_list.clear()
         for user in users:
             item = QListWidgetItem(f"{user}")
@@ -86,6 +130,21 @@ class InviteUsersDialog(QtWidgets.QDialog):
             self.user_list.addItem(item)
 
     def get_selected_users(self):
+        """
+        Récupère la liste des utilisateurs sélectionnés avec leurs droits.
+
+        Cette fonction renvoie un tuple contenant les utilisateurs sélectionnés
+        et les droits qui leur ont été attribués.
+
+        :return: Liste de tuples (user, permission)
+        :raise: Exception si la récupération échoue
+
+        Exemple:
+        >>> dialog = InviteUsersDialog()
+        >>> selected = dialog.get_selected_users()
+        >>> if selected:
+        >>>     print(f"Users selected: {selected}")
+        """
         selected_items = self.user_list.selectedItems()
         users = []
         rights = self.rights_combo.currentText()
@@ -94,12 +153,88 @@ class InviteUsersDialog(QtWidgets.QDialog):
             users.append((user, self.map_rights_combo.get(rights)))
         return users
 
+
 class Ui_MainWindow(object):
     def __init__(self):
+        """
+        Initialise la classe Ui_MainWindow.
+
+        Cette méthode initialise les valeurs de l'utilisateur actuel et de l'ID utilisateur.
+        """
         self.current_user = None
         self.user_id = None
 
+    def _setup_account_tab(self):
+        """
+        Configure l'onglet du compte utilisateur.
+
+        Cette méthode initialise et configure tous les éléments de l'interface utilisateur
+        pour l'onglet de gestion du compte, y compris les informations de l'utilisateur
+        et les boutons d'action.
+
+        :param self: Instance de la classe
+        :return: None
+        """
+        layout = QtWidgets.QVBoxLayout(self.account_tab)
+
+        # Groupe pour les informations du compte
+        account_group = QtWidgets.QGroupBox("Informations du Compte")
+        account_group.setStyleSheet("font-size: 16px;")
+        account_layout = QtWidgets.QVBoxLayout(account_group)
+
+        # Affichage du logo (si disponible)
+        logo_label = QtWidgets.QLabel()
+        try:
+            pixmap = QtGui.QPixmap("images/authentification/logo_alternatif.png")
+            pixmap = pixmap.scaledToWidth(150, QtCore.Qt.SmoothTransformation)
+            logo_label.setPixmap(pixmap)
+            logo_label.setAlignment(QtCore.Qt.AlignCenter)
+        except Exception as e:
+            print(f"Impossible de charger le logo : {e}")
+        account_layout.addWidget(logo_label)
+
+        # Étiquettes pour les informations de l'utilisateur
+        self.email_label = QtWidgets.QLabel("Email: ")
+        self.email_label.setObjectName("email_label")
+        self.email_label.setStyleSheet("font-size: 14px;")
+        account_layout.addWidget(self.email_label)
+
+        self.username_label = QtWidgets.QLabel("Nom d'utilisateur : Inconnu")
+        self.username_label.setStyleSheet("font-size: 14px;")
+        account_layout.addWidget(self.username_label)
+
+        self.role_label = QtWidgets.QLabel("Rôle : Inconnu")
+        self.role_label.setStyleSheet("font-size: 14px;")
+        account_layout.addWidget(self.role_label)
+
+        # Bouton de déconnexion
+        deconnexion_button = QtWidgets.QPushButton("Se déconnecter")
+        deconnexion_button.setObjectName("deconnexion_button")
+        deconnexion_button.setStyleSheet(
+            "background-color: red; color: white; font-weight: bold; font-size:14px;"
+        )
+        deconnexion_button.clicked.connect(self.deconnexion)
+        account_layout.addWidget(deconnexion_button)
+
+        # Bouton pour supprimer le compte
+        self.delete_account_button = QtWidgets.QPushButton("Supprimer mon compte")
+        self.delete_account_button.setStyleSheet(
+            "background-color: #a40000; color: white; font-weight: bold; font-size:14px;"
+        )
+        account_layout.addWidget(self.delete_account_button)
+
+        account_layout.addStretch(1)
+        layout.addWidget(account_group)
+
     def setupUi(self, MainWindow):
+        """
+        Configure l'interface utilisateur de la fenêtre principale.
+
+        Cette méthode configure la fenêtre principale, y compris sa taille, son icône,
+        le widget central, la mise en page, les onglets et les connexions pour divers boutons et widgets.
+
+        :param MainWindow: L'objet de la fenêtre principale à configurer.
+        """
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1200, 800)
         icon = QtGui.QIcon()
@@ -160,7 +295,15 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
     def _setup_project_tab(self):
-        # Layout principal horizontal pour diviser l'écran en deux
+        """
+        Configure l'onglet de gestion des projets.
+
+        Met en place :
+        - Liste des projets actifs
+        - Liste des projets en attente
+        - Boutons d'action (Ajouter, Supprimer, etc.)
+        - Mise en page et style
+        """
         self.main_project_layout = QtWidgets.QHBoxLayout(self.project_tab)
 
         # Partie gauche - Projets actifs
@@ -168,7 +311,6 @@ class Ui_MainWindow(object):
         self.left_layout = QtWidgets.QVBoxLayout(self.left_widget)
 
         self.project_label = QtWidgets.QLabel("Projets Actifs")
-        self.project_label.setObjectName("project_label")
         self.project_label.setStyleSheet("font-size: 16px;")
         self.left_layout.addWidget(self.project_label)
 
@@ -177,26 +319,13 @@ class Ui_MainWindow(object):
         self.left_layout.addWidget(self.project_list_widget)
 
         self.project_buttons_frame = QtWidgets.QFrame()
-        self.project_buttons_frame.setObjectName("project_buttons_frame")
         self.project_buttons_layout = QtWidgets.QHBoxLayout(self.project_buttons_frame)
 
         self.add_project_button = QtWidgets.QPushButton("Ajouter un Projet")
-        self.add_project_button.setObjectName("add_project_button")
-
         self.delete_project_button = QtWidgets.QPushButton("Supprimer le Projet")
-        self.delete_project_button.setObjectName("delete_project_button")
-        self.delete_project_button.setStyleSheet("""
-            QPushButton#delete_project_button {
-                background-color: #a40000;
-                color: white;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton#delete_project_button:hover {
-                background-color: #cc0000;
-            }
-        """)
-
+        self.delete_project_button.setStyleSheet(
+            "background-color: #a40000; color: white; font-size: 14px;"
+        )
         self.project_buttons_layout.addWidget(self.add_project_button)
         self.project_buttons_layout.addWidget(self.delete_project_button)
         self.left_layout.addWidget(self.project_buttons_frame)
@@ -206,7 +335,6 @@ class Ui_MainWindow(object):
         self.right_layout = QtWidgets.QVBoxLayout(self.right_widget)
 
         self.pending_label = QtWidgets.QLabel("Projets en Attente")
-        self.pending_label.setObjectName("pending_label")
         self.pending_label.setStyleSheet("font-size: 16px;")
         self.right_layout.addWidget(self.pending_label)
 
@@ -214,64 +342,46 @@ class Ui_MainWindow(object):
         self.pending_project.setStyleSheet("font-size: 14px;")
         self.right_layout.addWidget(self.pending_project)
 
-        # Frame pour les boutons de projets en attente
         self.pending_buttons_frame = QtWidgets.QFrame()
-        self.pending_buttons_frame.setObjectName("pending_buttons_frame")
         self.pending_buttons_layout = QtWidgets.QHBoxLayout(self.pending_buttons_frame)
 
-        # Bouton Accepter (bleu)
         self.accept_project_button = QtWidgets.QPushButton("Accepter Projet")
-        self.accept_project_button.setObjectName("accept_project_button")
-        self.accept_project_button.setStyleSheet("""
-            QPushButton#accept_project_button {
-                background-color: #0066cc;
-                color: white;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton#accept_project_button:hover {
-                background-color: #0080ff;
-            }
-        """)
-
-        # Bouton Refuser (rouge)
         self.refuse_project_button = QtWidgets.QPushButton("Refuser Projet")
-        self.refuse_project_button.setObjectName("refuse_project_button")
-        self.refuse_project_button.setStyleSheet("""
-            QPushButton#refuse_project_button {
-                background-color: #a40000;
-                color: white;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton#refuse_project_button:hover {
-                background-color: #cc0000;
-            }
-        """)
-
         self.pending_buttons_layout.addWidget(self.accept_project_button)
         self.pending_buttons_layout.addWidget(self.refuse_project_button)
         self.right_layout.addWidget(self.pending_buttons_frame)
 
-        # Ajout des widgets gauche et droit au layout principal
         self.main_project_layout.addWidget(self.left_widget)
         self.main_project_layout.addWidget(self.right_widget)
 
     def _setup_task_tab(self):
-        self.task_layout = QtWidgets.QVBoxLayout(self.task_tab)
+        """
+        Configure l'onglet des tâches.
+
+        Cette méthode initialise et configure tous les éléments de l'interface utilisateur
+        pour l'onglet de gestion des tâches, y compris les étiquettes, les listes et les boutons.
+
+        :param self: Instance de la classe
+        :return: None
+        """
+        # Layout principal pour l'onglet des tâches
+        self.task_layout = QtWidgets.QHBoxLayout(self.task_tab)
+
+        # Partie gauche : Liste des tâches
+        self.task_left_layout = QtWidgets.QVBoxLayout()
 
         self.title_label = QtWidgets.QLabel(self.task_tab)
         self.title_label.setText("Gestionnaire de Tâches")
         self.title_label.setAlignment(QtCore.Qt.AlignCenter)
         self.title_label.setObjectName("title_label")
         self.title_label.setStyleSheet("font-size: 18px;")
-        self.task_layout.addWidget(self.title_label)
+        self.task_left_layout.addWidget(self.title_label)
 
         self.current_project_label = QtWidgets.QLabel(self.task_tab)
         self.current_project_label.setAlignment(QtCore.Qt.AlignCenter)
         self.current_project_label.setObjectName("current_project_label")
         self.current_project_label.setStyleSheet("font-size: 16px;")
-        self.task_layout.addWidget(self.current_project_label)
+        self.task_left_layout.addWidget(self.current_project_label)
 
         self.tree = QtWidgets.QTreeWidget(self.task_tab)
         self.tree.setColumnCount(5)
@@ -279,7 +389,7 @@ class Ui_MainWindow(object):
             ["Tâche", "Date", "Commentaire", "Importance", "Utilisateurs assignés"]
         )
         self.tree.setStyleSheet("font-size: 14px;")
-        self.task_layout.addWidget(self.tree)
+        self.task_left_layout.addWidget(self.tree)
 
         for i in range(4):
             self.tree.header().setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
@@ -287,13 +397,29 @@ class Ui_MainWindow(object):
         # Boutons de gestion des tâches
         self.button_layout = QtWidgets.QHBoxLayout()
         self.add_task_button = QtWidgets.QPushButton("Ajouter une Tâche", self.task_tab)
-        self.add_subtask_button = QtWidgets.QPushButton("Ajouter Sous-Tâche", self.task_tab)
-        self.delete_task_button = QtWidgets.QPushButton("Supprimer", self.task_tab)
-        self.complete_task_button = QtWidgets.QPushButton("Marquer comme terminé", self.task_tab)
-        self.uncomplete_task_button = QtWidgets.QPushButton("Marquer comme non terminé", self.task_tab)
-        self.invite_users_button = QtWidgets.QPushButton("Inviter des utilisateurs", self.task_tab)
-        self.modify_task_button = QtWidgets.QPushButton("Modifier", self.task_tab)
+        self.add_task_button.setObjectName("add_task_button")  # Important
 
+        self.add_subtask_button = QtWidgets.QPushButton("Ajouter Sous-Tâche", self.task_tab)
+        self.add_subtask_button.setObjectName("add_subtask_button")  # Important
+
+        self.delete_task_button = QtWidgets.QPushButton("Supprimer", self.task_tab)
+        self.delete_task_button.setObjectName("delete_task_button")  # Important
+
+        self.complete_task_button = QtWidgets.QPushButton("Marquer comme terminé", self.task_tab)
+        self.complete_task_button.setObjectName("complete_task_button")  # Important
+
+        self.uncomplete_task_button = QtWidgets.QPushButton(
+            "Marquer comme non terminé", self.task_tab
+        )
+        self.uncomplete_task_button.setObjectName("uncomplete_task_button")  # Important
+
+        self.invite_users_button = QtWidgets.QPushButton("Inviter des utilisateurs", self.task_tab)
+        self.invite_users_button.setObjectName("invite_users_button")  # Important
+
+        self.modify_task_button = QtWidgets.QPushButton("Modifier", self.task_tab)
+        self.modify_task_button.setObjectName("modify_task_button")  # Important
+
+        # Ajouter les boutons au layout
         self.button_layout.addWidget(self.add_task_button)
         self.button_layout.addWidget(self.add_subtask_button)
         self.button_layout.addWidget(self.delete_task_button)
@@ -302,56 +428,50 @@ class Ui_MainWindow(object):
         self.button_layout.addWidget(self.invite_users_button)
         self.button_layout.addWidget(self.modify_task_button)
 
-        self.task_layout.addLayout(self.button_layout)
+        self.task_left_layout.addLayout(self.button_layout)
 
-    def _setup_account_tab(self):
-        layout = QVBoxLayout(self.account_tab)
+        # Ajout de la partie gauche dans le layout principal
+        self.task_layout.addLayout(self.task_left_layout)
 
-        account_group = QGroupBox("Informations du Compte")
-        account_group.setStyleSheet("font-size: 16px;")
-        account_layout = QVBoxLayout(account_group)
+        # Partie droite : Liste des utilisateurs assignés
+        self.user_right_layout = QtWidgets.QVBoxLayout()
 
-        logo_label = QLabel()
-        try:
-            pixmap = QtGui.QPixmap("images/logo_alternatif.png")
-            pixmap = pixmap.scaledToWidth(150, QtCore.Qt.SmoothTransformation)
-            logo_label.setPixmap(pixmap)
-            logo_label.setAlignment(QtCore.Qt.AlignCenter)
-        except Exception as e:
-            print(f"Impossible de charger le logo : {e}")
-        account_layout.addWidget(logo_label)
+        self.user_title_label = QtWidgets.QLabel("Utilisateurs dans le projet")
+        self.user_title_label.setStyleSheet("font-size: 16px; font-weight: bold; margin: 10px;")
+        self.user_right_layout.addWidget(self.user_title_label)
 
-        self.email_label = QLabel("Email: ")
-        self.email_label.setObjectName("email_label")
-        self.email_label.setStyleSheet("font-size: 14px;")
-        account_layout.addWidget(self.email_label)
+        # Création de la QScrollArea pour afficher les utilisateurs
+        self.users_scroll_area = QScrollArea(self.task_tab)
+        self.users_scroll_area.setWidgetResizable(True)
+        self.users_scroll_area.setStyleSheet("background-color: #f9f9f9; border: none;")
 
-        self.username_label = QLabel("Nom d'utilisateur : Inconnu")
-        self.username_label.setStyleSheet("font-size: 14px;")
-        account_layout.addWidget(self.username_label)
+        # Widget contenant les utilisateurs
+        self.users_container = QWidget()
+        self.users_container_layout = QVBoxLayout(self.users_container)
+        self.users_container_layout.setContentsMargins(0, 0, 0, 0)
+        self.users_container_layout.setSpacing(10)
 
-        self.role_label = QLabel("Rôle : Inconnu")
-        self.role_label.setStyleSheet("font-size: 14px;")
-        account_layout.addWidget(self.role_label)
+        # Étendre la zone des utilisateurs
+        self.users_scroll_area.setWidget(self.users_container)
+        self.user_right_layout.addWidget(self.users_scroll_area)
 
-        deconnexion_button = QPushButton("Se déconnecter")
-        deconnexion_button.setObjectName("deconnexion_button")
-        deconnexion_button.setStyleSheet(
-            "background-color: red; color: white; font-weight: bold; font-size:14px;"
-        )
-        deconnexion_button.clicked.connect(self.deconnexion)
-        account_layout.addWidget(deconnexion_button)
+        # Ajout de la partie droite dans le layout principal
+        self.task_layout.addLayout(self.user_right_layout)
 
-        self.delete_account_button = QPushButton("Supprimer mon compte")
-        self.delete_account_button.setStyleSheet(
-            "background-color: #a40000; color: white; font-weight: bold; font-size:14px;"
-        )
-        account_layout.addWidget(self.delete_account_button)
-
-        account_layout.addStretch(1)
-        layout.addWidget(account_group)
+        # Ajuster les proportions entre gauche et droite
+        self.task_layout.setStretch(0, 3)  # 3 parts pour la liste des tâches
+        self.task_layout.setStretch(1, 2)  # 2 parts pour les utilisateurs
 
     def set_current_user(self, email):
+        """
+        Définit l'utilisateur actuel en fonction de l'email fourni et met à jour l'interface utilisateur en conséquence.
+
+        Cette méthode met à jour les informations de l'utilisateur actuel, telles que l'email, le nom d'utilisateur et le rôle,
+        et charge les projets associés à cet utilisateur.
+
+        :param email: L'email de l'utilisateur actuel.
+        :return: None
+        """
         self.current_user = email
         self.user_id = DB_API.get_userID_by_email(email)[0]
         self.email_label.setText(f"Email: {email}")
@@ -370,6 +490,14 @@ class Ui_MainWindow(object):
         self.load_projects()
 
     def deconnexion(self):
+        """
+        Déconnecte l'utilisateur actuel et retourne à la fenêtre d'authentification.
+
+        Cette méthode ferme toutes les fenêtres ouvertes, met à jour le statut de l'utilisateur dans la base de données
+        et affiche la fenêtre d'authentification.
+
+        :return: None
+        """
         from authentification import Ui_MainWindow as AuthMainWindow
 
         try:
@@ -388,6 +516,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def delete_account(self):
+        """
+        Supprime le compte de l'utilisateur actuel après confirmation.
+
+        Cette méthode demande une confirmation à l'utilisateur avant de supprimer son compte de la base de données.
+        Si la suppression est réussie, l'utilisateur est déconnecté et la fenêtre d'authentification est affichée.
+
+        :return: None
+        """
         try:
             # Demander confirmation avant de supprimer le compte
             reponse = QMessageBox.question(
@@ -426,11 +562,21 @@ class Ui_MainWindow(object):
                     self.current_user = None
                 else:
                     # Gérer les erreurs de suppression
-                    QMessageBox.warning(None, "Erreur", f"Impossible de supprimer le compte : {err}")
+                    QMessageBox.warning(
+                        None, "Erreur", f"Impossible de supprimer le compte : {err}"
+                    )
         except Exception as e:
             print(e)
 
     def add_project(self):
+        """
+        Ajoute un nouveau projet après avoir obtenu le nom du projet de l'utilisateur.
+
+        Cette méthode affiche une boîte de dialogue pour que l'utilisateur entre le nom du projet.
+        Si le projet n'existe pas déjà, il est ajouté à la base de données et l'utilisateur est ajouté au projet.
+
+        :return: None
+        """
         try:
             project_name, ok = QInputDialog.getText(None, "Nouveau Projet", "Nom du projet :")
             if not ok or not project_name.strip():
@@ -447,6 +593,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def load_projects(self):
+        """
+        Charge les projets associés à l'utilisateur actuel et met à jour l'interface utilisateur.
+
+        Cette méthode récupère les projets actifs et en attente de l'utilisateur depuis la base de données
+        et les affiche dans les listes correspondantes.
+
+        :return: None
+        """
         self.project_list_widget.clear()
         self.pending_project.clear()
         try:
@@ -466,6 +620,14 @@ class Ui_MainWindow(object):
             QMessageBox.warning(None, "Erreur", f"Impossible de charger les projets : {e!s}")
 
     def project_clicked(self):
+        """
+        Gère l'événement lorsqu'un projet est cliqué dans la liste des projets.
+
+        Cette méthode met à jour l'interface utilisateur pour afficher les tâches et les utilisateurs
+        associés au projet sélectionné.
+
+        :return: None
+        """
         project_index = self.project_list_widget.currentRow()
         try:
             if project_index >= 0:
@@ -482,61 +644,92 @@ class Ui_MainWindow(object):
 
     def display_users_in_project(self):
         """
-        Affiche les utilisateurs du projet actuel et leur statut en ligne
-        dans une nouvelle section de l'interface.
+        Affiche les utilisateurs du projet actuel et leur statut en ligne dans une nouvelle section de l'interface.
+
+        Cette méthode crée une section dans l'onglet des tâches pour afficher les utilisateurs du projet actuel,
+        ainsi que leur statut en ligne. Elle met également en place un minuteur pour mettre à jour périodiquement
+        le statut des utilisateurs.
+
+        :return: None
         """
-        if not hasattr(self, "current_project"):
+        if not hasattr(self, "current_project") or not self.current_project:
             return
 
         try:
+            # Vérifiez si la zone de défilement pour les utilisateurs existe déjà
             if not hasattr(self, "users_scroll_area"):
+                # Widget principal pour la section des utilisateurs
                 self.users_widget = QWidget(self.task_tab)
+                self.users_widget.setStyleSheet("background-color: #f9f9f9;")
                 users_layout = QVBoxLayout(self.users_widget)
 
-                title_label = QLabel("Utilisateurs du projet")
-                title_label.setStyleSheet("font-size: 16px; font-weight: bold; margin: 10px;")
+                # Titre pour la liste des utilisateurs
+                title_label = QLabel("Utilisateurs dans le projet")
+                title_label.setStyleSheet(
+                    "font-size: 16px; font-weight: bold; margin: 10px; color: #333;"
+                )
                 users_layout.addWidget(title_label)
 
+                # Création de la zone de défilement pour afficher les utilisateurs
                 self.users_scroll_area = QScrollArea(self.task_tab)
                 self.users_scroll_area.setWidgetResizable(True)
-                self.users_scroll_area.setFixedHeight(200)
+                self.users_scroll_area.setStyleSheet("background-color: #ffffff; border: none;")
                 self.users_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
+                # Widget conteneur pour les utilisateurs
                 self.users_container = QWidget()
                 self.users_container_layout = QVBoxLayout(self.users_container)
+                self.users_container_layout.setContentsMargins(0, 0, 0, 0)
+                self.users_container_layout.setSpacing(10)
                 self.users_scroll_area.setWidget(self.users_container)
 
+                # Étendre la zone de défilement
                 users_layout.addWidget(self.users_scroll_area)
+                self.user_right_layout.addWidget(self.users_widget)
 
-                self.task_layout.addWidget(self.users_widget)
-
+            # Effacer les widgets existants avant de recharger
             for i in reversed(range(self.users_container_layout.count())):
                 item = self.users_container_layout.itemAt(i)
                 if item and item.widget():
                     item.widget().setParent(None)
 
+            # Récupérer les utilisateurs et leurs statuts
             project_id = DB_API.get_project_id_by_project_name(self.current_project)[0]
             users_in_project = DB_API.get_users_in_project_by_project_id(project_id)
             _user_status = DB_API.get_all_status()
             user_status = {item[0]: item[1] for item in _user_status}
+
+            # Permissions actuelles de l'utilisateur
             perms = next(user[2] for user in users_in_project if user[0] == self.user_id)
 
+            # Ajouter chaque utilisateur à la liste
             for user in users_in_project:
                 user_id = user[0]
-                if user_id != self.user_id:
-                    username = user[1]
-                    is_online = user_status.get(user_id, None)
-                    user_widget = UserStatusWidget(
-                        username=username,
-                        user_id=user_id,
-                        is_online=is_online,
-                        is_admin=True if perms == 2 else False,
-                        project_id=project_id,
-                        current_user_role=user[2],
-                    )
-                    self.users_container_layout.addWidget(user_widget)
+                username = user[1]
+                is_online = user_status.get(user_id, False)
+                user_widget = UserStatusWidget(
+                    username=username,
+                    user_id=user_id,
+                    is_online=is_online,
+                    is_admin=True if perms == 2 else False,
+                    project_id=project_id,
+                    current_user_role=user[2],
+                )
+                self.users_container_layout.addWidget(user_widget)
+
+            # Ajouter un espace flexible pour forcer l'extension
             self.users_container_layout.addStretch()
 
+            # Ajuster la taille de la zone des utilisateurs pour qu'elle occupe tout l'espace
+            self.users_scroll_area.setMinimumHeight(500)  # Ajustez cette valeur si nécessaire
+            self.users_scroll_area.setMaximumHeight(600)  # Facultatif
+            self.users_scroll_area.setMinimumWidth(self.user_right_layout.geometry().width() - 20)
+
+            # Ajuster les proportions entre la zone des utilisateurs et le reste de l'interface
+            self.task_layout.setStretch(0, 3)  # 3 parts pour la liste des tâches
+            self.task_layout.setStretch(1, 4)  # 4 parts pour la section des utilisateurs
+
+            # Mettre à jour automatiquement le statut des utilisateurs toutes les 30 secondes
             if not hasattr(self, "update_timer"):
                 self.update_timer = QTimer()
                 self.update_timer.timeout.connect(self.update_users_status)
@@ -550,20 +743,32 @@ class Ui_MainWindow(object):
     def update_users_status(self):
         """
         Met à jour le statut des utilisateurs périodiquement.
+
+        Cette méthode est appelée périodiquement pour mettre à jour le statut en ligne des utilisateurs
+        du projet actuel.
+
+        :return: None
         """
         try:
             if hasattr(self, "current_project"):
                 self.display_users_in_project()
         except Exception as e:
-            print(e)
+            print(f"Erreur lors de la mise à jour des statuts : {e}")
 
     def load_users_for_project(self, project_name):
-        # self.assign_user_dropdown.clear()
-        # self.assigned_users_list.clear()
+       """
+        Charge les utilisateurs associés au projet spécifié.
+
+        Cette méthode récupère les utilisateurs assignés au projet et les affiche dans les listes
+        de l'interface utilisateur.
+
+        :param project_name: Le nom du projet pour lequel charger les utilisateurs.
+        :return: None
+        """
 
         try:
             project_id = DB_API.get_project_id_by_project_name(project_name)
-            users_in_project = DB_API.get_users_in_project_by_project_id(project_id[0])
+            users_in_project = DB_API.get_users_in_project_by_project_id(project_id[0])  # noqa
             # for user in users_in_project:
             #     self.assign_user_dropdown.addItem(user[1])
         except Exception as e:
@@ -572,6 +777,14 @@ class Ui_MainWindow(object):
             )
 
     def add_selected_user(self):
+        """
+        Ajoute l'utilisateur sélectionné à la liste des utilisateurs assignés.
+
+        Cette méthode ajoute l'utilisateur sélectionné dans le menu déroulant à la liste des utilisateurs
+        assignés à la tâche ou au projet.
+
+        :return: None
+        """
         selected_user = self.assign_user_dropdown.currentText().strip()
         try:
             if selected_user and not self.is_user_already_assigned(selected_user):
@@ -580,6 +793,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def remove_selected_user_from_list(self):
+        """
+        Supprime l'utilisateur sélectionné de la liste des utilisateurs assignés.
+
+        Cette méthode supprime l'utilisateur sélectionné dans la liste des utilisateurs assignés
+        à la tâche ou au projet.
+
+        :return: None
+        """
         items = self.assigned_users_list.selectedItems()
         try:
             if items:
@@ -589,6 +810,15 @@ class Ui_MainWindow(object):
             print(e)
 
     def is_user_already_assigned(self, username: str) -> bool:
+        """
+        Vérifie si un utilisateur est déjà assigné.
+
+        Cette méthode vérifie si l'utilisateur spécifié est déjà présent dans la liste des utilisateurs
+        assignés à la tâche ou au projet.
+
+        :param username: Le nom d'utilisateur à vérifier.
+        :return: True si l'utilisateur est déjà assigné, False sinon.
+        """
         try:
             for i in range(self.assigned_users_list.count()):
                 if self.assigned_users_list.item(i).text() == username:
@@ -598,6 +828,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def add_task(self):
+        """
+        Ajoute une nouvelle tâche au projet actuel.
+
+        Cette méthode affiche une boîte de dialogue pour que l'utilisateur entre les détails de la tâche.
+        Si la tâche est validée, elle est ajoutée à la base de données et à l'interface utilisateur.
+
+        :return: None
+        """
         try:
             if not self.current_project:
                 QMessageBox.warning(None, "Erreur", "Veuillez sélectionner un projet.")
@@ -653,9 +891,7 @@ class Ui_MainWindow(object):
                 )
 
                 DB_API.add_task(
-                    project_id=project_id[0],
-                    task_info_id=task_info_id,
-                    user_id=self.user_id
+                    project_id=project_id[0], task_info_id=task_info_id, user_id=self.user_id
                 )
 
                 for username in form_data["assigned_users"]:
@@ -668,10 +904,21 @@ class Ui_MainWindow(object):
 
             except Exception as e:
                 QMessageBox.critical(
-                    None, "Erreur", f"Une erreur s'est produite lors de l'ajout de la tâche : {e!s}"
+                    None,
+                    "Erreur",
+                    f"Une erreur s'est produite lors de l'ajout de la tâche : {e!s}",
                 )
 
     def load_tasks_for_project(self, project_name):
+        """
+        Charge les tâches associées au projet spécifié.
+
+        Cette méthode récupère les tâches du projet depuis la base de données et les affiche
+        dans l'interface utilisateur.
+
+        :param project_name: Le nom du projet pour lequel charger les tâches.
+        :return: None
+        """
         self.tree.clear()
         try:
             project_id = DB_API.get_project_id_by_project_name(project_name)
@@ -722,10 +969,10 @@ class Ui_MainWindow(object):
                     subtask_item.setData(0, QtCore.Qt.UserRole, subtask[0])  # ID de la sous-tâche
 
                     # Vérifier le statut en direct et appliquer la couleur verte si terminé
-                    if subtask[3] == 1:  # Statut = 1 signifie "terminé"
-                        self.set_task_background(subtask_item, "green")
-                    else:  # Statut différent de 1 signifie "non terminé"
-                        self.set_task_background(subtask_item, "white")
+                    if task[3] == 1:  # Statut = 1 signifie "terminé"
+                        self.set_task_background(task_item, "#DFF0D8", is_completed=True)
+                    else:
+                        self.set_task_background(task_item, "white")
 
             self.tree.setIndentation(20)
 
@@ -735,20 +982,47 @@ class Ui_MainWindow(object):
         except Exception as e:
             QMessageBox.critical(None, "Erreur", f"Impossible de charger les tâches : {e!s}")
 
-    def set_task_background(self, item, color):
+    def set_task_background(self, item, color, is_completed=False):
         """
         Applique un fond coloré à un item.
+
+        Cette méthode applique une couleur de fond à un item de la liste des tâches
+        en fonction de son statut.
+
+        :param item: L'item à colorer.
+        :param color: La couleur à appliquer.
+        :return: None
         """
         try:
-            brush = QtGui.QBrush(QtGui.QColor(color))
-            for i in range(item.columnCount()):
-                item.setBackground(i, brush)
+            if is_completed:
+                # Style pour les tâches terminées
+                brush = QtGui.QBrush(QtGui.QColor("#DFF0D8"))  # Couleur de fond verte pâle
+                pen = QtGui.QPen(QtGui.QColor("#3C763D"))  # Couleur de bordure
+                font = QtGui.QFont()
+                font.setBold(True)  # Met le texte en gras
+                font.setItalic(True)  # Met le texte en italique
+
+                for i in range(item.columnCount()):
+                    item.setBackground(i, brush)
+                    item.setForeground(i, QtGui.QBrush(QtGui.QColor("#3C763D")))  # Couleur du texte
+                    item.setFont(i, font)
+            else:
+                # Style par défaut pour les tâches non terminées
+                brush = QtGui.QBrush(QtGui.QColor(color))
+                for i in range(item.columnCount()):
+                    item.setBackground(i, brush)
         except Exception as e:
             print(e)
 
     def refresh_task_status(self, project_id):
         """
         Rafraîchit périodiquement le statut des tâches et met à jour la couleur.
+
+        Cette méthode est appelée périodiquement pour mettre à jour le statut des tâches
+        et leur couleur de fond en fonction de leur statut.
+
+        :param project_id: L'ID du projet pour lequel rafraîchir les tâches.
+        :return: None
         """
         tasks = DB_API.get_tasks_by_project_id(project_id)
         try:
@@ -768,6 +1042,14 @@ class Ui_MainWindow(object):
         QtCore.QTimer.singleShot(2000, lambda: self.refresh_task_status(project_id))
 
     def add_subtask(self):
+        """
+        Ajoute une sous-tâche à la tâche sélectionnée.
+
+        Cette méthode affiche une boîte de dialogue pour que l'utilisateur entre les détails de la sous-tâche.
+        Si la sous-tâche est validée, elle est ajoutée à la base de données et à l'interface utilisateur.
+
+        :return: None
+        """
         selected_items = self.tree.selectedItems()
         try:
             if not selected_items:
@@ -847,6 +1129,14 @@ class Ui_MainWindow(object):
                 )
 
     def delete_task(self):
+        """
+        Supprime la tâche sélectionnée.
+
+        Cette méthode demande une confirmation à l'utilisateur avant de supprimer la tâche
+        sélectionnée de la base de données et de l'interface utilisateur.
+
+        :return: None
+        """
         selected_items = self.tree.selectedItems()
         project_id = DB_API.get_project_id_by_project_name(self.current_project)
         userID = DB_API.get_userID_by_email(self.current_user)
@@ -875,6 +1165,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def delete_project(self):
+        """
+        Supprime le projet sélectionné.
+
+        Cette méthode demande une confirmation à l'utilisateur avant de supprimer le projet
+        sélectionné de la base de données et de l'interface utilisateur.
+
+        :return: None
+        """
         current_item = self.project_list_widget.currentItem()
         try:
             if not current_item:
@@ -929,6 +1227,14 @@ class Ui_MainWindow(object):
             QMessageBox.information(None, "Succès", "Le projet a été supprimé avec succès.")
 
     def modify_task(self):
+        """
+        Modifie la tâche sélectionnée.
+
+        Cette méthode affiche une boîte de dialogue pour que l'utilisateur modifie les détails de la tâche.
+        Si la modification est validée, elle est mise à jour dans la base de données et dans l'interface utilisateur.
+
+        :return: None
+        """
         selected_items = self.tree.selectedItems()
         try:
             if not selected_items:
@@ -955,7 +1261,7 @@ class Ui_MainWindow(object):
             if is_subtask:
                 task_info = DB_API.get_subtask_info_by_subtask_id(task_id)
                 task_info = task_info[0]
-                task_infoID = DB_API.get_task_infoID_by_userID(task_id)
+                task_infoID = DB_API.get_task_infoID_by_taskID(task_id)
             else:
                 task_info = DB_API.get_task_info_by_task_id(task_id)
                 task_info = task_info[0]
@@ -990,7 +1296,10 @@ class Ui_MainWindow(object):
 
                 selected_item.setText(0, form_data["title"])
                 selected_item.setText(
-                    1, QtCore.QDate.fromString(form_data["date"], "yyyy-MM-dd").toString("dd/MM/yyyy")
+                    1,
+                    QtCore.QDate.fromString(form_data["date"], "yyyy-MM-dd").toString(
+                        "dd/MM/yyyy"
+                    ),
                 )
                 selected_item.setText(2, form_data["comment"])
                 selected_item.setText(
@@ -1008,6 +1317,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def mark_completed(self):
+        """
+        Marque la tâche sélectionnée comme terminée.
+
+        Cette méthode met à jour le statut de la tâche sélectionnée dans la base de données
+        et dans l'interface utilisateur pour indiquer qu'elle est terminée.
+
+        :return: None
+        """
         selected_items = self.tree.selectedItems()
         try:
             if not selected_items:
@@ -1067,6 +1384,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def mark_uncompleted(self):
+        """
+        Marque la tâche sélectionnée comme non terminée.
+
+        Cette méthode met à jour le statut de la tâche sélectionnée dans la base de données
+        et dans l'interface utilisateur pour indiquer qu'elle n'est pas terminée.
+
+        :return: None
+        """
         selected_items = self.tree.selectedItems()
         try:
             if not selected_items:
@@ -1114,7 +1439,9 @@ class Ui_MainWindow(object):
             success = DB_API.update_task_status(int(task_info_id[0]), 0)
 
             if success:
-                QMessageBox.information(None, "Succès", "La tâche a été marquée comme non terminée.")
+                QMessageBox.information(
+                    None, "Succès", "La tâche a été marquée comme non terminée."
+                )
 
                 self.set_task_background(selected_items[0], "white")
 
@@ -1130,6 +1457,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def update_subtask_availability(self):
+        """
+        Met à jour la disponibilité des boutons de sous-tâche en fonction de la sélection actuelle.
+
+        Cette méthode active ou désactive les boutons de sous-tâche en fonction de la sélection
+        actuelle dans la liste des tâches.
+
+        :return: None
+        """
         selected_items = self.tree.selectedItems()
         try:
             if selected_items:
@@ -1140,12 +1475,29 @@ class Ui_MainWindow(object):
             print(e)
 
     def retranslateUi(self, MainWindow):
+        """
+        Retraduit l'interface utilisateur.
+
+        Cette méthode met à jour les textes de l'interface utilisateur en fonction de la langue
+        sélectionnée.
+
+        :param MainWindow: L'objet de la fenêtre principale à retraduire.
+        :return: None
+        """
         try:
             MainWindow.setWindowTitle("TaskFlow")
         except Exception as e:
             print(e)
 
     def accept_project(self):
+        """
+        Accepte le projet sélectionné dans la liste des projets en attente.
+
+        Cette méthode met à jour le statut du projet sélectionné pour indiquer que l'utilisateur
+        a accepté l'invitation à rejoindre le projet.
+
+        :return: None
+        """
         selected_item = self.pending_project.currentItem()
         try:
             if selected_item:
@@ -1158,6 +1510,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def refuse_project(self):
+        """
+        Refuse le projet sélectionné dans la liste des projets en attente.
+
+        Cette méthode met à jour le statut du projet sélectionné pour indiquer que l'utilisateur
+        a refusé l'invitation à rejoindre le projet.
+
+        :return: None
+        """
         selected_item = self.pending_project.currentItem()
         try:
             if selected_item:
@@ -1241,7 +1601,14 @@ class Ui_MainWindow(object):
 
     def set_invite(self, project_id: int, user_id: int, joined: bool):
         """
-        Permet d'accepter ou refuser une invitation a un projet
+        Met à jour le statut d'une invitation de projet.
+
+        Cette méthode met à jour le statut de l'invitation pour l'utilisateur spécifié dans la base de données.
+
+        :param project_id: L'ID du projet.
+        :param user_id: L'ID de l'utilisateur.
+        :param joined: Booléen indiquant si l'invitation est acceptée (True) ou refusée (False).
+        :return: None
         """
         try:
             if joined:
@@ -1256,6 +1623,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def get_user_to_invite(self, _list_users: list, _list_users_in_projects: list):
+        """
+        Affiche le dialogue d'invitation des utilisateurs.
+
+        Cette méthode affiche une boîte de dialogue permettant d'inviter des utilisateurs
+        au projet actuel.
+
+        :return: None
+        """
         try:
             list_users = [user[1] for user in _list_users]
             list_users_in_projects = [user[1] for user in _list_users_in_projects]
@@ -1264,6 +1639,14 @@ class Ui_MainWindow(object):
             print(e)
 
     def show_invite_dialog(self):
+        """
+        Affiche le dialogue d'invitation des utilisateurs.
+
+        Cette méthode affiche une boîte de dialogue permettant d'inviter des utilisateurs
+        au projet actuel.
+
+        :return: None
+        """
         project_id = DB_API.get_project_id_by_project_name(self.current_project)[0]
         _list_users = DB_API.get_all_users()
         _list_users_in_projects = DB_API.get_users_in_project_by_project_id(project_id)
@@ -1285,7 +1668,17 @@ class Ui_MainWindow(object):
         except Exception as e:
             print(e)
 
+
 class UserRoleDialog(QtWidgets.QDialog):
+    """
+    Boîte de dialogue pour modifier le rôle d'un utilisateur dans un projet.
+
+    :param username: Le nom d'utilisateur.
+    :param user_id: L'ID de l'utilisateur.
+    :param project_id: L'ID du projet.
+    :param current_user_role: Le rôle actuel de l'utilisateur.
+    :param parent: Le parent de la boîte de dialogue (optionnel).
+    """
     def __init__(self, username, user_id, project_id, current_user_role, parent=None):
         super().__init__(parent)
         self.user_id = user_id
@@ -1314,12 +1707,29 @@ class UserRoleDialog(QtWidgets.QDialog):
         layout.addWidget(self.buttons)
 
     def accept(self):
+        """
+        Accepte les modifications et met à jour le rôle de l'utilisateur dans la base de données.
+
+        :return: None
+        """
         selected_role = self.role_combo.currentText()
         role_id = self.map_rights_combo.get(selected_role, None)
         DB_API.set_user_permission(self.project_id, self.user_id, role_id)
         super().accept()
 
+
 class UserStatusWidget(QWidget):
+    """
+    Widget pour afficher le statut d'un utilisateur.
+
+    :param username: Le nom d'utilisateur.
+    :param user_id: L'ID de l'utilisateur (optionnel).
+    :param is_online: Booléen indiquant si l'utilisateur est en ligne.
+    :param parent: Le parent du widget (optionnel).
+    :param is_admin: Booléen indiquant si l'utilisateur est administrateur.
+    :param project_id: L'ID du projet (optionnel).
+    :param current_user_role: Le rôle actuel de l'utilisateur (optionnel).
+    """
     def __init__(
         self,
         username,
@@ -1337,38 +1747,61 @@ class UserStatusWidget(QWidget):
         self.is_online = is_online
         self.user_id = user_id
         self.current_user_role = current_user_role
+
+        # Layout principal
         layout = QVBoxLayout(self)
 
+        # Conteneur utilisateur
         user_widget = QWidget()
-        user_widget.setFixedHeight(40)
+        user_widget.setFixedHeight(50)  # Réduisez ou ajustez la hauteur ici
         user_widget.setAutoFillBackground(True)
 
+        # Définition de la couleur de fond
         palette = user_widget.palette()
         bg_color = QColor("#E8F5E9") if is_online else QColor("#FFFFFF")
         palette.setColor(QPalette.Window, bg_color)
         user_widget.setPalette(palette)
 
+        # Layout pour les informations utilisateur
         user_layout = QVBoxLayout(user_widget)
+        user_layout.setContentsMargins(5, 5, 5, 5)  # Ajout de marges internes
+        user_layout.setSpacing(0)  # Réduisez l'espacement interne
 
+        # Nom de l'utilisateur
         username_label = QLabel(username)
         username_label.setStyleSheet("font-size: 14px; font-weight: bold;")
 
+        # Statut en ligne / hors ligne
         status_text = "En ligne" if is_online else "Hors ligne"
         status_color = "#4CAF50" if is_online else "#757575"
         status_label = QLabel(status_text)
         status_label.setStyleSheet(f"color: {status_color}; font-size: 12px;")
 
+        # Ajout des éléments au layout utilisateur
         user_layout.addWidget(username_label)
         user_layout.addWidget(status_label)
 
+        # Ajout du widget utilisateur au layout principal
         layout.addWidget(user_widget)
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(5)  # Réduisez l'espacement entre chaque widget utilisateur
 
     def mousePressEvent(self, event):
+        """
+        Gère l'événement de clic de la souris.
+
+        :param event: L'événement de clic de la souris.
+        :return: None
+        """
         if event.button() == Qt.LeftButton and self.is_admin:
             self.on_user_clicked()
 
     def on_user_clicked(self):
+        """
+        Affiche la boîte de dialogue pour modifier le rôle de l'utilisateur.
+
+        :return: None
+        """
         dialog = UserRoleDialog(
             self.username, self.user_id, self.project_id, self.current_user_role
         )
@@ -1379,7 +1812,13 @@ class UserStatusWidget(QWidget):
         )
 
 class TaskDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None, users=[]):
+    """
+    Boîte de dialogue pour ajouter une nouvelle tâche.
+
+    :param parent: Le parent de la boîte de dialogue (optionnel).
+    :param users: Liste des utilisateurs disponibles pour l'assignation.
+    """
+    def __init__(self, parent=None, users=[]):  # noqa
         super().__init__(parent)
         self.setWindowTitle("Nouvelle Tâche")
         self.setModal(True)
@@ -1387,6 +1826,11 @@ class TaskDialog(QtWidgets.QDialog):
         self.load_users(users)
 
     def setup_ui(self):
+        """
+        Configure l'interface utilisateur de la boîte de dialogue.
+
+        :return: None
+        """
         layout = QtWidgets.QVBoxLayout(self)
         form_layout = QtWidgets.QFormLayout()
 
@@ -1450,26 +1894,53 @@ class TaskDialog(QtWidgets.QDialog):
         layout.addWidget(button_box)
 
     def load_users(self, users):
+        """
+        Charge la liste des utilisateurs dans le menu déroulant.
+
+        :param users: Liste des utilisateurs.
+        :return: None
+        """
         self.assign_user_dropdown.clear()
         self.assign_user_dropdown.addItems(users)
 
     def add_selected_user(self):
+        """
+        Ajoute l'utilisateur sélectionné à la liste des utilisateurs assignés.
+
+        :return: None
+        """
         selected_user = self.assign_user_dropdown.currentText()
         if selected_user and not self.is_user_already_assigned(selected_user):
             self.assigned_users_list.addItem(selected_user)
 
     def remove_selected_user(self):
+        """
+        Retire l'utilisateur sélectionné de la liste des utilisateurs assignés.
+
+        :return: None
+        """
         current_item = self.assigned_users_list.currentItem()
         if current_item:
             self.assigned_users_list.takeItem(self.assigned_users_list.row(current_item))
 
     def is_user_already_assigned(self, username):
+        """
+        Vérifie si l'utilisateur est déjà assigné.
+
+        :param username: Le nom d'utilisateur.
+        :return: Booléen indiquant si l'utilisateur est déjà assigné.
+        """
         for i in range(self.assigned_users_list.count()):
             if self.assigned_users_list.item(i).text() == username:
                 return True
         return False
 
     def get_form_data(self):
+        """
+        Récupère les données du formulaire.
+
+        :return: Dictionnaire contenant les données du formulaire.
+        """
         return {
             "title": self.task_input.text().strip(),
             "date": self.date_input.date().toString("yyyy-MM-dd"),
@@ -1481,7 +1952,14 @@ class TaskDialog(QtWidgets.QDialog):
             ],
         }
 
+
 class SubtaskDialog(QtWidgets.QDialog):
+    """
+    Boîte de dialogue pour ajouter une sous-tâche.
+
+    :param parent: Le parent de la boîte de dialogue (optionnel).
+    :param users: Liste des utilisateurs disponibles pour l'assignation (optionnel).
+    """
     def __init__(self, parent=None, users=None):
         super().__init__(parent)
         self.users = users or []
@@ -1490,6 +1968,11 @@ class SubtaskDialog(QtWidgets.QDialog):
         self.load_users()
 
     def setup_ui(self):
+        """
+        Configure l'interface utilisateur de la boîte de dialogue.
+
+        :return: None
+        """
         layout = QtWidgets.QVBoxLayout(self)
         form_layout = QtWidgets.QFormLayout()
 
@@ -1553,7 +2036,11 @@ class SubtaskDialog(QtWidgets.QDialog):
         layout.addWidget(button_box)
 
     def load_users(self):
-        """Charge la liste des utilisateurs dans le dropdown"""
+        """
+        Charge la liste des utilisateurs dans le menu déroulant.
+
+        :return: None
+        """        
         self.assign_user_dropdown.clear()
         for user in self.users:
             if isinstance(user, tuple):
@@ -1562,26 +2049,43 @@ class SubtaskDialog(QtWidgets.QDialog):
                 self.assign_user_dropdown.addItem(user)
 
     def add_selected_user(self):
-        """Ajoute l'utilisateur sélectionné à la liste des utilisateurs assignés"""
+        """
+        Ajoute l'utilisateur sélectionné à la liste des utilisateurs assignés.
+
+        :return: None
+        """
         current_user = self.assign_user_dropdown.currentText()
         if current_user and not self.is_user_already_assigned(current_user):
             self.assigned_users_list.addItem(current_user)
 
     def remove_selected_user(self):
-        """Retire l'utilisateur sélectionné de la liste des utilisateurs assignés"""
+        """
+        Retire l'utilisateur sélectionné de la liste des utilisateurs assignés.
+
+        :return: None
+        """
         current_item = self.assigned_users_list.currentItem()
         if current_item:
             self.assigned_users_list.takeItem(self.assigned_users_list.row(current_item))
 
     def is_user_already_assigned(self, username):
-        """Vérifie si l'utilisateur est déjà assigné"""
+        """
+        Vérifie si l'utilisateur est déjà assigné.
+
+        :param username: Le nom d'utilisateur.
+        :return: Booléen indiquant si l'utilisateur est déjà assigné.
+        """
         for i in range(self.assigned_users_list.count()):
             if self.assigned_users_list.item(i).text() == username:
                 return True
         return False
 
     def get_form_data(self):
-        """Récupère les données du formulaire"""
+        """
+        Récupère les données du formulaire.
+
+        :return: Dictionnaire contenant les données du formulaire.
+        """
         return {
             "title": self.task_input.text(),
             "date": self.date_input.date().toString("yyyy-MM-dd"),
@@ -1590,10 +2094,19 @@ class SubtaskDialog(QtWidgets.QDialog):
             "assigned_users": [
                 self.assigned_users_list.item(i).text()
                 for i in range(self.assigned_users_list.count())
-            ]
+            ],
         }
 
+
 class TaskEditDialog(QtWidgets.QDialog):
+    """
+    Boîte de dialogue pour modifier une tâche existante.
+
+    :param parent: Le parent de la boîte de dialogue (optionnel).
+    :param task_info: Informations sur la tâche à modifier.
+    :param assigned_users: Liste des utilisateurs assignés à la tâche.
+    :param all_users: Liste de tous les utilisateurs disponibles pour l'assignation.
+    """
     def __init__(self, parent=None, task_info=None, assigned_users=None, all_users=None):
         super().__init__(parent)
         self.setWindowTitle("Modifier la tâche")
@@ -1680,22 +2193,43 @@ class TaskEditDialog(QtWidgets.QDialog):
         self.remove_user_button.clicked.connect(self.remove_selected_user)
 
     def add_selected_user(self):
+        """
+        Ajoute l'utilisateur sélectionné à la liste des utilisateurs assignés.
+
+        :return: None
+        """
         selected_user = self.assign_user_dropdown.currentText()
         if selected_user and not self.is_user_already_assigned(selected_user):
             self.assigned_users_list.addItem(selected_user)
 
     def remove_selected_user(self):
+        """
+        Retire l'utilisateur sélectionné de la liste des utilisateurs assignés.
+
+        :return: None
+        """
         current_item = self.assigned_users_list.currentItem()
         if current_item:
             self.assigned_users_list.takeItem(self.assigned_users_list.row(current_item))
 
     def is_user_already_assigned(self, username):
+        """
+        Vérifie si l'utilisateur est déjà assigné.
+
+        :param username: Le nom d'utilisateur.
+        :return: Booléen indiquant si l'utilisateur est déjà assigné.
+        """
         for i in range(self.assigned_users_list.count()):
             if self.assigned_users_list.item(i).text() == username:
                 return True
         return False
 
     def get_form_data(self):
+        """
+        Récupère les données du formulaire.
+
+        :return: Dictionnaire contenant les données du formulaire.
+        """
         return {
             "title": self.title_input.text().strip(),
             "date": self.date_input.date().toString("yyyy-MM-dd"),
@@ -1706,6 +2240,7 @@ class TaskEditDialog(QtWidgets.QDialog):
                 for i in range(self.assigned_users_list.count())
             ],
         }
+
 
 if __name__ == "__main__":
     # u = Ui_MainWindow()

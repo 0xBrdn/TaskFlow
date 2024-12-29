@@ -4,19 +4,9 @@ class _Requests:
         FROM users;
     """
 
-    get_all_infos_from_email = """SELECT * FROM users WHERE email = %s;"""
+    get_password_from_email = """SELECT password FROM users WHERE email = %s;"""
 
-    get_email_hashpass = """
-        SELECT password
-        FROM users
-        WHERE email = %s;
-    """
-
-    get_user_hashpass = """
-        SELECT password
-        FROM users
-        WHERE userID = %s;
-    """
+    update_user_password = """UPDATE users SET password = %s WHERE email = %s;"""
 
     get_project_id_by_project_name = """
         SELECT projectID
@@ -54,25 +44,11 @@ class _Requests:
         WHERE st.taskID = %s;
     """
 
-    get_user_logs_by_id = """
-        SELECT logID, action, action_time, details
-        FROM users_logs
-        WHERE userID = %s;
-    """
-
     get_users_in_project_by_project_id = """
         SELECT u.userID, u.username, ug.permission
         FROM users u
         JOIN users_groups ug ON u.userID = ug.userID
         WHERE ug.projectID = %s;
-    """
-
-    get_tasks_by_user_id = """
-        SELECT t.taskID, ti.title, ti.description, ti.status,
-               ti.priority, ti.covered, ti.assign, ti.dead_line
-        FROM tasks t
-        JOIN tasks_infos ti ON t.task_infoID = ti.task_infoID
-        WHERE t.userID = %s;
     """
 
     get_users_in_tasks_group_by_group_id = """
@@ -111,28 +87,6 @@ class _Requests:
         WHERE userID = %s;
     """
 
-    get_emails_by_task_projectID = """
-        SELECT u.email
-        FROM users_tasks_groups utg
-        JOIN users u ON utg.userID = u.userID
-        WHERE utg.task_projectID = %s;
-    """
-
-    get_users_groups_by_project_name = """
-        SELECT ug.*
-        FROM users_groups ug
-        JOIN projects p ON ug.projectID = p.projectID
-        WHERE p.name = %s;
-    """
-
-    get_tasks_by_title = """
-        SELECT t.taskID, t.projectID, ti.description, ti.status,
-               ti.priority, ti.covered, ti.assign, ti.dead_line
-        FROM tasks t
-        JOIN tasks_infos ti ON t.task_infoID = ti.task_infoID
-        WHERE ti.title = %s;
-    """
-
     get_email = """
         SELECT email
         FROM users
@@ -154,11 +108,6 @@ class _Requests:
     add_user = """
         INSERT INTO users (username, password, email, is_google_user)
         VALUES (%s, %s, %s, %s);
-    """
-
-    add_status = """
-        INSERT INTO status (userID, status)
-        VALUES (%s, %s);
     """
 
     add_project = """
@@ -199,21 +148,17 @@ class _Requests:
         VALUES (%s, %s);
     """
 
-    add_user_log = "INSERT INTO users_logs (userID, action, details) VALUES (%s, %s, %s);"
-
     add_task_group = "INSERT INTO tasks_groups () VALUES ();"
 
     delete_user = "DELETE FROM users WHERE userID = %s;"
 
     delete_task = "DELETE FROM tasks WHERE taskID = %s;"
 
-    delete_subtask = "DELETE FROM subtasks WHERE subtaskID = %s;"
-
     get_user_permission = (
-        "SELECT permission FROM users_groups WHERE projectID = '{}'" "AND userID = '{}';"
+        "SELECT permission FROM users_groups WHERE projectID = %s AND userID = %s;"
     )
 
-    delete_project = "DELETE FROM projects WHERE projectID = '{}';"
+    delete_project = "DELETE FROM projects WHERE projectID = %s;"
 
     get_task_info_by_task_id = (
         "SELECT ti.title, ti.description, ti.status, ti.priority, ti.covered,"
@@ -231,21 +176,21 @@ class _Requests:
         "WHERE s.subtaskID = %s;"
     )
 
-    delete_users_groups = "DELETE FROM users_groups WHERE projectID = '{}';"
+    delete_users_groups = "DELETE FROM users_groups WHERE projectID = %s;"
 
     delete_tasks_groups = (
         "DELETE tg FROM tasks_groups tg INNER JOIN tasks t ON t.assign = tg.task_projectID WHERE "
-        "t.projectID = '{}';"
+        "t.projectID = %s;"
     )
 
     delete_tasks_infos = (
         "DELETE ti FROM tasks_infos ti INNER JOIN tasks t ON "
-        "t.task_infoID = ti.task_infoID WHERE t.projectID = '{}';"
+        "t.task_infoID = ti.task_infoID WHERE t.projectID = %s;"
     )
 
-    delete_tasks = "DELETE FROM tasks where projectID = '{}';"
+    delete_tasks = "DELETE FROM tasks where projectID = %s;"
 
-    check_projects = "SELECT COUNT(*) AS project_count FROM projects WHERE name = '{}';"
+    check_projects = "SELECT COUNT(*) AS project_count FROM projects WHERE name = %s;"
 
     delete_users_from_users_tasks_groups = (
         "DELETE FROM users_tasks_groups WHERE task_projectID = %s;"
@@ -253,11 +198,9 @@ class _Requests:
 
     update_task_status = "UPDATE tasks_infos SET status = %s WHERE task_infoID = %s;"
 
-    update_task_status_to_zero = "UPDATE tasks_infos SET status = %s WHERE task_infoID = %s;"
-
     update_task_title = "UPDATE tasks_infos SET title = %s WHERE task_infoID = %s;"
 
-    get_task_infoID_by_taskID = "SELECT task_infoID FROM tasks WHERE taskID = '{}';"
+    get_task_infoID_by_taskID = "SELECT task_infoID FROM tasks WHERE taskID = %s;"
 
     update_task_description = "UPDATE tasks_infos SET description = %s WHERE task_infoID = %s;"
 
@@ -268,10 +211,6 @@ class _Requests:
     get_totp_secret = "SELECT totp_secret FROM users WHERE email = %s;"
 
     set_totp_secret = "UPDATE users SET totp_secret = %s WHERE email = %s;"
-
-    get_task_info_id_by_task_id = "SELECT task_infoID FROM tasks WHERE taskID = %s;"
-
-    get_user_status_by_userID = "SELECT status FROM status WHERE userID = '{}';"
 
     update_user_status = "UPDATE status SET status = %s WHERE userID = %s;"
 
@@ -285,9 +224,3 @@ class _Requests:
     add_user_status = "INSERT INTO status (userID, status) VALUES (%s, %s);"
 
     delete_user_status = "DELETE * FROM status WHERE userID = %s;"
-
-
-if __name__ == "__main__":
-    # Exemple fictif :
-    # print(_Requests.get_user_hashpass % "test_user")
-    pass
