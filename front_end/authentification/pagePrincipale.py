@@ -5,9 +5,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QLabel,
     QVBoxLayout,
-    QPushButton,
     QInputDialog,
-    QGroupBox,
     QListWidgetItem,
     QScrollArea,
     QWidget,
@@ -34,6 +32,7 @@ class InviteUsersDialog(QtWidgets.QDialog):
     >>> if dialog.exec_():
     >>>     users = dialog.get_selected_users()
     """
+
     def __init__(self, parent=None, deny=False):
         super().__init__(parent)
         self.deny = deny
@@ -231,7 +230,8 @@ class Ui_MainWindow(object):
         Configure l'interface utilisateur de la fenêtre principale.
 
         Cette méthode configure la fenêtre principale, y compris sa taille, son icône,
-        le widget central, la mise en page, les onglets et les connexions pour divers boutons et widgets.
+        le widget central, la mise en page, les onglets et
+        les connexions pour divers boutons et widgets.
 
         :param MainWindow: L'objet de la fenêtre principale à configurer.
         """
@@ -464,9 +464,11 @@ class Ui_MainWindow(object):
 
     def set_current_user(self, email):
         """
-        Définit l'utilisateur actuel en fonction de l'email fourni et met à jour l'interface utilisateur en conséquence.
+        Définit l'utilisateur actuel en fonction de l'email
+        fourni et met à jour l'interface utilisateur en conséquence.
 
-        Cette méthode met à jour les informations de l'utilisateur actuel, telles que l'email, le nom d'utilisateur et le rôle,
+        Cette méthode met à jour les informations de l'utilisateur
+        actuel, telles que l'email, le nom d'utilisateur et le rôle,
         et charge les projets associés à cet utilisateur.
 
         :param email: L'email de l'utilisateur actuel.
@@ -493,7 +495,8 @@ class Ui_MainWindow(object):
         """
         Déconnecte l'utilisateur actuel et retourne à la fenêtre d'authentification.
 
-        Cette méthode ferme toutes les fenêtres ouvertes, met à jour le statut de l'utilisateur dans la base de données
+        Cette méthode ferme toutes les fenêtres ouvertes,
+        met à jour le statut de l'utilisateur dans la base de données
         et affiche la fenêtre d'authentification.
 
         :return: None
@@ -519,8 +522,10 @@ class Ui_MainWindow(object):
         """
         Supprime le compte de l'utilisateur actuel après confirmation.
 
-        Cette méthode demande une confirmation à l'utilisateur avant de supprimer son compte de la base de données.
-        Si la suppression est réussie, l'utilisateur est déconnecté et la fenêtre d'authentification est affichée.
+        Cette méthode demande une confirmation à l'utilisateur
+        avant de supprimer son compte de la base de données.
+        Si la suppression est réussie, l'utilisateur est déconnecté
+        et la fenêtre d'authentification est affichée.
 
         :return: None
         """
@@ -572,8 +577,10 @@ class Ui_MainWindow(object):
         """
         Ajoute un nouveau projet après avoir obtenu le nom du projet de l'utilisateur.
 
-        Cette méthode affiche une boîte de dialogue pour que l'utilisateur entre le nom du projet.
-        Si le projet n'existe pas déjà, il est ajouté à la base de données et l'utilisateur est ajouté au projet.
+        Cette méthode affiche une boîte de dialogue pour
+        que l'utilisateur entre le nom du projet.
+        Si le projet n'existe pas déjà, il est ajouté à
+        la base de données et l'utilisateur est ajouté au projet.
 
         :return: None
         """
@@ -596,7 +603,8 @@ class Ui_MainWindow(object):
         """
         Charge les projets associés à l'utilisateur actuel et met à jour l'interface utilisateur.
 
-        Cette méthode récupère les projets actifs et en attente de l'utilisateur depuis la base de données
+        Cette méthode récupère les projets actifs et en
+        attente de l'utilisateur depuis la base de données
         et les affiche dans les listes correspondantes.
 
         :return: None
@@ -623,7 +631,8 @@ class Ui_MainWindow(object):
         """
         Gère l'événement lorsqu'un projet est cliqué dans la liste des projets.
 
-        Cette méthode met à jour l'interface utilisateur pour afficher les tâches et les utilisateurs
+        Cette méthode met à jour l'interface utilisateur
+        pour afficher les tâches et les utilisateurs
         associés au projet sélectionné.
 
         :return: None
@@ -644,10 +653,13 @@ class Ui_MainWindow(object):
 
     def display_users_in_project(self):
         """
-        Affiche les utilisateurs du projet actuel et leur statut en ligne dans une nouvelle section de l'interface.
+        Affiche les utilisateurs du projet actuel et leur statut en
+        ligne dans une nouvelle section de l'interface.
 
-        Cette méthode crée une section dans l'onglet des tâches pour afficher les utilisateurs du projet actuel,
-        ainsi que leur statut en ligne. Elle met également en place un minuteur pour mettre à jour périodiquement
+        Cette méthode crée une section dans l'onglet des tâches pour
+        afficher les utilisateurs du projet actuel,
+        ainsi que leur statut en ligne. Elle met également en place
+        un minuteur pour mettre à jour périodiquement
         le statut des utilisateurs.
 
         :return: None
@@ -744,7 +756,8 @@ class Ui_MainWindow(object):
         """
         Met à jour le statut des utilisateurs périodiquement.
 
-        Cette méthode est appelée périodiquement pour mettre à jour le statut en ligne des utilisateurs
+        Cette méthode est appelée périodiquement pour mettre à
+        jour le statut en ligne des utilisateurs
         du projet actuel.
 
         :return: None
@@ -756,7 +769,7 @@ class Ui_MainWindow(object):
             print(f"Erreur lors de la mise à jour des statuts : {e}")
 
     def load_users_for_project(self, project_name):
-       """
+        """
         Charge les utilisateurs associés au projet spécifié.
 
         Cette méthode récupère les utilisateurs assignés au projet et les affiche dans les listes
@@ -778,9 +791,11 @@ class Ui_MainWindow(object):
 
     def add_selected_user(self):
         """
-        Ajoute l'utilisateur sélectionné à la liste des utilisateurs assignés.
+        Ajoute l'utilisateur sélectionné à la liste des
+        utilisateurs assignés.
 
-        Cette méthode ajoute l'utilisateur sélectionné dans le menu déroulant à la liste des utilisateurs
+        Cette méthode ajoute l'utilisateur sélectionné dans
+        le menu déroulant à la liste des utilisateurs
         assignés à la tâche ou au projet.
 
         :return: None
@@ -813,7 +828,8 @@ class Ui_MainWindow(object):
         """
         Vérifie si un utilisateur est déjà assigné.
 
-        Cette méthode vérifie si l'utilisateur spécifié est déjà présent dans la liste des utilisateurs
+        Cette méthode vérifie si l'utilisateur spécifié est
+        déjà présent dans la liste des utilisateurs
         assignés à la tâche ou au projet.
 
         :param username: Le nom d'utilisateur à vérifier.
@@ -831,8 +847,10 @@ class Ui_MainWindow(object):
         """
         Ajoute une nouvelle tâche au projet actuel.
 
-        Cette méthode affiche une boîte de dialogue pour que l'utilisateur entre les détails de la tâche.
-        Si la tâche est validée, elle est ajoutée à la base de données et à l'interface utilisateur.
+        Cette méthode affiche une boîte de dialogue pour que
+        l'utilisateur entre les détails de la tâche.
+        Si la tâche est validée, elle est ajoutée à la base
+        de données et à l'interface utilisateur.
 
         :return: None
         """
@@ -997,14 +1015,15 @@ class Ui_MainWindow(object):
             if is_completed:
                 # Style pour les tâches terminées
                 brush = QtGui.QBrush(QtGui.QColor("#DFF0D8"))  # Couleur de fond verte pâle
-                pen = QtGui.QPen(QtGui.QColor("#3C763D"))  # Couleur de bordure
                 font = QtGui.QFont()
                 font.setBold(True)  # Met le texte en gras
                 font.setItalic(True)  # Met le texte en italique
 
                 for i in range(item.columnCount()):
                     item.setBackground(i, brush)
-                    item.setForeground(i, QtGui.QBrush(QtGui.QColor("#3C763D")))  # Couleur du texte
+                    item.setForeground(
+                        i, QtGui.QBrush(QtGui.QColor("#3C763D"))
+                    )  # Couleur du texte
                     item.setFont(i, font)
             else:
                 # Style par défaut pour les tâches non terminées
@@ -1045,8 +1064,10 @@ class Ui_MainWindow(object):
         """
         Ajoute une sous-tâche à la tâche sélectionnée.
 
-        Cette méthode affiche une boîte de dialogue pour que l'utilisateur entre les détails de la sous-tâche.
-        Si la sous-tâche est validée, elle est ajoutée à la base de données et à l'interface utilisateur.
+        Cette méthode affiche une boîte de dialogue pour que
+        l'utilisateur entre les détails de la sous-tâche.
+        Si la sous-tâche est validée, elle est ajoutée à la
+        base de données et à l'interface utilisateur.
 
         :return: None
         """
@@ -1230,8 +1251,10 @@ class Ui_MainWindow(object):
         """
         Modifie la tâche sélectionnée.
 
-        Cette méthode affiche une boîte de dialogue pour que l'utilisateur modifie les détails de la tâche.
-        Si la modification est validée, elle est mise à jour dans la base de données et dans l'interface utilisateur.
+        Cette méthode affiche une boîte de dialogue pour que
+        l'utilisateur modifie les détails de la tâche.
+        Si la modification est validée, elle est mise à jour
+        dans la base de données et dans l'interface utilisateur.
 
         :return: None
         """
@@ -1603,7 +1626,8 @@ class Ui_MainWindow(object):
         """
         Met à jour le statut d'une invitation de projet.
 
-        Cette méthode met à jour le statut de l'invitation pour l'utilisateur spécifié dans la base de données.
+        Cette méthode met à jour le statut de l'invitation pour
+        l'utilisateur spécifié dans la base de données.
 
         :param project_id: L'ID du projet.
         :param user_id: L'ID de l'utilisateur.
@@ -1679,6 +1703,7 @@ class UserRoleDialog(QtWidgets.QDialog):
     :param current_user_role: Le rôle actuel de l'utilisateur.
     :param parent: Le parent de la boîte de dialogue (optionnel).
     """
+
     def __init__(self, username, user_id, project_id, current_user_role, parent=None):
         super().__init__(parent)
         self.user_id = user_id
@@ -1730,6 +1755,7 @@ class UserStatusWidget(QWidget):
     :param project_id: L'ID du projet (optionnel).
     :param current_user_role: Le rôle actuel de l'utilisateur (optionnel).
     """
+
     def __init__(
         self,
         username,
@@ -1811,6 +1837,7 @@ class UserStatusWidget(QWidget):
             user[2] for user in users_in_project if user[0] == self.user_id
         )
 
+
 class TaskDialog(QtWidgets.QDialog):
     """
     Boîte de dialogue pour ajouter une nouvelle tâche.
@@ -1818,6 +1845,7 @@ class TaskDialog(QtWidgets.QDialog):
     :param parent: Le parent de la boîte de dialogue (optionnel).
     :param users: Liste des utilisateurs disponibles pour l'assignation.
     """
+
     def __init__(self, parent=None, users=[]):  # noqa
         super().__init__(parent)
         self.setWindowTitle("Nouvelle Tâche")
@@ -1960,6 +1988,7 @@ class SubtaskDialog(QtWidgets.QDialog):
     :param parent: Le parent de la boîte de dialogue (optionnel).
     :param users: Liste des utilisateurs disponibles pour l'assignation (optionnel).
     """
+
     def __init__(self, parent=None, users=None):
         super().__init__(parent)
         self.users = users or []
@@ -2040,7 +2069,7 @@ class SubtaskDialog(QtWidgets.QDialog):
         Charge la liste des utilisateurs dans le menu déroulant.
 
         :return: None
-        """        
+        """
         self.assign_user_dropdown.clear()
         for user in self.users:
             if isinstance(user, tuple):
@@ -2107,6 +2136,7 @@ class TaskEditDialog(QtWidgets.QDialog):
     :param assigned_users: Liste des utilisateurs assignés à la tâche.
     :param all_users: Liste de tous les utilisateurs disponibles pour l'assignation.
     """
+
     def __init__(self, parent=None, task_info=None, assigned_users=None, all_users=None):
         super().__init__(parent)
         self.setWindowTitle("Modifier la tâche")
