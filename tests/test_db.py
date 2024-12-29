@@ -1778,3 +1778,57 @@ def test_get_project_in_users_groups_userid_empty(mock_cursor):
         mock_cursor.execute.assert_called_once_with(
             _Requests.get_project_in_users_groups, (user_id,)
         )
+
+
+def test_get_all_infos_from_email_success(mock_cursor):
+    """
+    Teste la méthode get_all_infos_from_email dans un scénario de succès.
+    """
+    email = "test@example.com"
+    expected_result = (1, "testuser", "test@example.com", "hashed_password")
+
+    mock_cursor.execute.return_value = None
+    mock_cursor.fetchone.return_value = expected_result
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_all_infos_from_email(email, cursor=mock_cursor)
+
+        assert result == expected_result
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.get_all_infos_from_email,
+            (email,),
+        )
+
+
+def test_get_all_infos_from_email_no_result(mock_cursor):
+    """
+    Teste la méthode get_all_infos_from_email lorsqu'aucun résultat n'est trouvé.
+    """
+    email = "nonexistent@example.com"
+
+    mock_cursor.execute.return_value = None
+    mock_cursor.fetchone.return_value = None
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_all_infos_from_email(email, cursor=mock_cursor)
+
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(
+            _Requests.get_all_infos_from_email,
+            (email,),
+        )
+
+
+def test_get_all_infos_from_email_exception(mock_cursor):
+    """
+    Teste la méthode get_all_infos_from_email lorsqu'une exception se produit.
+    """
+    email = "test@example.com"
+
+    mock_cursor.execute.side_effect = Exception("Erreur de requête")
+
+    with patch("backend.db_helper.cm_cursor", return_value=lambda func: func):
+        result = DB_API.get_all_infos_from_email(email, cursor=mock_cursor)
+
+        assert isinstance(result, Exception)
+        assert str(result) == "Erreur de requête"
