@@ -48,7 +48,6 @@ def send_totp_to_user(totp, user_email: str):
     Génère le code TOTP et l'envoie par mail.
     """
     current_otp = totp.now()
-    print(current_otp, "sayez")
     send_otp_email(user_email, current_otp)
 
 
