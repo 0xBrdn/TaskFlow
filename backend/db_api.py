@@ -121,6 +121,29 @@ class DB_API:
 
     @staticmethod
     @cm_cursor()
+    def get_task_infoID_by_subtaskID(subtask_id: int, *, cursor: MySQLCursor) -> ResultType:
+        """
+        Permet de récupérer l'ID des informations d'une sous tâche en fonction de son ID.
+
+        Cette fonction renvoie un tuple comprenant l'ID des informations de la sous tâche.
+        En cas d'échec, elle renverra None ou dans certains cas, un objet de type Exception.
+
+        :param subtask_id: ID de la sous tâche
+        :param cursor: Curseur d'une connexion vers une DB
+        (optionnel, géré automatiquement par le décorateur cm_cursor())
+        :return: ID des informations de la tâche ou exception
+
+        Exemple:
+        >>> task_info_id = DB_API.get_task_infoID_by_subtaskID(1)
+        >>> if task_info_id and not isinstance(task_info_id, Exception):
+        >>>     print(task_info_id)
+        """
+        cursor.execute(_Requests.get_task_infoID_by_subtaskID, (subtask_id,))
+        result = cursor.fetchone()
+        return result
+
+    @staticmethod
+    @cm_cursor()
     def get_all_infos_from_email(email: str, *, cursor: MySQLCursor) -> ResultType:
         """
         Permet de récupérer toutes les informations d'un utilisateur en fonction
@@ -1013,7 +1036,7 @@ class DB_API:
         """
         query = _Requests.get_subtask_info_by_subtask_id
         cursor.execute(query, (subtaskID,))
-        result = cursor.fetchall()
+        result = cursor.fetchone()
         return result
 
     @staticmethod
@@ -1272,6 +1295,6 @@ if __name__ == "__main__":
     # print(DB_API.add_project('tebgfbgrsbs'))
     # t = (DB_API.add_user(username="vlad", password="trql",
     # email="email@vlad.com", is_google_user=False))
-    t = DB_API.get_all_tasks()
+    t = DB_API.get_all_infos_from_email("miaw@redgally.xyz")
     print(type(t), t)
     pass

@@ -155,71 +155,8 @@ class InviteUsersDialog(QtWidgets.QDialog):
 
 class Ui_MainWindow(object):
     def __init__(self):
-        """
-        Initialise la classe Ui_MainWindow.
-
-        Cette méthode initialise les valeurs de l'utilisateur actuel et de l'ID utilisateur.
-        """
         self.current_user = None
         self.user_id = None
-
-    def _setup_account_tab(self):
-        """
-        Configure l'onglet du compte utilisateur.
-
-        Cette méthode initialise et configure tous les éléments de l'interface utilisateur
-        pour l'onglet de gestion du compte, y compris les informations de l'utilisateur
-        et les boutons d'action.
-
-        :param self: Instance de la classe
-        :return: None
-        """
-        layout = QtWidgets.QVBoxLayout(self.account_tab)
-
-        # Groupe pour les informations du compte
-        account_group = QtWidgets.QGroupBox("Informations du Compte")
-        account_group.setStyleSheet("font-size: 16px;")
-        account_layout = QtWidgets.QVBoxLayout(account_group)
-
-        # Affichage du logo (si disponible)
-        logo_label = QtWidgets.QLabel()
-        try:
-            pixmap = QtGui.QPixmap("images/authentification/logo_alternatif.png")
-            pixmap = pixmap.scaledToWidth(150, QtCore.Qt.SmoothTransformation)
-            logo_label.setPixmap(pixmap)
-            logo_label.setAlignment(QtCore.Qt.AlignCenter)
-        except Exception as e:
-            print(f"Impossible de charger le logo : {e}")
-        account_layout.addWidget(logo_label)
-
-        # Étiquettes pour les informations de l'utilisateur
-        self.email_label = QtWidgets.QLabel("Email: ")
-        self.email_label.setObjectName("email_label")
-        self.email_label.setStyleSheet("font-size: 14px;")
-        account_layout.addWidget(self.email_label)
-
-        self.username_label = QtWidgets.QLabel("Nom d'utilisateur : Inconnu")
-        self.username_label.setStyleSheet("font-size: 14px;")
-        account_layout.addWidget(self.username_label)
-
-        # Bouton de déconnexion
-        deconnexion_button = QtWidgets.QPushButton("Se déconnecter")
-        deconnexion_button.setObjectName("deconnexion_button")
-        deconnexion_button.setStyleSheet(
-            "background-color: red; color: white; font-weight: bold; font-size:14px;"
-        )
-        deconnexion_button.clicked.connect(self.deconnexion)
-        account_layout.addWidget(deconnexion_button)
-
-        # Bouton pour supprimer le compte
-        self.delete_account_button = QtWidgets.QPushButton("Supprimer mon compte")
-        self.delete_account_button.setStyleSheet(
-            "background-color: #a40000; color: white; font-weight: bold; font-size:14px;"
-        )
-        account_layout.addWidget(self.delete_account_button)
-
-        account_layout.addStretch(1)
-        layout.addWidget(account_group)
 
     def setupUi(self, MainWindow):
         """
@@ -289,6 +226,64 @@ class Ui_MainWindow(object):
         self.refuse_project_button.clicked.connect(self.refuse_project)
 
         self.retranslateUi(MainWindow)
+
+    def _setup_account_tab(self):
+        """
+        Configure l'onglet du compte utilisateur.
+
+        Cette méthode initialise et configure tous les éléments de l'interface utilisateur
+        pour l'onglet de gestion du compte, y compris les informations de l'utilisateur
+        et les boutons d'action.
+
+        :param self: Instance de la classe
+        :return: None
+        """
+        layout = QtWidgets.QVBoxLayout(self.account_tab)
+
+        # Groupe pour les informations du compte
+        account_group = QtWidgets.QGroupBox("Informations du Compte")
+        account_group.setStyleSheet("font-size: 16px;")
+        account_layout = QtWidgets.QVBoxLayout(account_group)
+
+        # Affichage du logo (si disponible)
+        logo_label = QtWidgets.QLabel()
+        try:
+            pixmap = QtGui.QPixmap("images/authentification/logo_alternatif.png")
+            pixmap = pixmap.scaledToWidth(150, QtCore.Qt.SmoothTransformation)
+            logo_label.setPixmap(pixmap)
+            logo_label.setAlignment(QtCore.Qt.AlignCenter)
+        except Exception as e:
+            print(f"Impossible de charger le logo : {e}")
+        account_layout.addWidget(logo_label)
+
+        # Étiquettes pour les informations de l'utilisateur
+        self.email_label = QtWidgets.QLabel("Email: ")
+        self.email_label.setObjectName("email_label")
+        self.email_label.setStyleSheet("font-size: 14px;")
+        account_layout.addWidget(self.email_label)
+
+        self.username_label = QtWidgets.QLabel("Nom d'utilisateur : Inconnu")
+        self.username_label.setStyleSheet("font-size: 14px;")
+        account_layout.addWidget(self.username_label)
+
+        # Bouton de déconnexion
+        deconnexion_button = QtWidgets.QPushButton("Se déconnecter")
+        deconnexion_button.setObjectName("deconnexion_button")
+        deconnexion_button.setStyleSheet(
+            "background-color: red; color: white; font-weight: bold; font-size:14px;"
+        )
+        deconnexion_button.clicked.connect(self.deconnexion)
+        account_layout.addWidget(deconnexion_button)
+
+        # Bouton pour supprimer le compte
+        self.delete_account_button = QtWidgets.QPushButton("Supprimer mon compte")
+        self.delete_account_button.setStyleSheet(
+            "background-color: #a40000; color: white; font-weight: bold; font-size:14px;"
+        )
+        account_layout.addWidget(self.delete_account_button)
+
+        account_layout.addStretch(1)
+        layout.addWidget(account_group)
 
     def _setup_project_tab(self):
         """
@@ -488,6 +483,7 @@ class Ui_MainWindow(object):
             self.username_label.setText(
                 f"Nom d'utilisateur : {user_info.get('username', 'Inconnu')}"
             )
+            DB_API.set_user_status(self.user_id, 1)
         except Exception:
             self.username_label.setText("Nom d'utilisateur : Inconnu")
 
@@ -503,7 +499,7 @@ class Ui_MainWindow(object):
 
         :return: None
         """
-        from authentification import Ui_MainWindow as AuthMainWindow
+        from authentification import MainWindow as AuthMainWindow
 
         try:
             QMessageBox.information(None, "Déconnexion", "Vous êtes maintenant déconnecté.")
@@ -988,10 +984,10 @@ class Ui_MainWindow(object):
                     subtask_item.setData(0, QtCore.Qt.UserRole, subtask[0])  # ID de la sous-tâche
 
                     # Vérifier le statut en direct et appliquer la couleur verte si terminé
-                    if task[3] == 1:  # Statut = 1 signifie "terminé"
-                        self.set_task_background(task_item, "#DFF0D8", is_completed=True)
+                    if subtask[3] == 1:  # Statut = 1 signifie "terminé"
+                        self.set_task_background(subtask_item, "#DFF0D8", is_completed=True)
                     else:
-                        self.set_task_background(task_item, "white")
+                        self.set_task_background(subtask_item, "white")
 
             self.tree.setIndentation(20)
 
@@ -1373,9 +1369,8 @@ class Ui_MainWindow(object):
             parent_item = selected_item.parent()
             is_subtask = bool(parent_item)
             task_id = selected_item.data(0, QtCore.Qt.UserRole)
-
             if is_subtask:
-                task_info_id = DB_API.get_task_infoID_by_taskID(task_id)
+                task_info_id = DB_API.get_task_infoID_by_subtaskID(task_id)
             else:
                 task_info_id = DB_API.get_task_infoID_by_taskID(task_id)
 
@@ -1392,8 +1387,8 @@ class Ui_MainWindow(object):
                     "Impossible de récupérer les informations de la tâche sélectionnée.",
                 )
                 return
-
             success = DB_API.update_task_status(int(task_info_id[0]), 1)
+            self.load_tasks_for_project(self.current_project)
 
             if success:
                 QMessageBox.information(None, "Succès", "La tâche a été marquée comme terminée.")
@@ -1442,7 +1437,7 @@ class Ui_MainWindow(object):
             task_id = selected_item.data(0, QtCore.Qt.UserRole)
 
             if is_subtask:
-                task_info_id = DB_API.get_task_infoID_by_taskID(task_id)
+                task_info_id = DB_API.get_task_infoID_by_subtaskID(task_id)
             else:
                 task_info_id = DB_API.get_task_infoID_by_taskID(task_id)
 
@@ -1468,8 +1463,8 @@ class Ui_MainWindow(object):
                 )
 
                 self.set_task_background(selected_items[0], "white")
-
                 self.load_tasks_for_project(self.current_project)
+
             else:
                 QMessageBox.critical(
                     None,
@@ -1692,6 +1687,21 @@ class Ui_MainWindow(object):
                 dialog.exec_()
         except Exception as e:
             print(e)
+
+
+class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+    def __init__(self, *args, **kwargs):
+        """
+        Initialise la classe Ui_MainWindow.
+
+        Cette méthode initialise les valeurs de l'utilisateur actuel et de l'ID utilisateur.
+        """
+        super(MainWindow, self).__init__(*args, **kwargs)
+        self.setupUi(self)
+
+    def closeEvent(self, event):
+        DB_API.set_user_status(self.user_id, 0)
+        event.accept()
 
 
 class UserRoleDialog(QtWidgets.QDialog):
@@ -2289,8 +2299,6 @@ if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
+    win = MainWindow()
+    win.show()
     sys.exit(app.exec_())
