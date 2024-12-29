@@ -16,6 +16,7 @@
     <a href="https://github.com/zzendor/SAE502-TaskFlow/tree/main/docs/pdf"><strong>Explorez les documents d'installation et d'utilisation </strong></a>
     <br />
     <a href="https://github.com/zzendor/SAE502-TaskFlow/tree/main/docs/sphinx/build/html"><strong>Documentation du code </strong></a>
+     <br />
     Pour consulter la documentation du code, clonez ce dépôt sur votre poste local, puis ouvrez le fichier suivant dans votre navigateur :
     `SAE502-TaskFlow/docs/sphinx/build/html/index.html`. Cela vous permettra d'explorer en détail les classes, fonctions et modules utilisés dans le projet.
     <br />
