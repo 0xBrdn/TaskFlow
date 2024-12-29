@@ -22,29 +22,6 @@
 
 ---
 
-## Table des matières
-
-<details>
-  <summary>Table des matières</summary>
-  <ol>
-    <li>
-      <a href="#à-propos-du-projet">À propos du projet</a>
-      <ul>
-        <li><a href="#fonctionnalités-principales">Fonctionnalités principales</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#installation">Installation</a>
-      <ul>
-        <li><a href="#prérequis">Prérequis</a></li>
-        <li><a href="#installation-des-dépendances">Installation des dépendances</a></li>
-      </ul>
-    </li>
-    <li><a href="#utilisation">Utilisation</a></li>
-    <li><a href="#remerciements">Remerciements</a></li>
-  </ol>
-</details>
-
 ---
 <!-- ABOUT THE PROJECT -->
 ## À propos du projet
