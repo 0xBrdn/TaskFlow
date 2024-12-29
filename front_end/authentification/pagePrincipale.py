@@ -984,10 +984,10 @@ class Ui_MainWindow(object):
                     subtask_item.setData(0, QtCore.Qt.UserRole, subtask[0])  # ID de la sous-tâche
 
                     # Vérifier le statut en direct et appliquer la couleur verte si terminé
-                    if task[3] == 1:  # Statut = 1 signifie "terminé"
-                        self.set_task_background(task_item, "#DFF0D8", is_completed=True)
+                    if subtask[3] == 1:  # Statut = 1 signifie "terminé"
+                        self.set_task_background(subtask_item, "#DFF0D8", is_completed=True)
                     else:
-                        self.set_task_background(task_item, "white")
+                        self.set_task_background(subtask_item, "white")
 
             self.tree.setIndentation(20)
 
@@ -1369,9 +1369,8 @@ class Ui_MainWindow(object):
             parent_item = selected_item.parent()
             is_subtask = bool(parent_item)
             task_id = selected_item.data(0, QtCore.Qt.UserRole)
-
             if is_subtask:
-                task_info_id = DB_API.get_task_infoID_by_taskID(task_id)
+                task_info_id = DB_API.get_task_infoID_by_subtaskID(task_id)
             else:
                 task_info_id = DB_API.get_task_infoID_by_taskID(task_id)
 
@@ -1388,8 +1387,8 @@ class Ui_MainWindow(object):
                     "Impossible de récupérer les informations de la tâche sélectionnée.",
                 )
                 return
-
             success = DB_API.update_task_status(int(task_info_id[0]), 1)
+            self.load_tasks_for_project(self.current_project)
 
             if success:
                 QMessageBox.information(None, "Succès", "La tâche a été marquée comme terminée.")
@@ -1438,7 +1437,7 @@ class Ui_MainWindow(object):
             task_id = selected_item.data(0, QtCore.Qt.UserRole)
 
             if is_subtask:
-                task_info_id = DB_API.get_task_infoID_by_taskID(task_id)
+                task_info_id = DB_API.get_task_infoID_by_subtaskID(task_id)
             else:
                 task_info_id = DB_API.get_task_infoID_by_taskID(task_id)
 
@@ -1464,8 +1463,8 @@ class Ui_MainWindow(object):
                 )
 
                 self.set_task_background(selected_items[0], "white")
-
                 self.load_tasks_for_project(self.current_project)
+
             else:
                 QMessageBox.critical(
                     None,
@@ -1701,7 +1700,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
     def closeEvent(self, event):
-        print("Close clicked pageprinc")
         DB_API.set_user_status(self.user_id, 0)
         event.accept()
 
