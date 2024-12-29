@@ -11,8 +11,8 @@ sys.path.insert(0, os.path.abspath('../../../'))
 # -- Project information -----------------------------------------------------
 
 project = 'SAE502-TaskFlow'
-copyright = '2024, Auteur'
-author = 'Auteur'
+copyright = '2024, TaskFlow'
+author = 'TaskFlow'
 release = '1.0.0'
 
 # -- General configuration ---------------------------------------------------
