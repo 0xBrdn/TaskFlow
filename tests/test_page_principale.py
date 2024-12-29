@@ -181,3 +181,33 @@ def test_add_subtask_success(mock_db_api):
 
     mock_db_api.add_subtask_info.assert_called_once()
     mock_db_api.add_subtask.assert_called_once()
+
+
+def test_load_task_info(mock_db_api):
+    """Test du chargement des informations de tâche."""
+    task_id = 1
+    task_info = ("Task 1", "Description 1", "Status 1", "Priority 1", "Covered 1", "Assign 1", "Dead Line 1")
+
+    mock_db_api.get_task_info_by_task_id.return_value = task_info
+
+    result = mock_db_api.get_task_info_by_task_id(task_id)
+    assert result == task_info
+    mock_db_api.get_task_info_by_task_id.assert_called_once_with(task_id)
+
+
+def test_delete_task_success(mock_db_api):
+    """Test de suppression de tâche réussie."""
+    task_id = 1
+
+    mock_db_api.delete_task(task_id)
+
+    mock_db_api.delete_task.assert_called_once_with(task_id)
+
+
+def test_delete_task_no_task_id(mock_db_api):
+    """Test de suppression de tâche sans ID de tâche."""
+    task_id = None
+
+    mock_db_api.delete_task(task_id)
+
+    mock_db_api.delete_task.assert_not_called()
