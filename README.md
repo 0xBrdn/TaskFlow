@@ -62,9 +62,18 @@ Les outils suivants ont été utilisés dans le cadre de ce projet :
 - **Sphinx** : Génération de la documentation technique.
 - **Docker** : Conteneurisation de l'application pour simplifier son déploiement.
 - **Conda** : Gestionnaire d'environnements pour les dépendances Python.
+- **pre-commit** : Exécute automatiquement des outils de vérification et de formatage lors des commits pour garantir la qualité du code.
+- **ruff** : Linter et formateur de code Python rapide et efficace.
+- **mypy** : Vérification statique des types pour renforcer la robustesse et la maintenabilité du code.
 
 ---
 
-## Remerciements
+## Configuration des outils supplémentaires
 
-Merci à tous les contributeurs et utilisateurs pour leur soutien continu à TaskFlow !
+### **pre-commit**
+
+`pre-commit` est configuré pour exécuter des vérifications automatiques (comme le linting avec `ruff` ou la vérification des types avec `mypy`) avant chaque commit. Pour activer cet outil, exécutez les commandes suivantes :
+
+```bash
+pip install pre-commit
+pre-commit install
